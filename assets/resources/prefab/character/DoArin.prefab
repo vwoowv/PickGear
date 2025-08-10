@@ -80,10 +80,6 @@
     "characterSprite": {
       "__id__": 4
     },
-    "characterSpriteFrame": {
-      "__uuid__": "fe074843-564b-4510-865a-8d565ccfe760@f9941",
-      "__expectedType__": "cc.SpriteFrame"
-    },
     "_id": ""
   },
   {

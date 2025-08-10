@@ -73,18 +73,6 @@ export class GameManager extends Component {
     }
 
     private async showCharacterPreview() {
-        // const firstCharacter = this.characters["EmmaMoon"];
-        // firstCharacter.node.setParent(this.characterPos);
-        for (const characterName of this.characterNames) {
-            const character = this.characters[characterName];
-            character.node.setParent(this.characterPos);
-
-            await delay(1000);
-            character.node.setParent(null);
-        }
-
-        await delay(1000);
-
         for (const characterName of this.characterNames) {
             const character = this.characters[characterName];
             character.node.setParent(this.characterPos);

@@ -20,4 +20,7 @@ export class Character extends Component {
     public async prepareData() {
         // this.characterSprite.spriteFrame = await ResourceManager.I.loadResource(this.characterData.characterSpriteFramePath, SpriteFrame);
     }
+
+    public async showPreview() {
+    }
 }
