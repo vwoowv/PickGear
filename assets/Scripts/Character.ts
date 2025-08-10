@@ -46,6 +46,12 @@ export class Character extends Component {
         await this.delay(1000);
     }
 
+    public async ShowRandomSuit() {
+        const randomSuit = this.SuitList[Math.floor(Math.random() * this.SuitList.length)];
+        this.currentShit.spriteFrame = randomSuit;
+        await this.delay(1000);
+    }
+
     private async delay(ms: number) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }

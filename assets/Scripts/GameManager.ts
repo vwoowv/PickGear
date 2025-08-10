@@ -2,6 +2,7 @@ import { _decorator, Component, instantiate, Node, Prefab, SpriteFrame } from 'c
 import { Character } from './Character';
 import { CharacterDataDefinition } from './CharacterDataDefinition';
 import { ResourceManager } from './ResourceManager';
+import { RootUI } from './RootUI';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameManager')
@@ -17,6 +18,9 @@ export class GameManager extends Component {
     private characterNames: string[] = ["DoArin", "EmmaMoon", "SongUnbee", "SooHana"];
 
     private characters: { [key: string]: Character } = {};
+
+    @property(RootUI)
+    private rootUI: RootUI = null;
 
     @property(Node)
     public characterPos: Node = null;
@@ -73,12 +77,16 @@ export class GameManager extends Component {
     }
 
     private async showCharacterPreview() {
+        let count = this.characterNames.length;
         for (const characterName of this.characterNames) {
             const character = this.characters[characterName];
             character.node.setParent(this.characterPos);
 
-            await character.showPreview();
+            this.rootUI.setCountText(count);
+
+            await character.ShowRandomSuit();
             character.node.setParent(null);
+            count--;
         }
     }
 
