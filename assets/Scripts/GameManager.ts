@@ -144,8 +144,9 @@ export class GameManager extends Component {
     private updatePickCharacter(deltaTime: number) {
         this.currentTime -= deltaTime;
         this.rootUI.setTimeProgressBar(this.currentTime / this.duration);
-        if (this.currentTime >= this.nextCharacterTime) {
+        if (this.duration - this.currentTime >= this.nextCharacterTime) {
             this.currentCharacterIndex++;
+            console.log("currentCharacterIndex : " + this.currentCharacterIndex + ", nextCharacterTime : " + this.nextCharacterTime);
             if (this.currentCharacterIndex >= this.characterNames.length) {
                 return false;
             }
@@ -166,7 +167,12 @@ export class GameManager extends Component {
             const rollingNode = instantiate(newRollingSuit);
             rollingNode.setParent(this.characterPos);
             rollingNode.setPosition(this.characterRollingPosStart.position);
-            this.rollingSuitList.push(rollingNode.getComponent(RollingSuit));
+            const rollingSuit = rollingNode.getComponent(RollingSuit);
+            this.rollingSuitList.push(rollingSuit);
+            let characterName = this.characterNames[this.currentCharacterIndex];
+            const character = this.characters[characterName];
+            const suitSprite = character.SuitList[0];
+            rollingSuit.Initialize(suitSprite);
         }
         this.rollingSuitList.forEach(suit => {
             suit.roll(deltaTime);
