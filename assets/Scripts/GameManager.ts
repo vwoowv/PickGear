@@ -3,6 +3,7 @@ import { Character } from './Character';
 import { CharacterDataDefinition } from './CharacterDataDefinition';
 import { ResourceManager } from './ResourceManager';
 import { RootUI } from './RootUI';
+import { ECharacterSuitType, ECharacterType } from './GameDefine';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameManager')
@@ -24,6 +25,8 @@ export class GameManager extends Component {
 
     @property(Node)
     public characterPos: Node = null;
+
+    public currentSuitType: [ECharacterType, ECharacterSuitType][] = [];
 
     // Singleton 인스턴스에 접근하는 getter
     public static get I(): GameManager {
@@ -64,7 +67,7 @@ export class GameManager extends Component {
 
     private async initialize() {
         await this.prepareData();
-        await this.showCharacterPreview();
+        this.startGame();
     }
 
     private async prepareData() {
@@ -84,15 +87,20 @@ export class GameManager extends Component {
 
             this.rootUI.setCountText(count);
 
-            await character.ShowRandomSuit();
+            const suitType = await character.ShowRandomSuit();
+            this.currentSuitType.push([character.characterType, suitType]);
+            console.log(this.currentSuitType);
             character.node.setParent(null);
             count--;
         }
     }
 
     // 게임 매니저의 기능들
-    public startGame() {
+    public async startGame() {
         console.log('게임 시작!');
+        this.currentSuitType = [];
+        await this.showCharacterPreview();
+        await this.PickCharacterSuit();
     }
 
     public pauseGame() {
@@ -101,6 +109,16 @@ export class GameManager extends Component {
 
     public resumeGame() {
         console.log('게임 재개!');
+    }
+
+    private async PickCharacterSuit() {
+        // 캐릭터를 순서대로 보여주면서 해당 캐릭터의 옷을 스크롤 시킨다
+        for (const characterName of this.characterNames) {
+            const character = this.characters[characterName];
+            character.node.setParent(this.characterPos);
+            character.takeOffSuit();
+            await delay(1000);
+        }
     }
 }
 

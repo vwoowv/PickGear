@@ -1,16 +1,9 @@
-import { _decorator, Component, Node, resources, Sprite, SpriteFrame } from 'cc';
+import { _decorator, Component, Enum, Node, resources, Sprite, SpriteFrame } from 'cc';
 import { ResourceManager } from './ResourceManager';
 import { GameManager } from './GameManager';
 import { CharacterDataDefinition } from './CharacterDataDefinition';
+import { ECharacterSuitType, ECharacterType } from './GameDefine';
 const { ccclass, property } = _decorator;
-
-// 캐릭터 타입을 구분하는 enum을 생성합니다.
-export enum ECharacterSuitType {
-    HYBE = 0,
-    YG = 1,
-    JYP = 2,
-    SM = 3
-}
 
 @ccclass('Character')
 export class Character extends Component {
@@ -21,6 +14,9 @@ export class Character extends Component {
 
     @property(SpriteFrame)
     public SuitList: SpriteFrame[] = [];
+
+    @property({ type: Enum(ECharacterType) })
+    public characterType: ECharacterType = ECharacterType.DoArin;
 
     public Initialize(characterData: CharacterDataDefinition) {
         this.prepareData();
@@ -46,10 +42,16 @@ export class Character extends Component {
         await this.delay(1000);
     }
 
-    public async ShowRandomSuit() {
-        const randomSuit = this.SuitList[Math.floor(Math.random() * this.SuitList.length)];
+    public async ShowRandomSuit(): Promise<ECharacterSuitType> {
+        const randomSuitType = Math.floor(Math.random() * this.SuitList.length);
+        const randomSuit = this.SuitList[randomSuitType];
         this.currentShit.spriteFrame = randomSuit;
         await this.delay(1000);
+        return randomSuitType;
+    }
+
+    public takeOffSuit() {
+        this.currentShit.spriteFrame = null;
     }
 
     private async delay(ms: number) {
