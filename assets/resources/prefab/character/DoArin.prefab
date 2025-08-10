@@ -237,6 +237,8 @@
       "__id__": 0
     },
     "fileId": "08xwcdE+5AbYQyMQPwiODg",
+    "instance": null,
+    "targetOverrides": null,
     "nestedPrefabInstanceRoots": null
   },
   {
@@ -275,6 +277,7 @@
         "__expectedType__": "cc.SpriteFrame"
       }
     ],
+    "characterType": 0,
     "_id": ""
   },
   {
