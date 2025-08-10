@@ -11,6 +11,6 @@ export class RollingSuit extends Component {
     }
 
     public roll(deltaTime: number) {
-        this.node.setPosition(this.node.position.x - deltaTime, this.node.position.y, this.node.position.z);
+        this.node.setPosition(this.node.position.x - deltaTime * 1000, this.node.position.y, this.node.position.z);
     }
 }
