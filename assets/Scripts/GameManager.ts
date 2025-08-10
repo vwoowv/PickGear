@@ -93,6 +93,7 @@ export class GameManager extends Component {
             character.node.setParent(null);
             count--;
         }
+        this.rootUI.showCountText(false);
     }
 
     // 게임 매니저의 기능들
@@ -118,6 +119,7 @@ export class GameManager extends Component {
             character.node.setParent(this.characterPos);
             character.takeOffSuit();
             await delay(1000);
+            character.node.setParent(null);
         }
     }
 }

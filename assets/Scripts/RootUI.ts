@@ -9,20 +9,17 @@ export class RootUI extends Component {
     @property(RichText)
     private CountText: RichText = null;
 
-    start() {
-
-    }
-
-    update(deltaTime: number) {
-        
-    }
-
     public onStartButtonClick() {
         GameManager.I.startGame();
         this.startButton.node.active = false;
     }
 
     public setCountText(count: number) {
+        this.showCountText(true);
         this.CountText.string = count.toString();
+    }
+
+    public showCountText(isShow: boolean) {
+        this.CountText.node.active = isShow;
     }
 }
