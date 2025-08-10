@@ -14,7 +14,7 @@ export class GameManager extends Component {
         "SongUnbee": new CharacterDataDefinition("SongUnbee", "textures/Character/SongUnbee/spriteFrame"),
         "SooHana": new CharacterDataDefinition("SooHana", "textures/Character/SooHana/spriteFrame")
     };
-    private characterNames: string[] = ["EmmaMoon", "DoArin", "SongUnbee", "SooHana"];
+    private characterNames: string[] = ["DoArin", "EmmaMoon", "SongUnbee", "SooHana"];
 
     private characters: { [key: string]: Character } = {};
 
@@ -77,7 +77,7 @@ export class GameManager extends Component {
             const character = this.characters[characterName];
             character.node.setParent(this.characterPos);
 
-            await delay(1000);
+            await character.showPreview();
             character.node.setParent(null);
         }
     }
