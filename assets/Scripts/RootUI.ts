@@ -1,4 +1,4 @@
-import { _decorator, Button, Component, Node, RichText, serializeTag } from 'cc';
+import { _decorator, Button, Component, Node, ProgressBar, RichText, serializeTag } from 'cc';
 import { GameManager } from './GameManager';
 const { ccclass, property } = _decorator;
 
@@ -8,6 +8,8 @@ export class RootUI extends Component {
     private startButton: Button = null;
     @property(RichText)
     private CountText: RichText = null;
+    @property(ProgressBar)
+    private timeProgressBar: ProgressBar = null;
 
     public onStartButtonClick() {
         GameManager.I.startGame();
@@ -21,5 +23,13 @@ export class RootUI extends Component {
 
     public showCountText(isShow: boolean) {
         this.CountText.node.active = isShow;
+    }
+
+    public showTimeProgressBar(isShow: boolean) {
+        this.timeProgressBar.node.active = isShow;
+    }
+
+    public setTimeProgressBar(value: number) {
+        this.timeProgressBar.progress = value;
     }
 }

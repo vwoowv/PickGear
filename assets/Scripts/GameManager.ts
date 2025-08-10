@@ -100,6 +100,7 @@ export class GameManager extends Component {
     public async startGame() {
         console.log('게임 시작!');
         this.currentSuitType = [];
+        this.rootUI.showTimeProgressBar(false);
         await this.showCharacterPreview();
         await this.PickCharacterSuit();
     }
@@ -112,15 +113,38 @@ export class GameManager extends Component {
         console.log('게임 재개!');
     }
 
+    private durationMS: number = 10000;
     private async PickCharacterSuit() {
         // 캐릭터를 순서대로 보여주면서 해당 캐릭터의 옷을 스크롤 시킨다
-        for (const characterName of this.characterNames) {
-            const character = this.characters[characterName];
-            character.node.setParent(this.characterPos);
-            character.takeOffSuit();
-            await delay(1000);
-            character.node.setParent(null);
+        this.rootUI.showTimeProgressBar(true);
+        this.rootUI.setTimeProgressBar(1);
+
+        let currentTimeMS = this.durationMS;
+        let nextCharacterTimeMS = this.durationMS / this.characterNames.length;
+        let currentCharacterIndex = 0;
+        this.showCharacter(this.characterNames[currentCharacterIndex]);
+        while (currentTimeMS > 0) {
+            currentTimeMS -= 10;
+            this.rootUI.setTimeProgressBar(currentTimeMS / this.durationMS);
+            if (this.durationMS - currentTimeMS >= nextCharacterTimeMS) {
+                currentCharacterIndex++;
+                if (currentCharacterIndex >= this.characterNames.length) {
+                    break;
+                }
+                nextCharacterTimeMS += this.durationMS / this.characterNames.length;
+                this.showCharacter(this.characterNames[currentCharacterIndex]);
+            }
+            await delay(10);
         }
+
+        console.log("Game Over");
+    }
+
+    private showCharacter(characterName: string) {
+        this.characterPos.removeAllChildren();
+        const character = this.characters[characterName];
+        character.node.setParent(this.characterPos);
+        character.takeOffSuit();
     }
 }
 
