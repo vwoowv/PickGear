@@ -31,6 +31,8 @@ export class GameManager extends Component {
     @property(Node)
     public characterPos: Node = null;
     @property(Node)
+    public rollingSuitPos: Node = null;
+    @property(Node)
     public characterRollingPosStart: Node = null;
     @property(Node)
     public characterRollingPosEnd: Node = null;
@@ -145,6 +147,7 @@ export class GameManager extends Component {
         this.currentCharacterIndex = 0;
         this.showCharacter(this.characterNames[this.currentCharacterIndex]);
         this.currentGameState = EGameState.Pick_Suit;
+        this.rollingSuitPos.removeAllChildren();
     }
 
     private updatePickCharacter(deltaTime: number) {
@@ -170,7 +173,7 @@ export class GameManager extends Component {
             this.nextRollingSuitTime = 0.5;       // 0.5초 마다 하나씩 새로운 옷을 보여준다
             const newRollingSuit = await ResourceManager.I.loadResource<Prefab>("prefab/suit/RollingSuit", Prefab);
             const rollingNode = instantiate(newRollingSuit);
-            rollingNode.setParent(this.characterPos);
+            rollingNode.setParent(this.rollingSuitPos);
             rollingNode.setPosition(this.characterRollingPosStart.position);
             const rollingSuit = rollingNode.getComponent(RollingSuit);
             this.rollingSuitList.push(rollingSuit);
