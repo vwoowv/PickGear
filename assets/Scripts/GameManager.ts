@@ -78,11 +78,17 @@ export class GameManager extends Component {
     }
 
     private updatePickSuit(deltaTime: number) {
-        if (!this.updatePickCharacter(deltaTime)) {
-            this.currentGameState = EGameState.None;
+        this.updatePickCharacter(deltaTime);
+        this.rollSuit(deltaTime);
+        this.updatePickSuitTime(deltaTime);
+    }
+
+    private updatePickSuitTime(deltaTime: number) {
+        this.currentTime -= deltaTime;
+        if (this.currentTime > 0) {
             return;
         }
-        this.rollSuit(deltaTime);
+        this.currentGameState = EGameState.None;
     }
 
     private async initialize() {
@@ -142,7 +148,6 @@ export class GameManager extends Component {
     }
 
     private updatePickCharacter(deltaTime: number) {
-        this.currentTime -= deltaTime;
         this.rootUI.setTimeProgressBar(this.currentTime / this.duration);
         if (this.duration - this.currentTime >= this.nextCharacterTime) {
             this.currentCharacterIndex++;
