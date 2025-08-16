@@ -27,7 +27,6 @@ export class Character extends Component {
     }
 
     public async prepareData() {
-        // this.characterSprite.spriteFrame = await ResourceManager.I.loadResource(this.characterData.characterSpriteFramePath, SpriteFrame);
     }
 
     // 전체 돌면서 한번씩 보여주기

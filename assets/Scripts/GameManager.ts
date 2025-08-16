@@ -195,6 +195,13 @@ export class GameManager extends Component {
         character.node.setParent(this.characterPos);
         character.takeOffSuit();
     }
+
+    public async touchSuit() {
+        if (this.currentGameState !== EGameState.Pick_Suit) {
+            return;
+        }
+        console.log('touchSuit');
+    }
 }
 
 function delay(ms: number) {

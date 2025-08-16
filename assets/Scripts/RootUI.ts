@@ -11,9 +11,8 @@ export class RootUI extends Component {
     @property(ProgressBar)
     private timeProgressBar: ProgressBar = null;
 
-    public onStartButtonClick() {
-        GameManager.I.startGame();
-        this.startButton.node.active = false;
+    public onPickingButtonClick() {
+        GameManager.I.touchSuit();
     }
 
     public setCountText(count: number) {
