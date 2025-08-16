@@ -8,10 +8,12 @@ export class egg extends Component {
     @property(Sprite)
     private eggImage: Sprite = null;
     private isRotating: boolean = false;
+    private endLine: Node = null;
 
-    public async initialize(egg: EggType) {
+    public async initialize(egg: EggType, endLine: Node) {
         this.eggImage.spriteFrame = await eggResource.loadSprite(egg);
         this.isRotating = Math.random() < 0.5;
+        this.endLine = endLine;
     }
 
     update(deltaTime: number) {
@@ -23,6 +25,13 @@ export class egg extends Component {
 
     private fallDown(deltaTime: number) {
         this.node.setPosition(this.node.position.x, this.node.position.y - 500 * deltaTime, this.node.position.z);
+        if (this.endLine === null)
+        {
+            return;
+        }
+        if (this.node.position.y < this.endLine.position.y) {
+            this.node.destroy();
+        }
     }
 }
 

@@ -12,6 +12,8 @@ export class gameManager extends Component {
     private eggSpawnPoint_Left: Node = null;
     @property(Node)
     private eggSpawnPoint_Right: Node = null;
+    @property(Node)
+    private eggEndLine: Node = null;
     private gameState: GameState = GameState.None;
     async start() {
         this.startNewGame();
@@ -47,7 +49,7 @@ export class gameManager extends Component {
         const eggNode = instantiate(eggPrefab);
         const newEgg = eggNode.getComponent(egg);
         const randomEgg = Math.floor(Math.random() * EggType.TotalCount);
-        newEgg.initialize(randomEgg);
+        newEgg.initialize(randomEgg, this.eggEndLine);
         this.eggParent.addChild(eggNode);
         const xPosition = Math.random() * (this.eggSpawnPoint_Right.position.x - this.eggSpawnPoint_Left.position.x) + this.eggSpawnPoint_Left.position.x;
         const eggPosition = new Vec3(xPosition, this.eggSpawnPoint_Right.position.y, this.eggSpawnPoint_Right.position.z);
