@@ -9,4 +9,11 @@ export enum EggType {
     Hoyang,
     SongUnbee,
     SooHana,
+    TotalCount,
+}
+
+export enum GameState {
+    None,
+    Playing,
+    GameOver,
 }
