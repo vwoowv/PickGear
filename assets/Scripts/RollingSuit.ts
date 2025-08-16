@@ -1,13 +1,16 @@
 import { _decorator, Component, Node, Sprite, SpriteFrame } from 'cc';
+import { ECharacterSuitType } from './GameDefine';
 const { ccclass, property } = _decorator;
 
 @ccclass('RollingSuit')
 export class RollingSuit extends Component {
     @property(Sprite)
     private suitSprite: Sprite = null;
-
-    public Initialize(suitSprite: SpriteFrame) {
+    private suitType: ECharacterSuitType = ECharacterSuitType.HYBE;
+    
+    public Initialize(suitSprite: SpriteFrame, suitType: ECharacterSuitType) {
         this.suitSprite.spriteFrame = suitSprite;
+        this.suitType = suitType;
     }
 
     public roll(deltaTime: number) {

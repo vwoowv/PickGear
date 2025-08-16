@@ -77,11 +77,16 @@ export class GameManager extends Component {
         if (this.currentGameState === EGameState.Pick_Suit) {
             this.updatePickSuit(deltaTime);
         }
+
+        // 시간이 끝나도 계속 이동
+        this.rollingSuitList.forEach(suit => {
+            suit.roll(deltaTime);
+        });
     }
 
     private updatePickSuit(deltaTime: number) {
         this.updatePickCharacter(deltaTime);
-        this.rollSuit(deltaTime);
+        this.checkAndAddrollSuit(deltaTime);
         this.updatePickSuitTime(deltaTime);
     }
 
@@ -166,7 +171,7 @@ export class GameManager extends Component {
 
     private nextRollingSuitTime: number = 0;
     private rollingSuitList: RollingSuit[] = [];
-    private async rollSuit(deltaTime: number) {
+    private async checkAndAddrollSuit(deltaTime: number) {
         this.nextRollingSuitTime -= deltaTime;
         if (this.nextRollingSuitTime <= 0) {
             console.log("rollSuit");
@@ -179,12 +184,9 @@ export class GameManager extends Component {
             this.rollingSuitList.push(rollingSuit);
             let characterName = this.characterNames[this.currentCharacterIndex];
             const character = this.characters[characterName];
-            const suitSprite = character.SuitList[0];
-            rollingSuit.Initialize(suitSprite);
+            const [suitSprite, suitType] = character.getRandomSuit();
+            rollingSuit.Initialize(suitSprite, suitType);
         }
-        this.rollingSuitList.forEach(suit => {
-            suit.roll(deltaTime);
-        });
     }
 
     private showCharacter(characterName: string) {

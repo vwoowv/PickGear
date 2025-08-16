@@ -54,6 +54,20 @@ export class Character extends Component {
         this.currentShit.spriteFrame = null;
     }
 
+    private exposedSuitTypeList: ECharacterSuitType[] = [];
+    // 겹치지 않게 랜덤으로 지급해야 한다
+    public getRandomSuit(): [SpriteFrame, ECharacterSuitType] {
+        if (this.exposedSuitTypeList.length === this.SuitList.length) {
+            this.exposedSuitTypeList = [];
+        }
+        const randomSuitType = Math.floor(Math.random() * this.SuitList.length);
+        if (this.exposedSuitTypeList.indexOf(randomSuitType) !== -1) {
+            return this.getRandomSuit();
+        }
+        this.exposedSuitTypeList.push(randomSuitType);
+        return [this.SuitList[randomSuitType], randomSuitType];
+    }
+
     private async delay(ms: number) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
