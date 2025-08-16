@@ -77,6 +77,18 @@ export class gameManager extends Component {
         if (this.timeLeft <= 0) {
             this.gameState = GameState.GameOver;
         }
+        this.checkEggsInBasket();
+    }
+
+    private checkEggsInBasket() {
+        const eggs = this.eggParent.children;
+        for (const egg of eggs) {
+            const distance: number = egg.position.clone().subtract(this.basket.position).length();
+            if (distance < 100) {
+                console.log("egg in basket");
+                egg.destroy();
+            }
+        }
     }
 
     private async spawnRandomEgg() {
