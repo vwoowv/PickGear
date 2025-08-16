@@ -1,0 +1,134 @@
+{
+  "ver": "1.0.27",
+  "importer": "image",
+  "imported": true,
+  "uuid": "065f0f08-0f46-4f77-8174-089d0a5896fc",
+  "files": [
+    ".json",
+    ".png"
+  ],
+  "subMetas": {
+    "6c48a": {
+      "importer": "texture",
+      "uuid": "065f0f08-0f46-4f77-8174-089d0a5896fc@6c48a",
+      "displayName": "오프닝 엔딩_도아린",
+      "id": "6c48a",
+      "name": "texture",
+      "userData": {
+        "wrapModeS": "clamp-to-edge",
+        "wrapModeT": "clamp-to-edge",
+        "imageUuidOrDatabaseUri": "065f0f08-0f46-4f77-8174-089d0a5896fc",
+        "isUuid": true,
+        "visible": false,
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "f9941": {
+      "importer": "sprite-frame",
+      "uuid": "065f0f08-0f46-4f77-8174-089d0a5896fc@f9941",
+      "displayName": "오프닝 엔딩_도아린",
+      "id": "f9941",
+      "name": "spriteFrame",
+      "userData": {
+        "trimThreshold": 1,
+        "rotated": false,
+        "offsetX": 404.5,
+        "offsetY": 216,
+        "trimX": 887,
+        "trimY": 665,
+        "width": 115,
+        "height": 158,
+        "rawWidth": 1080,
+        "rawHeight": 1920,
+        "borderTop": 0,
+        "borderBottom": 0,
+        "borderLeft": 0,
+        "borderRight": 0,
+        "packable": true,
+        "pixelsToUnit": 100,
+        "pivotX": 0.5,
+        "pivotY": 0.5,
+        "meshType": 0,
+        "vertices": {
+          "rawPosition": [
+            -57.5,
+            -79,
+            0,
+            57.5,
+            -79,
+            0,
+            -57.5,
+            79,
+            0,
+            57.5,
+            79,
+            0
+          ],
+          "indexes": [
+            0,
+            1,
+            2,
+            2,
+            1,
+            3
+          ],
+          "uv": [
+            887,
+            1255,
+            1002,
+            1255,
+            887,
+            1097,
+            1002,
+            1097
+          ],
+          "nuv": [
+            0.8212962962962963,
+            0.5713541666666667,
+            0.9277777777777778,
+            0.5713541666666667,
+            0.8212962962962963,
+            0.6536458333333334,
+            0.9277777777777778,
+            0.6536458333333334
+          ],
+          "minPos": [
+            -57.5,
+            -79,
+            0
+          ],
+          "maxPos": [
+            57.5,
+            79,
+            0
+          ]
+        },
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "065f0f08-0f46-4f77-8174-089d0a5896fc@6c48a",
+        "atlasUuid": "",
+        "trimType": "auto"
+      },
+      "ver": "1.0.12",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "type": "sprite-frame",
+    "hasAlpha": true,
+    "fixAlphaTransparencyArtifacts": false,
+    "redirect": "065f0f08-0f46-4f77-8174-089d0a5896fc@6c48a"
+  }
+}
