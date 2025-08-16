@@ -14,6 +14,7 @@ export enum EggType {
 
 export enum GameState {
     None,
+    Prepare,
     Playing,
     GameOver,
 }

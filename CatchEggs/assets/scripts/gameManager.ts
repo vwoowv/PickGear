@@ -16,16 +16,20 @@ export class gameManager extends Component {
     private eggSpawnPoint_Right: Node = null;
     @property(Node)
     private eggEndLine: Node = null;
+    @property(Node)
+    private playingNode: Node = null;
+    @property(Node)
+    private prepareNode: Node = null;
     private gameState: GameState = GameState.None;
     private timeLeftValue: number = 10;
     private timeLeft: number = this.timeLeftValue;
     async start() {
-        this.startNewGame();
+        this.prepareGame();
     }
 
     update(deltaTime: number) {
-        if (this.gameState == GameState.None) {
-            return;
+        if (this.gameState == GameState.Prepare) {
+            this.updatePrepare(deltaTime);
         }
         else if (this.gameState == GameState.Playing) {
             this.updatePlaying(deltaTime);
@@ -34,8 +38,22 @@ export class gameManager extends Component {
         }
     }
 
-    private startNewGame() {
+    private prepareGame() {
+        this.gameState = GameState.Prepare;
+        this.playingNode.active = false;
+        this.prepareNode.active = true;
+    }
+
+    private updatePrepare(deltaTime: number) {
+        if (this.gameState != GameState.Prepare) {
+            return;
+        }
+    }
+
+    public startNewGame() {
         this.gameState = GameState.Playing;
+        this.playingNode.active = true;
+        this.prepareNode.active = false;
         this.timeLeft = this.timeLeftValue;
     }
 
