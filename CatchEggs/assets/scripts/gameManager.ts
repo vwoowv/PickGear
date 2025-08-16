@@ -1,4 +1,4 @@
-import { _decorator, Component, instantiate, Node, Prefab, Vec3 } from 'cc';
+import { _decorator, Component, instantiate, Node, Prefab, ProgressBar, Vec3 } from 'cc';
 import { ResourceManager } from './ResourceManager';
 import { egg } from './egg';
 import { EggType, GameState } from './gameDefine';
@@ -6,6 +6,8 @@ const { ccclass, property } = _decorator;
 
 @ccclass('gameManager')
 export class gameManager extends Component {
+    @property(ProgressBar)
+    private timeProgressBar: ProgressBar = null;
     @property(Node)
     private eggParent: Node = null;
     @property(Node)
@@ -15,6 +17,8 @@ export class gameManager extends Component {
     @property(Node)
     private eggEndLine: Node = null;
     private gameState: GameState = GameState.None;
+    private timeLeftValue: number = 10;
+    private timeLeft: number = this.timeLeftValue;
     async start() {
         this.startNewGame();
     }
@@ -26,10 +30,13 @@ export class gameManager extends Component {
         else if (this.gameState == GameState.Playing) {
             this.updatePlaying(deltaTime);
         }
+        else if (this.gameState == GameState.GameOver) {
+        }
     }
 
     private startNewGame() {
         this.gameState = GameState.Playing;
+        this.timeLeft = this.timeLeftValue;
     }
 
     private leftTimeToSpawnEgg: number = 0;
@@ -41,6 +48,11 @@ export class gameManager extends Component {
         if (this.leftTimeToSpawnEgg <= 0) {
             this.spawnRandomEgg();
             this.leftTimeToSpawnEgg = 1;
+        }
+        this.timeLeft -= deltaTime;
+        this.timeProgressBar.progress = this.timeLeft / this.timeLeftValue;
+        if (this.timeLeft <= 0) {
+            this.gameState = GameState.GameOver;
         }
     }
 
