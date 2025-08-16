@@ -2,6 +2,7 @@ import { _decorator, Component, instantiate, Node, Prefab, ProgressBar, Vec3 } f
 import { ResourceManager } from './ResourceManager';
 import { egg } from './egg';
 import { EggType, GameState } from './gameDefine';
+import { dragArea } from './dragArea';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameManager')
@@ -20,6 +21,10 @@ export class gameManager extends Component {
     private playingNode: Node = null;
     @property(Node)
     private prepareNode: Node = null;
+    @property(Node)
+    private dragAreaNode: dragArea = null;
+    @property(Node)
+    private basket: Node = null;
     private gameState: GameState = GameState.None;
     private timeLeftValue: number = 10;
     private timeLeft: number = this.timeLeftValue;
@@ -84,5 +89,15 @@ export class gameManager extends Component {
         const xPosition = Math.random() * (this.eggSpawnPoint_Right.position.x - this.eggSpawnPoint_Left.position.x) + this.eggSpawnPoint_Left.position.x;
         const eggPosition = new Vec3(xPosition, this.eggSpawnPoint_Right.position.y, this.eggSpawnPoint_Right.position.z);
         eggNode.setPosition(eggPosition);
+    }
+
+    public onDragAreaTouchMove(x: number, y: number) {
+        if (y > 0) {
+            y = 0;
+        }
+        else if (y < -100) {
+            y = -100;
+        }
+        this.basket.setPosition(x, y, 0);
     }
 }
