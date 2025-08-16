@@ -1,4 +1,4 @@
-import { _decorator, Component, instantiate, Node, Prefab, SpriteFrame } from 'cc';
+import { _decorator, Component, instantiate, Node, Prefab, SpriteFrame, Vec3 } from 'cc';
 import { Character } from './Character';
 import { CharacterDataDefinition } from './CharacterDataDefinition';
 import { ResourceManager } from './ResourceManager';
@@ -10,6 +10,9 @@ const { ccclass, property } = _decorator;
 export enum EGameState {
     None,
     Pick_Suit,
+    Switch_ShowResult,
+    ShowResult,
+    End_Game,
 }
 
 @ccclass('GameManager')
@@ -36,9 +39,13 @@ export class GameManager extends Component {
     public characterRollingPosStart: Node = null;
     @property(Node)
     public characterRollingPosEnd: Node = null;
+    @property(Node)
+    public resultPos: Node[] = [];
 
-    public currentSuitType: [ECharacterType, ECharacterSuitType][] = [];
+    // public currentSuitType: [ECharacterType, ECharacterSuitType][] = [];
+    public currentSuitType = new Map<ECharacterType, ECharacterSuitType>();
     public currentGameState: EGameState = EGameState.None;
+    private pickedSuitList: ECharacterSuitType[] = [];
 
     // Singleton 인스턴스에 접근하는 getter
     public static get I(): GameManager {
@@ -77,6 +84,9 @@ export class GameManager extends Component {
         if (this.currentGameState === EGameState.Pick_Suit) {
             this.updatePickSuit(deltaTime);
         }
+        else if (this.currentGameState === EGameState.Switch_ShowResult) {
+            this.showGameResult();
+        }
 
         // 시간이 끝나도 계속 이동
         this.rollingSuitList.forEach(suit => {
@@ -95,7 +105,7 @@ export class GameManager extends Component {
         if (this.currentTime > 0) {
             return;
         }
-        this.currentGameState = EGameState.None;
+        this.currentGameState = EGameState.Switch_ShowResult;
     }
 
     private async initialize() {
@@ -121,7 +131,7 @@ export class GameManager extends Component {
             this.rootUI.setCountText(count);
 
             const suitType = await character.ShowRandomSuit();
-            this.currentSuitType.push([character.characterType, suitType]);
+            this.currentSuitType.set(character.characterType, suitType);
             console.log(this.currentSuitType);
             character.node.setParent(null);
             count--;
@@ -132,7 +142,14 @@ export class GameManager extends Component {
     // 게임 매니저의 기능들
     public async startGame() {
         console.log('게임 시작!');
-        this.currentSuitType = [];
+        this.currentSuitType.clear();
+        this.pickedSuitList = [
+            ECharacterSuitType.NONE,
+            ECharacterSuitType.NONE,
+            ECharacterSuitType.NONE,
+            ECharacterSuitType.NONE
+        ];
+        this.rootUI.showResultCountText(false);
         this.rootUI.showTimeProgressBar(false);
         await this.showCharacterPreview();
         await this.PickCharacterSuit();
@@ -173,6 +190,10 @@ export class GameManager extends Component {
     private rollingSuitList: RollingSuit[] = [];
     private async checkAndAddrollSuit(deltaTime: number) {
         this.nextRollingSuitTime -= deltaTime;
+        if (this.duration < 1) {
+            return;
+        }
+
         if (this.nextRollingSuitTime <= 0) {
             console.log("rollSuit");
             this.nextRollingSuitTime = 0.5;       // 0.5초 마다 하나씩 새로운 옷을 보여준다
@@ -201,6 +222,52 @@ export class GameManager extends Component {
             return;
         }
         console.log('touchSuit');
+        // 터치했을 때 가장 근접한 옷을 찾는다. x 좌표가 0에 가장 가까운 옷
+        let closedDistance = 100000;
+        let closedSuit: RollingSuit = null;
+        this.rollingSuitList.forEach(suit => {
+            let distance = Math.abs(suit.node.position.x);
+            if (distance < closedDistance) {
+                closedDistance = distance;
+                closedSuit = suit;
+            }
+        });
+        if (closedSuit === null || closedDistance > 30) {
+            return;
+        }
+
+        this.pickedSuitList[this.currentCharacterIndex] = closedSuit.suitType;
+
+        console.log(closedSuit.suitType);
+        if (this.currentSuitType[this.currentCharacterIndex].indexOf(closedSuit.suitType) !== -1) {
+            console.log("pickSuit");
+            this.showPickSuit(closedSuit);
+        }
+    }
+
+    private async showPickSuit(pickedSuit: RollingSuit) {
+        pickedSuit.node.scale = new Vec3(1.1, 1.1, 1.1);
+        await delay(500);
+        pickedSuit.node.scale = new Vec3(1, 1, 1);
+    }
+
+    private async showGameResult() {
+        this.currentGameState = EGameState.ShowResult;
+        this.rootUI.showTimeProgressBar(false);
+        this.characterPos.removeAllChildren();
+        this.rollingSuitPos.removeAllChildren();
+        let pickCount = 0;
+        for (let i = 0; i < this.characterNames.length; i++) {
+            const character = this.characters[this.characterNames[i]];
+            character.node.setParent(this.resultPos[i]);
+            const characterSuitType = this.currentSuitType.get(character.characterType);
+            character.showSuit(characterSuitType);
+            if (this.pickedSuitList[i] === characterSuitType) {
+                pickCount++;
+            }
+        }
+        this.rootUI.showResultCountText(true);
+        this.rootUI.setResultCountText(pickCount);
     }
 }
 

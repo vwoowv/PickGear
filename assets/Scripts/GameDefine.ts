@@ -10,5 +10,6 @@ export enum ECharacterSuitType {
     HYBE = 0,
     YG = 1,
     JYP = 2,
-    SM = 3
+    SM = 3,
+    NONE = 255
 }

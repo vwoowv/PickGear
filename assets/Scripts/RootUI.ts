@@ -10,6 +10,8 @@ export class RootUI extends Component {
     private CountText: RichText = null;
     @property(ProgressBar)
     private timeProgressBar: ProgressBar = null;
+    @property(RichText)
+    private resultCountText: RichText = null;
 
     public onPickingButtonClick() {
         GameManager.I.touchSuit();
@@ -30,5 +32,13 @@ export class RootUI extends Component {
 
     public setTimeProgressBar(value: number) {
         this.timeProgressBar.progress = value;
+    }
+
+    public showResultCountText(isShow: boolean) {
+        this.resultCountText.node.active = isShow;
+    }
+
+    public setResultCountText(count: number) {
+        this.resultCountText.string = "점수 : " + count.toString();
     }
 }

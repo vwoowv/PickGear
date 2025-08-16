@@ -49,6 +49,10 @@ export class Character extends Component {
         return randomSuitType;
     }
 
+    public showSuit(suitType: ECharacterSuitType) {
+        this.currentShit.spriteFrame = this.SuitList[suitType];
+    }
+
     public takeOffSuit() {
         this.currentShit.spriteFrame = null;
     }
