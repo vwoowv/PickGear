@@ -232,14 +232,14 @@ export class GameManager extends Component {
                 closedSuit = suit;
             }
         });
-        if (closedSuit === null || closedDistance > 30) {
+        if (closedSuit === null || closedDistance > 30 || this.currentCharacterIndex >= this.characterNames.length) {
             return;
         }
 
         this.pickedSuitList[this.currentCharacterIndex] = closedSuit.suitType;
 
         console.log(closedSuit.suitType);
-        if (this.currentSuitType[this.currentCharacterIndex].indexOf(closedSuit.suitType) !== -1) {
+        if (this.currentSuitType.get(this.currentCharacterIndex) === closedSuit.suitType) {
             console.log("pickSuit");
             this.showPickSuit(closedSuit);
         }
