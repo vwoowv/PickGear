@@ -1,4 +1,4 @@
-import { _decorator, Component, instantiate, Node, Prefab, ProgressBar, RichText, Vec3 } from 'cc';
+import { _decorator, Component, instantiate, Node, ParticleSystem, Prefab, ProgressBar, RichText, Vec3 } from 'cc';
 import { ResourceManager } from './ResourceManager';
 import { egg } from './egg';
 import { EggType, GameState } from './gameDefine';
@@ -115,28 +115,32 @@ export class gameManager extends Component {
         this.prepareGame();
     }
 
-    private checkEggsInBasket() {
+    private async checkEggsInBasket() {
         const eggs = this.eggParent.children;
         for (const egg of eggs) {
             const distance: number = egg.position.clone().subtract(this.basket.position).length();
             if (distance < 100) {
                 console.log("egg in basket");
-                egg.destroy();
                 this.currentScore += 1;
+                const hitEffect = await ResourceManager.I.loadResource<Prefab>("effect/box/boxHit2D", Prefab);
+                const hitEffectNode = instantiate(hitEffect);
+                const hitEffectPosition = egg.position.clone();
+                hitEffectPosition.y -= 100;
+                hitEffectNode.setPosition(hitEffectPosition);
+                hitEffectNode.setScale(100, 100, 100);
+                this.playingNode.addChild(hitEffectNode);
+                egg.destroy();
             }
         }
     }
 
     private async spawnRandomEgg() {
-        const eggPrefab = await ResourceManager.I.loadResource<Prefab>("prefab/Egg", Prefab);
-        const eggNode = instantiate(eggPrefab);
-        const newEgg = eggNode.getComponent(egg);
+        const newEgg = await ResourceManager.I.spawnPrefab<egg>("prefab/Egg", this.eggParent);
         const randomEgg = Math.floor(Math.random() * EggType.TotalCount);
         newEgg.initialize(randomEgg, this.eggEndLine);
-        this.eggParent.addChild(eggNode);
         const xPosition = Math.random() * (this.eggSpawnPoint_Right.position.x - this.eggSpawnPoint_Left.position.x) + this.eggSpawnPoint_Left.position.x;
         const eggPosition = new Vec3(xPosition, this.eggSpawnPoint_Right.position.y, this.eggSpawnPoint_Right.position.z);
-        eggNode.setPosition(eggPosition);
+        newEgg.node.setPosition(eggPosition);
     }
 
     public onDragAreaTouchMove(x: number, y: number) {

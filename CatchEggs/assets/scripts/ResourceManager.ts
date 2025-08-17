@@ -1,4 +1,4 @@
-import { _decorator, Component, error, resources } from 'cc';
+import { _decorator, Component, error, instantiate, Node, Prefab, resources } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('ResourceManager')
@@ -49,6 +49,13 @@ export class ResourceManager extends Component {
                 resolve(asset as T);
             });
         });
+    }
+
+    public async spawnPrefab<T extends Component>(path: string, parent: Node): Promise<T> {
+        const prefab = await this.loadResource<Prefab>(path, Prefab);
+        const newNode: Node = instantiate(prefab);
+        parent.addChild(newNode);
+        return newNode.getComponent(Component) as T;
     }
 }
 
