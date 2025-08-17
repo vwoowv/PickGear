@@ -4,6 +4,7 @@ const { ccclass, property } = _decorator;
 @ccclass('ResourceManager')
 export class ResourceManager extends Component {
     private static _instance: ResourceManager = null;
+    private resourceCache: Map<string, any> = new Map();
 
     // Singleton 인스턴스에 접근하는 getter
     public static get I(): ResourceManager {
@@ -32,7 +33,6 @@ export class ResourceManager extends Component {
         }
     }
 
-    private resourceCache: Map<string, any> = new Map();
     public loadResource<T>(path: string, type: any): Promise<T> {
         if (this.resourceCache.has(path)) {
             return Promise.resolve(this.resourceCache.get(path) as T);
