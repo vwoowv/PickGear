@@ -32,7 +32,12 @@ export class ResourceManager extends Component {
         }
     }
 
+    private resourceCache: Map<string, any> = new Map();
     public loadResource<T>(path: string, type: any): Promise<T> {
+        if (this.resourceCache.has(path)) {
+            return Promise.resolve(this.resourceCache.get(path) as T);
+        }
+        
         return new Promise((resolve, reject) => {
             resources.load(path, type, (err, asset) => {
                 if (err) {
@@ -40,6 +45,7 @@ export class ResourceManager extends Component {
                     reject(err);
                     return;
                 }
+                this.resourceCache.set(path, asset);
                 resolve(asset as T);
             });
         });
