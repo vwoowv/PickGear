@@ -1,4 +1,4 @@
-import { _decorator, Component, instantiate, Node, Prefab, ProgressBar, Vec3 } from 'cc';
+import { _decorator, Component, instantiate, Node, Prefab, ProgressBar, RichText, Vec3 } from 'cc';
 import { ResourceManager } from './ResourceManager';
 import { egg } from './egg';
 import { EggType, GameState } from './gameDefine';
@@ -24,10 +24,15 @@ export class gameManager extends Component {
     @property(Node)
     private dragAreaNode: dragArea = null;
     @property(Node)
+    private retryNode: Node = null;
+    @property(RichText)
+    private scoreText: RichText = null;
+    @property(Node)
     private basket: Node = null;
     private gameState: GameState = GameState.None;
     private timeLeftValue: number = 10;
     private timeLeft: number = this.timeLeftValue;
+    private currentScore: number = 0;
     async start() {
         this.prepareGame();
     }
@@ -40,6 +45,7 @@ export class gameManager extends Component {
             this.updatePlaying(deltaTime);
         }
         else if (this.gameState == GameState.GameOver) {
+            this.updateGameOver(deltaTime);
         }
     }
 
@@ -47,6 +53,9 @@ export class gameManager extends Component {
         this.gameState = GameState.Prepare;
         this.playingNode.active = false;
         this.prepareNode.active = true;
+        this.retryNode.active = false;
+        this.currentScore = 0;
+        this.scoreText.string = this.currentScore.toString();
     }
 
     private updatePrepare(deltaTime: number) {
@@ -60,6 +69,9 @@ export class gameManager extends Component {
         this.playingNode.active = true;
         this.prepareNode.active = false;
         this.timeLeft = this.timeLeftValue;
+        this.retryNode.active = false;
+        this.currentScore = 0;
+        this.scoreText.string = this.currentScore.toString();
     }
 
     private leftTimeToSpawnEgg: number = 0;
@@ -68,16 +80,39 @@ export class gameManager extends Component {
             return;
         }
         this.leftTimeToSpawnEgg -= deltaTime;
-        if (this.leftTimeToSpawnEgg <= 0) {
+        // 끝나기 1초전까지 스폰시킨다
+        if (this.leftTimeToSpawnEgg <= 0 && this.timeLeft - 1 > 0) {
             this.spawnRandomEgg();
             this.leftTimeToSpawnEgg = 1;
         }
         this.timeLeft -= deltaTime;
         this.timeProgressBar.progress = this.timeLeft / this.timeLeftValue;
         if (this.timeLeft <= 0) {
-            this.gameState = GameState.GameOver;
+            this.gameOver();
         }
         this.checkEggsInBasket();
+    }
+
+    private gameOver() {
+        this.gameState = GameState.GameOver;
+        this.eggParent.children.forEach(child => {
+            child.destroy();
+        });
+        this.eggParent.removeAllChildren();
+        this.playingNode.active = false;
+        this.prepareNode.active = false;
+        this.retryNode.active = true;
+        this.scoreText.string = this.currentScore.toString();
+    }
+
+    private updateGameOver(deltaTime: number) {
+        if (this.gameState != GameState.GameOver) {
+            return;
+        }
+    }
+
+    private onRetryButtonClick() {
+        this.prepareGame();
     }
 
     private checkEggsInBasket() {
@@ -87,6 +122,7 @@ export class gameManager extends Component {
             if (distance < 100) {
                 console.log("egg in basket");
                 egg.destroy();
+                this.currentScore += 1;
             }
         }
     }
