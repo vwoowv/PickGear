@@ -1309,7 +1309,7 @@
       "__id__": 85
     },
     "scoreText": {
-      "__id__": 146
+      "__id__": 148
     },
     "basket": {
       "__id__": 67
@@ -2534,7 +2534,7 @@
         "__id__": 160
       }
     ],
-    "_active": false,
+    "_active": true,
     "_components": [
       {
         "__id__": 168

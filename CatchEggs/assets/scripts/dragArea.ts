@@ -1,4 +1,4 @@
-import { _decorator, Component, EventTouch, Node, UITransform } from 'cc';
+import { _decorator, Component, EventTouch, Node, UITransform, Vec3 } from 'cc';
 import { gameManager } from './gameManager';
 const { ccclass, property } = _decorator;
 
@@ -6,7 +6,7 @@ const { ccclass, property } = _decorator;
 export class dragArea extends Component {
     @property(gameManager)
     private gameManagerInstance: gameManager = null;
-    
+
     onLoad() {
         this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
         this.node.on(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
@@ -26,15 +26,12 @@ export class dragArea extends Component {
     }
 
     private onTouchMove(event: EventTouch) {
-        let location = event.getLocation();
-        const transform = this.node.getComponent(UITransform);
-        const size = transform.contentSize;
-        const position = this.node.position;
-        const x = location.x - position.x - size.width / 2;
-        const y = location.y - position.y - size.height / 2;
-        this.gameManagerInstance.onDragAreaTouchMove(x, y);
+        const uiTransform = this.node.getComponent(UITransform);
+        const location = event.getUILocation();
+        const localPos = uiTransform.convertToNodeSpaceAR(new Vec3(location.x, location.y, 0));
+        this.gameManagerInstance.onDragAreaTouchMove(localPos.x, localPos.y);
     }
-    
+
     private onTouchEnd(event: EventTouch) {
         console.log("onTouchEnd");
     }
