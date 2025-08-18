@@ -116,20 +116,20 @@ export class gameManager extends Component {
     }
 
     private async checkEggsInBasket() {
-        const eggs = this.eggParent.children;
-        for (const egg of eggs) {
+        for (const egg of this.eggParent.children) {
             const distance: number = egg.position.clone().subtract(this.basket.position).length();
             if (distance < 100) {
                 console.log("egg in basket");
                 this.currentScore += 1;
                 const hitEffect = await ResourceManager.I.loadResource<Prefab>("effect/box/boxHit2D", Prefab);
                 const hitEffectNode = instantiate(hitEffect);
-                const hitEffectPosition = egg.position.clone();
-                hitEffectPosition.y -= 100;
+                const hitEffectPosition = new Vec3(egg.position.x, egg.position.y - 100, egg.position.z);
                 hitEffectNode.setPosition(hitEffectPosition);
                 hitEffectNode.setScale(100, 100, 100);
                 this.playingNode.addChild(hitEffectNode);
+                this.eggParent.removeChild(egg);
                 egg.destroy();
+                break;
             }
         }
     }
