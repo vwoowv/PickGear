@@ -1,12 +1,15 @@
 import { _decorator, AudioClip, AudioSource, Component, instantiate, Node, ParticleSystem, Prefab, ProgressBar, RichText, Vec3 } from 'cc';
 import { ResourceManager } from './ResourceManager';
 import { egg } from './egg';
-import { EggType, GameState } from './gameDefine';
+import { EggType, EGameState } from './gameDefine';
 import { dragArea } from './dragArea';
+import { gameModeData } from './gameModeData';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameManager')
 export class gameManager extends Component {
+    @property(gameModeData)
+    private gameMode: gameModeData = null;
     @property(ProgressBar)
     private timeProgressBar: ProgressBar = null;
     @property(Node)
@@ -17,6 +20,8 @@ export class gameManager extends Component {
     private eggSpawnPoint_Right: Node = null;
     @property(Node)
     private eggEndLine: Node = null;
+    @property(Node)
+    private selectGameModeNode: Node = null;
     @property(Node)
     private playingNode: Node = null;
     @property(Node)
@@ -33,28 +38,41 @@ export class gameManager extends Component {
     private playSound: AudioSource = null;
     @property(AudioClip)
     private eggCatchSound: AudioClip[] = [];
-    private gameState: GameState = GameState.None;
+    private gameState: EGameState = EGameState.None;
     private timeLeftValue: number = 10;
     private timeLeft: number = this.timeLeftValue;
     private currentScore: number = 0;
     async start() {
-        this.prepareGame();
+        this.selectGameMode();
     }
 
     update(deltaTime: number) {
-        if (this.gameState == GameState.Prepare) {
+        if (this.gameState == EGameState.Prepare) {
             this.updatePrepare(deltaTime);
         }
-        else if (this.gameState == GameState.Playing) {
+        else if (this.gameState == EGameState.Playing) {
             this.updatePlaying(deltaTime);
         }
-        else if (this.gameState == GameState.GameOver) {
+        else if (this.gameState == EGameState.GameOver) {
             this.updateGameOver(deltaTime);
         }
     }
 
+    private selectGameMode() {
+        this.gameState = EGameState.SelectGameMode;
+        this.selectGameModeNode.active = true;
+        this.playingNode.active = false;
+        this.prepareNode.active = false;
+        this.retryNode.active = false;
+    }
+
+    public completeSelectGameMode() {
+        this.prepareGame();
+    }
+
     private prepareGame() {
-        this.gameState = GameState.Prepare;
+        this.gameState = EGameState.Prepare;
+        this.selectGameModeNode.active = false;
         this.playingNode.active = false;
         this.prepareNode.active = true;
         this.retryNode.active = false;
@@ -63,13 +81,13 @@ export class gameManager extends Component {
     }
 
     private updatePrepare(deltaTime: number) {
-        if (this.gameState != GameState.Prepare) {
+        if (this.gameState != EGameState.Prepare) {
             return;
         }
     }
 
     public startNewGame() {
-        this.gameState = GameState.Playing;
+        this.gameState = EGameState.Playing;
         this.playingNode.active = true;
         this.prepareNode.active = false;
         this.timeLeft = this.timeLeftValue;
@@ -80,7 +98,7 @@ export class gameManager extends Component {
 
     private leftTimeToSpawnEgg: number = 0;
     private async updatePlaying(deltaTime: number) {
-        if (this.gameState != GameState.Playing) {
+        if (this.gameState != EGameState.Playing) {
             return;
         }
         this.leftTimeToSpawnEgg -= deltaTime;
@@ -98,7 +116,7 @@ export class gameManager extends Component {
     }
 
     private gameOver() {
-        this.gameState = GameState.GameOver;
+        this.gameState = EGameState.GameOver;
         this.eggParent.children.forEach(child => {
             child.destroy();
         });
@@ -110,7 +128,7 @@ export class gameManager extends Component {
     }
 
     private updateGameOver(deltaTime: number) {
-        if (this.gameState != GameState.GameOver) {
+        if (this.gameState != EGameState.GameOver) {
             return;
         }
     }

@@ -12,9 +12,16 @@ export enum EggType {
     TotalCount,
 }
 
-export enum GameState {
+export enum EGameState {
     None,
+    SelectGameMode,
     Prepare,
     Playing,
     GameOver,
+}
+
+export enum EGameMode {
+    Version1,
+    Version2,
+    Version3,
 }
