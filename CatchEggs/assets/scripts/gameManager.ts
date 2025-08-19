@@ -1,4 +1,4 @@
-import { _decorator, AudioClip, AudioSource, Component, instantiate, Node, ParticleSystem, Prefab, ProgressBar, RichText, Vec3 } from 'cc';
+import { _decorator, AudioClip, AudioSource, Component, instantiate, Node, ParticleSystem, Prefab, ProgressBar, RichText, Sprite, Vec3 } from 'cc';
 import { ResourceManager } from './ResourceManager';
 import { egg } from './egg';
 import { EggType, EGameState } from './gameDefine';
@@ -38,6 +38,8 @@ export class gameManager extends Component {
     private playSound: AudioSource = null;
     @property(AudioClip)
     private eggCatchSound: AudioClip[] = [];
+    @property(Sprite)
+    private background: Sprite = null;
     private gameState: EGameState = EGameState.None;
     private timeLeftValue: number = 10;
     private timeLeft: number = this.timeLeftValue;
@@ -66,7 +68,8 @@ export class gameManager extends Component {
         this.retryNode.active = false;
     }
 
-    public completeSelectGameMode() {
+    public async completeSelectGameMode() {
+        this.background.spriteFrame = await this.gameMode.getCurrentBackground();
         this.prepareGame();
     }
 
