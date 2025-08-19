@@ -1,4 +1,4 @@
-import { _decorator, Component, instantiate, Node, ParticleSystem, Prefab, ProgressBar, RichText, Vec3 } from 'cc';
+import { _decorator, AudioClip, AudioSource, Component, instantiate, Node, ParticleSystem, Prefab, ProgressBar, RichText, Vec3 } from 'cc';
 import { ResourceManager } from './ResourceManager';
 import { egg } from './egg';
 import { EggType, GameState } from './gameDefine';
@@ -29,6 +29,10 @@ export class gameManager extends Component {
     private scoreText: RichText = null;
     @property(Node)
     private basket: Node = null;
+    @property(AudioSource)
+    private playSound: AudioSource = null;
+    @property(AudioClip)
+    private eggCatchSound: AudioClip[] = [];
     private gameState: GameState = GameState.None;
     private timeLeftValue: number = 10;
     private timeLeft: number = this.timeLeftValue;
@@ -116,19 +120,26 @@ export class gameManager extends Component {
     }
 
     private async checkEggsInBasket() {
-        for (const egg of this.eggParent.children) {
-            const distance: number = egg.position.clone().subtract(this.basket.position).length();
+        for (const eggNode of this.eggParent.children) {
+            const distance: number = eggNode.position.clone().subtract(this.basket.position).length();
             if (distance < 100) {
                 console.log("egg in basket");
                 this.currentScore += 1;
                 const hitEffect = await ResourceManager.I.loadResource<Prefab>("effect/box/boxHit2D", Prefab);
                 const hitEffectNode = instantiate(hitEffect);
-                const hitEffectPosition = new Vec3(egg.position.x, egg.position.y - 100, egg.position.z);
+                const hitEffectPosition = new Vec3(eggNode.position.x, eggNode.position.y - 100, eggNode.position.z);
                 hitEffectNode.setPosition(hitEffectPosition);
                 hitEffectNode.setScale(100, 100, 100);
                 this.playingNode.addChild(hitEffectNode);
-                this.eggParent.removeChild(egg);
-                egg.destroy();
+                const eggComponent = eggNode.getComponent(egg);
+                if (eggComponent.currentType == EggType.Happy) {
+                    this.playSound.playOneShot(this.eggCatchSound[1]);
+                }
+                else {
+                    this.playSound.playOneShot(this.eggCatchSound[0]);
+                }
+                this.eggParent.removeChild(eggNode);
+                eggNode.destroy();
                 break;
             }
         }

@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, random, Sprite, SpriteFrame } from 'cc';
+import { _decorator, AudioSource, Component, Node, random, Sprite, SpriteFrame } from 'cc';
 import { EggType } from './gameDefine';
 import { ResourceManager } from './ResourceManager';
 const { ccclass, property } = _decorator;
@@ -9,11 +9,13 @@ export class egg extends Component {
     private eggImage: Sprite = null;
     private isRotating: boolean = false;
     private endLine: Node = null;
+    public currentType: EggType = EggType.DoArin;
 
     public async initialize(egg: EggType, endLine: Node) {
         this.eggImage.spriteFrame = await eggResource.loadSprite(egg);
         this.isRotating = Math.random() < 0.5;
         this.endLine = endLine;
+        this.currentType = egg;
     }
 
     update(deltaTime: number) {
