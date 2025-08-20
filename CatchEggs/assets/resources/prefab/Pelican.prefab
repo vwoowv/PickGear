@@ -717,8 +717,16 @@
       "__id__": 33
     },
     "playOnLoad": false,
-    "_clips": [],
-    "_defaultClip": null,
+    "_clips": [
+      {
+        "__uuid__": "a5e94b8c-d776-4ef6-af4e-b6bc77e79d30",
+        "__expectedType__": "cc.AnimationClip"
+      }
+    ],
+    "_defaultClip": {
+      "__uuid__": "a5e94b8c-d776-4ef6-af4e-b6bc77e79d30",
+      "__expectedType__": "cc.AnimationClip"
+    },
     "_id": ""
   },
   {
