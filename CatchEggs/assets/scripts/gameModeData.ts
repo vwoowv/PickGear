@@ -11,6 +11,8 @@ export class gameModeData extends Component {
     private currentGameMode: EGameMode = EGameMode.Version1;
     @property(Node)
     private enemyParent: Node[] = [];
+    @property(Node)
+    private enemyParent_Result: Node[] = [];
     private backgroundName: string[] = ["background", "backgroundLake", "backgroundCity"];
 
     private onTouchVersion1Button() {
@@ -37,6 +39,13 @@ export class gameModeData extends Component {
             this.gameManagerInstance = this.node.getComponent(gameManager)
         }
         this.gameManagerInstance.completeSelectGameMode();
+    }
+
+    public resultGame() {
+        this.enemyParent_Result.forEach(enemy => {
+            enemy.active = false;
+        });
+        this.enemyParent_Result[this.currentGameMode].active = true;
     }
 
     public async getCurrentBackground(): Promise<SpriteFrame> {

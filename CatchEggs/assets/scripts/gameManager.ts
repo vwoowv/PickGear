@@ -128,6 +128,7 @@ export class gameManager extends Component {
         this.prepareNode.active = false;
         this.retryNode.active = true;
         this.scoreText.string = this.currentScore.toString();
+        this.gameMode.resultGame();
     }
 
     private updateGameOver(deltaTime: number) {
