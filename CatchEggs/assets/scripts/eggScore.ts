@@ -10,7 +10,7 @@ export class eggScore extends Component {
 
     public setScore(score: number) {
         this.scoreText.string = score.toString();
-        this.scoreAnimation.play("idle");
+        this.scoreAnimation.play(null);
     }
 }
 
