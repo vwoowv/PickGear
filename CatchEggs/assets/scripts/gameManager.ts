@@ -38,9 +38,9 @@ export class gameManager extends Component {
     @property(Node)
     private basket: Node = null;
     @property(AudioSource)
-    private playSound: AudioSource = null;
+    public playSound: AudioSource = null;
     @property(AudioClip)
-    private eggCatchSound: AudioClip[] = [];
+    public eggCatchSound: AudioClip[] = [];
     @property(Sprite)
     private background: Sprite = null;
     private gameState: EGameState = EGameState.None;
@@ -154,14 +154,8 @@ export class gameManager extends Component {
             if (distance < 100) {
                 console.log("egg in basket : " + eggNode.name);
                 this.currentScore += 1;
-                this.extensions.showEggEffect(eggNode.position.clone());
                 const eggComponent = eggNode.getComponent(egg);
-                if (eggComponent.currentType == EggType.Happy) {
-                    this.playSound.playOneShot(this.eggCatchSound[1]);
-                }
-                else {
-                    this.playSound.playOneShot(this.eggCatchSound[0]);
-                }
+                eggComponent.onEggCatch();
                 eggInBasket.push(eggNode);
                 break;
             }

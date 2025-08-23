@@ -30,6 +30,17 @@ export class egg extends Component {
         }
     }
 
+    public onEggCatch() {
+        if (this.currentType == EggType.Happy) {
+            this.extensions.playSound.playOneShot(this.extensions.eggCatchSound[1]);
+        }
+        else {
+            this.extensions.playSound.playOneShot(this.extensions.eggCatchSound[0]);
+        }
+        this.extensions.showEggEffect(this.node.position.clone());
+        this.extensions.spawnEggScore(this.node.position.clone(), 1);
+    }
+
     private fallDown(deltaTime: number) {
         this.node.setPosition(this.node.position.x, this.node.position.y - 500 * deltaTime, this.node.position.z);
         if (this.endLine === null) {

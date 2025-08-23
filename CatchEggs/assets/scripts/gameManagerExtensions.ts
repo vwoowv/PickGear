@@ -1,4 +1,4 @@
-import { _decorator, Component, instantiate, Node, Prefab, SpriteFrame, Vec3 } from 'cc';
+import { _decorator, AudioClip, AudioSource, Component, instantiate, Node, Prefab, SpriteFrame, Vec3 } from 'cc';
 import { gameManager } from './gameManager';
 import { ResourceManager } from './ResourceManager';
 import { egg } from './egg';
@@ -20,6 +20,14 @@ export class gameManagerExtensions extends Component {
     }
     public get eggSpawnPoint_Left(): Node {
         return this.gameManager.eggSpawnPoint_Left;
+    }
+
+    public get playSound(): AudioSource {
+        return this.gameManager.playSound;
+    }
+
+    public get eggCatchSound(): AudioClip[] {
+        return this.gameManager.eggCatchSound;
     }
 
     public async initialize(gameManager: gameManager) {
