@@ -10,14 +10,12 @@ const { ccclass, property } = _decorator;
 export class egg extends Component {
     @property(Sprite)
     private eggImage: Sprite = null;
-    private isRotating: boolean = false;
     private endLine: Node = null;
     private extensions: gameManagerExtensions = null;
     public currentType: EggType = EggType.DoArin;
 
     public async initialize(egg: EggType, endLine: Node, extensions: gameManagerExtensions) {
         this.eggImage.spriteFrame = await extensions.loadSprite(egg);
-        this.isRotating = Math.random() < 0.5;
         this.endLine = endLine;
         this.currentType = egg;
         this.extensions = extensions;
@@ -25,8 +23,11 @@ export class egg extends Component {
 
     update(deltaTime: number) {
         this.fallDown(deltaTime);
-        if (this.isRotating) {
+        if (this.currentType == EggType.Happy) {
             this.node.angle += 180 * deltaTime;
+        }
+        else if (this.currentType == EggType.EmmaMoon) {
+            this.node.angle = Math.sin(this.node.position.y * 0.05) * 30;
         }
     }
 
