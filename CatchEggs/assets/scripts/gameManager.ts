@@ -170,7 +170,7 @@ export class gameManager extends Component {
     }
 
     private onRetryButtonClick() {
-        this.prepareGame();
+        this.selectGameMode();
     }
 
     private checkEggsInBasket() {
@@ -199,8 +199,14 @@ export class gameManager extends Component {
         if (y > 0) {
             y = 0;
         }
-        else if (y < -100) {
-            y = -100;
+        else if (y < -2) {
+            y = -2;
+        }
+        if (x > 300) {
+            x = 300;
+        }
+        else if (x < -300) {
+            x = -300;
         }
         this.basket.setPosition(x, y, 0);
     }
