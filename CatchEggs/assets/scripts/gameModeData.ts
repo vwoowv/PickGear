@@ -14,7 +14,7 @@ export class gameModeData extends Component {
     @property(Node)
     private enemyParent_Result: Node[] = [];
     private backgroundName: string[] = ["background", "backgroundLake", "backgroundCity"];
-    private gameDurationInSeconds: number[] = [45, 49, 74];
+    private gameDurationInSeconds: number[] = [44, 49, 74];
     private gameBgName: string[] = ["sound/Sanrio1_Full_Version", "sound/Sanrio2_Full_Version", "sound/Sanrio3_Full_Version"];
 
     private onTouchVersion1Button() {

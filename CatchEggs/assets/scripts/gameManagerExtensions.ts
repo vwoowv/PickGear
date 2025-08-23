@@ -54,11 +54,23 @@ export class gameManagerExtensions extends Component {
         this.gameManager.playingNode.addChild(hitEffectNode);
     }
 
+    private prevRandomX: number = -1;
     public async spawnRandomEgg(currentTime: number, totalDuration: number, gameMode: EGameMode): Promise<number> {
         const newEgg = await ResourceManager.I.spawnPrefab<egg>("prefab/Egg", this.eggParent);
         const randomEgg = Math.floor(Math.random() * EggType.TotalCount);
         newEgg.initialize(randomEgg, this.eggEndLine, currentTime, totalDuration, gameMode, this);
-        const xPosition = Math.random() * (this.eggSpawnPoint_Right.position.x - this.eggSpawnPoint_Left.position.x) + this.eggSpawnPoint_Left.position.x;
+        let xPosition = Math.random() * (this.eggSpawnPoint_Right.position.x - this.eggSpawnPoint_Left.position.x) + this.eggSpawnPoint_Left.position.x;
+        if (this.prevRandomX == -1) {
+            this.prevRandomX = xPosition;
+        }
+        else {
+            let xLength = Math.abs(this.prevRandomX - xPosition);
+            while (xLength < 300) {
+                xPosition = Math.random() * (this.eggSpawnPoint_Right.position.x - this.eggSpawnPoint_Left.position.x) + this.eggSpawnPoint_Left.position.x;
+                xLength = Math.abs(this.prevRandomX - xPosition);
+            }
+            this.prevRandomX = xPosition;
+        }
         const eggPosition = new Vec3(xPosition, this.eggSpawnPoint_Right.position.y, this.eggSpawnPoint_Right.position.z);
         newEgg.node.setPosition(eggPosition);
         return this.getSpawnTime(currentTime, totalDuration, gameMode);
