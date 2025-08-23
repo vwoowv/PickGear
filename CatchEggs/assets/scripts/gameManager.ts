@@ -4,6 +4,7 @@ import { egg } from './egg';
 import { EggType, EGameState } from './gameDefine';
 import { dragArea } from './dragArea';
 import { gameModeData } from './gameModeData';
+import { gameManagerExtensions } from './gameManagerExtensions';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameManager')
@@ -13,17 +14,17 @@ export class gameManager extends Component {
     @property(ProgressBar)
     private timeProgressBar: ProgressBar = null;
     @property(Node)
-    private eggParent: Node = null;
+    public eggParent: Node = null;
     @property(Node)
-    private eggSpawnPoint_Left: Node = null;
+    public eggSpawnPoint_Left: Node = null;
     @property(Node)
-    private eggSpawnPoint_Right: Node = null;
+    public eggSpawnPoint_Right: Node = null;
     @property(Node)
-    private eggEndLine: Node = null;
+    public eggEndLine: Node = null;
     @property(Node)
     private selectGameModeNode: Node = null;
     @property(Node)
-    private playingNode: Node = null;
+    public playingNode: Node = null;
     @property(Node)
     private prepareNode: Node = null;
     @property(Node)
@@ -44,7 +45,10 @@ export class gameManager extends Component {
     private timeLeftValue: number = 10;
     private timeLeft: number = this.timeLeftValue;
     private currentScore: number = 0;
+    private extensions: gameManagerExtensions = null;
     async start() {
+        this.extensions = this.node.addComponent(gameManagerExtensions);
+        await this.extensions.initialize(this);
         this.selectGameMode();
     }
 
@@ -107,7 +111,7 @@ export class gameManager extends Component {
         this.leftTimeToSpawnEgg -= deltaTime;
         // 끝나기 1초전까지 스폰시킨다
         if (this.leftTimeToSpawnEgg <= 0 && this.timeLeft - 1 > 0) {
-            this.spawnRandomEgg();
+            this.extensions.spawnRandomEgg();
             this.leftTimeToSpawnEgg = 1;
         }
         this.timeLeft -= deltaTime;
@@ -141,18 +145,14 @@ export class gameManager extends Component {
         this.prepareGame();
     }
 
-    private async checkEggsInBasket() {
+    private checkEggsInBasket() {
+        const eggInBasket: Node[] = [];
         for (const eggNode of this.eggParent.children) {
             const distance: number = eggNode.position.clone().subtract(this.basket.position).length();
             if (distance < 100) {
-                console.log("egg in basket");
+                console.log("egg in basket : " + eggNode.name);
                 this.currentScore += 1;
-                const hitEffect = await ResourceManager.I.loadResource<Prefab>("effect/box/boxHit2D", Prefab);
-                const hitEffectNode = instantiate(hitEffect);
-                const hitEffectPosition = new Vec3(eggNode.position.x, eggNode.position.y - 100, eggNode.position.z);
-                hitEffectNode.setPosition(hitEffectPosition);
-                hitEffectNode.setScale(100, 100, 100);
-                this.playingNode.addChild(hitEffectNode);
+                this.extensions.showEggEffect(eggNode.position.clone());
                 const eggComponent = eggNode.getComponent(egg);
                 if (eggComponent.currentType == EggType.Happy) {
                     this.playSound.playOneShot(this.eggCatchSound[1]);
@@ -160,20 +160,17 @@ export class gameManager extends Component {
                 else {
                     this.playSound.playOneShot(this.eggCatchSound[0]);
                 }
-                this.eggParent.removeChild(eggNode);
-                eggNode.destroy();
+                eggInBasket.push(eggNode);
                 break;
             }
         }
-    }
 
-    private async spawnRandomEgg() {
-        const newEgg = await ResourceManager.I.spawnPrefab<egg>("prefab/Egg", this.eggParent);
-        const randomEgg = Math.floor(Math.random() * EggType.TotalCount);
-        newEgg.initialize(randomEgg, this.eggEndLine);
-        const xPosition = Math.random() * (this.eggSpawnPoint_Right.position.x - this.eggSpawnPoint_Left.position.x) + this.eggSpawnPoint_Left.position.x;
-        const eggPosition = new Vec3(xPosition, this.eggSpawnPoint_Right.position.y, this.eggSpawnPoint_Right.position.z);
-        newEgg.node.setPosition(eggPosition);
+        if (eggInBasket.length > 0) {
+            for (const eggNode of eggInBasket) {
+                this.eggParent.removeChild(eggNode);
+                eggNode.destroy();
+            }
+        }
     }
 
     public onDragAreaTouchMove(x: number, y: number) {
