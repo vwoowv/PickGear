@@ -16,6 +16,7 @@ export enum EGameState {
     None,
     SelectGameMode,
     Prepare,
+    PlayStarting,
     Playing,
     GameOver,
 }

@@ -5,6 +5,7 @@ import { EggType, EGameState } from './gameDefine';
 import { dragArea } from './dragArea';
 import { gameModeData } from './gameModeData';
 import { gameManagerExtensions } from './gameManagerExtensions';
+import { playStartingNode } from './playStartingNode';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameManager')
@@ -24,15 +25,17 @@ export class gameManager extends Component {
     @property(Node)
     public eggEndLine: Node = null;
     @property(Node)
-    private selectGameModeNode: Node = null;
+    public selectGameModeNode: Node = null;
+    @property(Node)
+    public playStartingNode: Node = null;
     @property(Node)
     public playingNode: Node = null;
     @property(Node)
-    private prepareNode: Node = null;
+    public prepareNode: Node = null;
     @property(Node)
     private dragAreaNode: dragArea = null;
     @property(Node)
-    private retryNode: Node = null;
+    public retryNode: Node = null;
     @property(RichText)
     private scoreText: RichText = null;
     @property(Node)
@@ -58,6 +61,9 @@ export class gameManager extends Component {
         if (this.gameState == EGameState.Prepare) {
             this.updatePrepare(deltaTime);
         }
+        else if (this.gameState == EGameState.PlayStarting) {
+            this.updatePlayStarting(deltaTime);
+        }
         else if (this.gameState == EGameState.Playing) {
             this.updatePlaying(deltaTime);
         }
@@ -69,6 +75,7 @@ export class gameManager extends Component {
     private selectGameMode() {
         this.gameState = EGameState.SelectGameMode;
         this.selectGameModeNode.active = true;
+        this.playStartingNode.active = false;
         this.playingNode.active = false;
         this.prepareNode.active = false;
         this.retryNode.active = false;
@@ -82,6 +89,7 @@ export class gameManager extends Component {
     private prepareGame() {
         this.gameState = EGameState.Prepare;
         this.selectGameModeNode.active = false;
+        this.playStartingNode.active = false;
         this.playingNode.active = false;
         this.prepareNode.active = true;
         this.retryNode.active = false;
@@ -95,8 +103,24 @@ export class gameManager extends Component {
         }
     }
 
+    private updatePlayStarting(deltaTime: number) {
+        if (this.gameState != EGameState.PlayStarting) {
+            return;
+        }
+    }
+
+    public startPlayStarting() {
+        this.gameState = EGameState.PlayStarting;
+        this.playStartingNode.active = true;
+        this.playStartingNode.getComponent(playStartingNode).initialize(this);
+        this.playingNode.active = false;
+        this.prepareNode.active = false;
+        this.retryNode.active = false;
+    }
+
     public startNewGame() {
         this.gameState = EGameState.Playing;
+        this.playStartingNode.active = false;
         this.playingNode.active = true;
         this.prepareNode.active = false;
         this.timeLeft = this.timeLeftValue;
@@ -130,6 +154,7 @@ export class gameManager extends Component {
             child.destroy();
         });
         this.eggParent.removeAllChildren();
+        this.playStartingNode.active = false;
         this.playingNode.active = false;
         this.prepareNode.active = false;
         this.retryNode.active = true;
