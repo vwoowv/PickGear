@@ -1,4 +1,4 @@
-import { _decorator, Component, Node } from 'cc';
+import { _decorator, AnimationComponent, Component, Node } from 'cc';
 import { gameManager } from './gameManager';
 import { ResourceManager } from './ResourceManager';
 const { ccclass, property } = _decorator;
@@ -7,6 +7,8 @@ const { ccclass, property } = _decorator;
 export class playStartingNode extends Component {
     @property(Node)
     private eggParent: Node = null;
+    @property(AnimationComponent)
+    private animation: AnimationComponent = null;
     private eggs: Node[] = [];
     private sinElapsedTime: number = 0;
     private elapsedTime: number = 0;
@@ -21,6 +23,7 @@ export class playStartingNode extends Component {
         this.gameManager = gameManager;
         const audioClip = await ResourceManager.I.loadAudioClip('sound/Sanrio1_Full_Version');
         this.gameManager.playSound.playOneShot(audioClip);
+        this.animation.play();
     }
 
     update(deltaTime: number) {
