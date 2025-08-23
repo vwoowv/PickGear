@@ -16,6 +16,8 @@ export class gameManager extends Component {
     @property(Node)
     public eggParent: Node = null;
     @property(Node)
+    public eggScoreParent: Node = null;
+    @property(Node)
     public eggSpawnPoint_Left: Node = null;
     @property(Node)
     public eggSpawnPoint_Right: Node = null;

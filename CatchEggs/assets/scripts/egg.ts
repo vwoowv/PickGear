@@ -3,6 +3,7 @@ import { EggType } from './gameDefine';
 import { ResourceManager } from './ResourceManager';
 import { eggScore } from './eggScore';
 import { Vec3 } from 'cc';
+import { gameManagerExtensions } from './gameManagerExtensions';
 const { ccclass, property } = _decorator;
 
 @ccclass('egg')
@@ -11,13 +12,15 @@ export class egg extends Component {
     private eggImage: Sprite = null;
     private isRotating: boolean = false;
     private endLine: Node = null;
+    private extensions: gameManagerExtensions = null;
     public currentType: EggType = EggType.DoArin;
 
-    public async initialize(egg: EggType, endLine: Node) {
-        this.eggImage.spriteFrame = await eggResource.loadSprite(egg);
+    public async initialize(egg: EggType, endLine: Node, extensions: gameManagerExtensions) {
+        this.eggImage.spriteFrame = await extensions.loadSprite(egg);
         this.isRotating = Math.random() < 0.5;
         this.endLine = endLine;
         this.currentType = egg;
+        this.extensions = extensions;
     }
 
     update(deltaTime: number) {
@@ -33,21 +36,8 @@ export class egg extends Component {
             return;
         }
         if (this.node.position.y < this.endLine.position.y) {
-            eggResource.spawnEggScore(this.node.parent.parent, this.node.position.clone(), 0);
+            this.extensions.spawnEggScore(this.node.position.clone(), 0);
             this.node.destroy();
         }
-    }
-}
-
-export class eggResource {
-    public static async loadSprite(egg: EggType): Promise<SpriteFrame> {
-        return ResourceManager.I.loadResource(`textures/character/${EggType[egg]}/spriteFrame`, SpriteFrame);
-    }
-
-    public static async spawnEggScore(parent: Node, position: Vec3, score: number): Promise<eggScore> {
-        const newEggScore = await ResourceManager.I.spawnPrefab<eggScore>("prefab/EggScore", parent);
-        newEggScore.node.setPosition(position);
-        newEggScore.setScore(score);
-        return newEggScore;
     }
 }
