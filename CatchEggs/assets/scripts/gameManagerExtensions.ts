@@ -54,12 +54,24 @@ export class gameManagerExtensions extends Component {
         this.gameManager.playingNode.addChild(hitEffectNode);
     }
 
-    public async spawnRandomEgg() {
+    public async spawnRandomEgg(currentTime: number, totalDuration: number): Promise<number> {
         const newEgg = await ResourceManager.I.spawnPrefab<egg>("prefab/Egg", this.eggParent);
         const randomEgg = Math.floor(Math.random() * EggType.TotalCount);
         newEgg.initialize(randomEgg, this.eggEndLine, this);
         const xPosition = Math.random() * (this.eggSpawnPoint_Right.position.x - this.eggSpawnPoint_Left.position.x) + this.eggSpawnPoint_Left.position.x;
         const eggPosition = new Vec3(xPosition, this.eggSpawnPoint_Right.position.y, this.eggSpawnPoint_Right.position.z);
         newEgg.node.setPosition(eggPosition);
+        let spawnTime = 1;
+        const leftTimeRate = currentTime / totalDuration;
+        if (leftTimeRate < 0.3) {
+            spawnTime = 0.35;
+        }
+        else if (leftTimeRate < 0.7) {
+            spawnTime = 0.6;
+        }
+        else {
+            spawnTime = 1;
+        }
+        return spawnTime;
     }
 }

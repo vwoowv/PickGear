@@ -14,6 +14,7 @@ export class gameModeData extends Component {
     @property(Node)
     private enemyParent_Result: Node[] = [];
     private backgroundName: string[] = ["background", "backgroundLake", "backgroundCity"];
+    private gameDurationInSeconds: number[] = [45, 48, 73];
 
     private onTouchVersion1Button() {
         this.currentGameMode = EGameMode.Version1;
@@ -50,5 +51,9 @@ export class gameModeData extends Component {
 
     public async getCurrentBackground(): Promise<SpriteFrame> {
         return await ResourceManager.I.loadResource(`textures/background/${this.backgroundName[this.currentGameMode]}/spriteFrame`, SpriteFrame);
+    }
+
+    public getCurrentGameDuration(): number {
+        return this.gameDurationInSeconds[this.currentGameMode];
     }
 }

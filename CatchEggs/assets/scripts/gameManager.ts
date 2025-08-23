@@ -47,8 +47,7 @@ export class gameManager extends Component {
     @property(Sprite)
     private background: Sprite = null;
     private gameState: EGameState = EGameState.None;
-    private timeLeftValue: number = 10;
-    private timeLeft: number = this.timeLeftValue;
+    private timeLeft: number = 0;
     private currentScore: number = 0;
     private extensions: gameManagerExtensions = null;
     async start() {
@@ -123,7 +122,7 @@ export class gameManager extends Component {
         this.playStartingNode.active = false;
         this.playingNode.active = true;
         this.prepareNode.active = false;
-        this.timeLeft = this.timeLeftValue;
+        this.timeLeft = this.gameMode.getCurrentGameDuration();
         this.retryNode.active = false;
         this.currentScore = 0;
         this.scoreText.string = this.currentScore.toString();
@@ -134,14 +133,16 @@ export class gameManager extends Component {
         if (this.gameState != EGameState.Playing) {
             return;
         }
+
+        const totalDuration = this.gameMode.getCurrentGameDuration();
         this.leftTimeToSpawnEgg -= deltaTime;
         // 끝나기 1초전까지 스폰시킨다
-        if (this.leftTimeToSpawnEgg <= 0 && this.timeLeft - 1 > 0) {
-            this.extensions.spawnRandomEgg();
-            this.leftTimeToSpawnEgg = 1;
+        if (this.leftTimeToSpawnEgg <= 0 && this.timeLeft - 2 > 0) {
+            const spawnTime = await this.extensions.spawnRandomEgg(this.timeLeft, totalDuration);
+            this.leftTimeToSpawnEgg = spawnTime;
         }
         this.timeLeft -= deltaTime;
-        this.timeProgressBar.progress = this.timeLeft / this.timeLeftValue;
+        this.timeProgressBar.progress = this.timeLeft / totalDuration;
         if (this.timeLeft <= 0) {
             this.gameOver();
         }
