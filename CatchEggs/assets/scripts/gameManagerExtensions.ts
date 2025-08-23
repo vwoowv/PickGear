@@ -57,7 +57,7 @@ export class gameManagerExtensions extends Component {
     public async spawnRandomEgg(currentTime: number, totalDuration: number, gameMode: EGameMode): Promise<number> {
         const newEgg = await ResourceManager.I.spawnPrefab<egg>("prefab/Egg", this.eggParent);
         const randomEgg = Math.floor(Math.random() * EggType.TotalCount);
-        newEgg.initialize(randomEgg, this.eggEndLine, this);
+        newEgg.initialize(randomEgg, this.eggEndLine, currentTime, totalDuration, gameMode, this);
         const xPosition = Math.random() * (this.eggSpawnPoint_Right.position.x - this.eggSpawnPoint_Left.position.x) + this.eggSpawnPoint_Left.position.x;
         const eggPosition = new Vec3(xPosition, this.eggSpawnPoint_Right.position.y, this.eggSpawnPoint_Right.position.z);
         newEgg.node.setPosition(eggPosition);

@@ -1,5 +1,5 @@
 import { _decorator, AudioSource, Component, Node, random, Sprite, SpriteFrame } from 'cc';
-import { EggType } from './gameDefine';
+import { EGameMode, EggType } from './gameDefine';
 import { ResourceManager } from './ResourceManager';
 import { eggScore } from './eggScore';
 import { Vec3 } from 'cc';
@@ -13,12 +13,39 @@ export class egg extends Component {
     private endLine: Node = null;
     private extensions: gameManagerExtensions = null;
     public currentType: EggType = EggType.DoArin;
+    private defaultFallDownSpeed: number = 500;
+    private fallDownSpeed: number = this.defaultFallDownSpeed;
 
-    public async initialize(egg: EggType, endLine: Node, extensions: gameManagerExtensions) {
+    public async initialize(egg: EggType, endLine: Node, currentTime: number, totalDuration: number, gameMode: EGameMode, extensions: gameManagerExtensions) {
         this.eggImage.spriteFrame = await extensions.loadSprite(egg);
         this.endLine = endLine;
         this.currentType = egg;
         this.extensions = extensions;
+
+        this.setupFallDownSpeed(currentTime, totalDuration, gameMode);
+    }
+
+    private setupFallDownSpeed(currentTime: number, totalDuration: number, gameMode: EGameMode) {
+        this.fallDownSpeed = this.defaultFallDownSpeed;
+        const leftTimeRate = currentTime / totalDuration;
+        if (gameMode == EGameMode.Version1) {
+            this.fallDownSpeed = this.defaultFallDownSpeed * 1.0;
+            if (leftTimeRate < 0.5) {
+                this.fallDownSpeed = this.defaultFallDownSpeed * 1.2;
+            }
+        }
+        else if (gameMode == EGameMode.Version2) {
+            this.fallDownSpeed = this.defaultFallDownSpeed * 1.1;
+            if (leftTimeRate < 0.5) {
+                this.fallDownSpeed = this.defaultFallDownSpeed * 1.3;
+            }
+        }
+        else if (gameMode == EGameMode.Version3) {
+            this.fallDownSpeed = this.defaultFallDownSpeed * 1.2;
+            if (leftTimeRate < 0.5) {
+                this.fallDownSpeed = this.defaultFallDownSpeed * 1.4;
+            }
+        }
     }
 
     update(deltaTime: number) {
@@ -49,7 +76,7 @@ export class egg extends Component {
     }
 
     private fallDown(deltaTime: number) {
-        this.node.setPosition(this.node.position.x, this.node.position.y - 500 * deltaTime, this.node.position.z);
+        this.node.setPosition(this.node.position.x, this.node.position.y - this.fallDownSpeed * deltaTime, this.node.position.z);
         if (this.endLine === null) {
             return;
         }
