@@ -21,7 +21,8 @@ export class playStartingNode extends Component {
         this.sinElapsedTime = 0;
         this.elapsedTime = 0;
         this.gameManager = gameManager;
-        const audioClip = await ResourceManager.I.loadAudioClip('sound/Sanrio1_Full_Version');
+        const soundName = this.gameManager.gameMode.getCurrentGameBgName();
+        const audioClip = await ResourceManager.I.loadAudioClip(soundName);
         this.gameManager.playSound.playOneShot(audioClip);
         this.animation.play();
     }

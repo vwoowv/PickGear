@@ -11,7 +11,7 @@ const { ccclass, property } = _decorator;
 @ccclass('gameManager')
 export class gameManager extends Component {
     @property(gameModeData)
-    private gameMode: gameModeData = null;
+    public gameMode: gameModeData = null;
     @property(ProgressBar)
     private timeProgressBar: ProgressBar = null;
     @property(Node)

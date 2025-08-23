@@ -27,7 +27,13 @@ export class egg extends Component {
             this.node.angle += 180 * deltaTime;
         }
         else if (this.currentType == EggType.EmmaMoon) {
-            this.node.angle = Math.sin(this.node.position.y * 0.05) * 30;
+            const currentPosition = this.node.position.clone();
+            const sinValue = Math.sin(currentPosition.y * 0.05) * 10;
+            this.node.setPosition(
+                sinValue,
+                currentPosition.y,
+                currentPosition.z
+            );
         }
     }
 
