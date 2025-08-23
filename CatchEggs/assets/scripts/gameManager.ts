@@ -138,7 +138,7 @@ export class gameManager extends Component {
         this.leftTimeToSpawnEgg -= deltaTime;
         // 끝나기 1초전까지 스폰시킨다
         if (this.leftTimeToSpawnEgg <= 0 && this.timeLeft - 2 > 0) {
-            const spawnTime = await this.extensions.spawnRandomEgg(this.timeLeft, totalDuration);
+            const spawnTime = await this.extensions.spawnRandomEgg(this.timeLeft, totalDuration, this.gameMode.currentGameMode);
             this.leftTimeToSpawnEgg = spawnTime;
         }
         this.timeLeft -= deltaTime;

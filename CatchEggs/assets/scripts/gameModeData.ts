@@ -8,13 +8,13 @@ const { ccclass, property } = _decorator;
 export class gameModeData extends Component {
     private gameManagerInstance: gameManager = null;
     @property({ type: Enum(EGameMode) })
-    private currentGameMode: EGameMode = EGameMode.Version1;
+    public currentGameMode: EGameMode = EGameMode.Version1;
     @property(Node)
     private enemyParent: Node[] = [];
     @property(Node)
     private enemyParent_Result: Node[] = [];
     private backgroundName: string[] = ["background", "backgroundLake", "backgroundCity"];
-    private gameDurationInSeconds: number[] = [45, 50, 75];
+    private gameDurationInSeconds: number[] = [45, 49, 74];
     private gameBgName: string[] = ["sound/Sanrio1_Full_Version", "sound/Sanrio2_Full_Version", "sound/Sanrio3_Full_Version"];
 
     private onTouchVersion1Button() {

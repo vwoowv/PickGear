@@ -2,7 +2,7 @@ import { _decorator, AudioClip, AudioSource, Component, instantiate, Node, Prefa
 import { gameManager } from './gameManager';
 import { ResourceManager } from './ResourceManager';
 import { egg } from './egg';
-import { EggType } from './gameDefine';
+import { EGameMode, EggType } from './gameDefine';
 import { eggScore } from './eggScore';
 const { ccclass, property } = _decorator;
 
@@ -54,24 +54,51 @@ export class gameManagerExtensions extends Component {
         this.gameManager.playingNode.addChild(hitEffectNode);
     }
 
-    public async spawnRandomEgg(currentTime: number, totalDuration: number): Promise<number> {
+    public async spawnRandomEgg(currentTime: number, totalDuration: number, gameMode: EGameMode): Promise<number> {
         const newEgg = await ResourceManager.I.spawnPrefab<egg>("prefab/Egg", this.eggParent);
         const randomEgg = Math.floor(Math.random() * EggType.TotalCount);
         newEgg.initialize(randomEgg, this.eggEndLine, this);
         const xPosition = Math.random() * (this.eggSpawnPoint_Right.position.x - this.eggSpawnPoint_Left.position.x) + this.eggSpawnPoint_Left.position.x;
         const eggPosition = new Vec3(xPosition, this.eggSpawnPoint_Right.position.y, this.eggSpawnPoint_Right.position.z);
         newEgg.node.setPosition(eggPosition);
-        let spawnTime = 1;
+        return this.getSpawnTime(currentTime, totalDuration, gameMode);
+    }
+
+    private getSpawnTime(currentTime: number, totalDuration: number, gameMode: EGameMode): number {
         const leftTimeRate = currentTime / totalDuration;
-        if (leftTimeRate < 0.3) {
-            spawnTime = 0.35;
+        if (gameMode == EGameMode.Version1) {
+            if (leftTimeRate < 0.3) {
+                return 0.5;
+            }
+            else if (leftTimeRate < 0.7) {
+                return 0.7;
+            }
+            else {
+                return 1;
+            }
         }
-        else if (leftTimeRate < 0.7) {
-            spawnTime = 0.6;
+        else if (gameMode == EGameMode.Version2) {
+            if (leftTimeRate < 0.3) {
+                return 0.4;
+            }
+            else if (leftTimeRate < 0.7) {
+                return 0.55;
+            }
+            else {
+                return 0.9;
+            }
         }
-        else {
-            spawnTime = 1;
+        else if (gameMode == EGameMode.Version3) {
+            if (leftTimeRate < 0.3) {
+                return 0.3;
+            }
+            else if (leftTimeRate < 0.7) {
+                return 0.5;
+            }
+            else {
+                return 0.8;
+            }
         }
-        return spawnTime;
+        return 1;
     }
 }
