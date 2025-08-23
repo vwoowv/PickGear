@@ -1,4 +1,4 @@
-import { _decorator, Component, error, instantiate, Node, Prefab, resources } from 'cc';
+import { _decorator, AudioClip, Component, error, instantiate, Node, Prefab, resources } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('ResourceManager')
@@ -49,6 +49,10 @@ export class ResourceManager extends Component {
                 resolve(asset as T);
             });
         });
+    }
+
+    public loadAudioClip(path: string): Promise<AudioClip> {
+        return this.loadResource<AudioClip>(path, AudioClip);
     }
 
     public async spawnPrefab<T extends Component>(path: string, parent: Node): Promise<T> {

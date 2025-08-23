@@ -699,7 +699,7 @@
       "b": 0,
       "a": 255
     },
-    "_string": "Version1",
+    "_string": "Level1",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 40,
@@ -3523,7 +3523,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 254.638671875,
+      "width": 257.4462890625,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -3544,7 +3544,7 @@
     "_enabled": true,
     "__prefab": null,
     "_lineHeight": 40,
-    "_string": "Nick Work!!",
+    "_string": "Nice Work!!",
     "_horizontalAlign": 0,
     "_verticalAlign": 0,
     "_fontSize": 50,
@@ -6827,7 +6827,7 @@
         "__id__": 290
       }
     ],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 315
@@ -6965,7 +6965,10 @@
     "_fontFamily": "Arial",
     "_font": null,
     "_isSystemFontUsed": true,
-    "_userDefinedFont": null,
+    "_userDefinedFont": {
+      "__uuid__": "0ed97c56-390e-4dd1-96b7-e7f2d93a98ed",
+      "__expectedType__": "cc.TTFFont"
+    },
     "_cacheMode": 0,
     "_imageAtlas": null,
     "_handleTouchEvent": true,
@@ -9902,7 +9905,7 @@
       "b": 0,
       "a": 255
     },
-    "_string": "Version2",
+    "_string": "Level2",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 40,
@@ -10228,7 +10231,7 @@
       "b": 0,
       "a": 255
     },
-    "_string": "Version3",
+    "_string": "Level3",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 40,
