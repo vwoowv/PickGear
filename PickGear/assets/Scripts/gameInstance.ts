@@ -6,12 +6,15 @@ import { dancer } from './dancer';
 import { delaySeconds } from './delay';
 import { switchGameMode } from './switchGameMode';
 import { gameNodeCollection } from './gameNodeCollection';
+import { gamePlaying } from './gamePlaying';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameInstance')
 export class gameInstance extends Component {
     @property(gameNodeCollection)
     public nodeCollection: gameNodeCollection = null;
+    @property(gamePlaying)
+    public playing: gamePlaying = null;
     @property(Node)
     public gameBackground: Node = null;
 
@@ -32,6 +35,7 @@ export class gameInstance extends Component {
     public startGame(gameType: EGameType) {
         this.gameType = gameType;
         new switchGameMode(this).switchMode(EGameMode.PlayGame);
+        this.playing.startNewGame(this);
     }
 
     public async onStartButtonClick() {

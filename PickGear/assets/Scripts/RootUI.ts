@@ -11,6 +11,8 @@ export class RootUI extends Component {
     private startButton: Button = null;
     @property(RichText)
     private CountText: RichText = null;
+    @property(RichText)
+    private levelText: RichText = null;
     @property(ProgressBar)
     private timeProgressBar: ProgressBar = null;
     @property(RichText)
