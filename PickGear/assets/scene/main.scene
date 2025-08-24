@@ -23,16 +23,16 @@
         "__id__": 4
       },
       {
-        "__id__": 63
+        "__id__": 61
       },
       {
-        "__id__": 65
+        "__id__": 66
       }
     ],
     "_active": true,
     "_components": [],
     "_prefab": {
-      "__id__": 67
+      "__id__": 68
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -63,7 +63,7 @@
     },
     "autoReleaseAssets": false,
     "_globals": {
-      "__id__": 68
+      "__id__": 69
     },
     "_id": "f2843639-ca7e-4826-8bd8-eb45ca751e6e"
   },
@@ -180,13 +180,13 @@
         "__id__": 59
       },
       {
-        "__id__": 60
+        "__id__": 63
       },
       {
-        "__id__": 61
+        "__id__": 64
       },
       {
-        "__id__": 62
+        "__id__": 65
       }
     ],
     "_prefab": null,
@@ -2112,6 +2112,9 @@
     },
     "_enabled": true,
     "__prefab": null,
+    "game": {
+      "__id__": 60
+    },
     "startButton": {
       "__id__": 56
     },
@@ -2125,6 +2128,110 @@
       "__id__": 48
     },
     "_id": "7727+MBqpBSIEMwLC1iM1X"
+  },
+  {
+    "__type__": "ee171E1do5D/IX+9VHpvopQ",
+    "_name": "",
+    "_objFlags": 0,
+    "__editorExtras__": {},
+    "node": {
+      "__id__": 61
+    },
+    "_enabled": true,
+    "__prefab": null,
+    "dancerPos": {
+      "__id__": 10
+    },
+    "_id": "c4oADgLKZJsKkuZz427sFL"
+  },
+  {
+    "__type__": "cc.Node",
+    "_name": "Game",
+    "_objFlags": 0,
+    "__editorExtras__": {},
+    "_parent": {
+      "__id__": 1
+    },
+    "_children": [],
+    "_active": true,
+    "_components": [
+      {
+        "__id__": 62
+      },
+      {
+        "__id__": 60
+      }
+    ],
+    "_prefab": null,
+    "_lpos": {
+      "__type__": "cc.Vec3",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "_lrot": {
+      "__type__": "cc.Quat",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "w": 1
+    },
+    "_lscale": {
+      "__type__": "cc.Vec3",
+      "x": 1,
+      "y": 1,
+      "z": 1
+    },
+    "_mobility": 0,
+    "_layer": 33554432,
+    "_euler": {
+      "__type__": "cc.Vec3",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "_id": "d3PFsrTCdJ8qytE2qM16SG"
+  },
+  {
+    "__type__": "20e74dd+xBHxoc3qnrbXr2r",
+    "_name": "",
+    "_objFlags": 0,
+    "__editorExtras__": {},
+    "node": {
+      "__id__": 61
+    },
+    "_enabled": true,
+    "__prefab": null,
+    "rootUI": {
+      "__id__": 59
+    },
+    "characterPos": {
+      "__id__": 10
+    },
+    "rollingSuitPos": {
+      "__id__": 13
+    },
+    "characterRollingPosStart": {
+      "__id__": 16
+    },
+    "characterRollingPosEnd": {
+      "__id__": 19
+    },
+    "resultPos": [
+      {
+        "__id__": 32
+      },
+      {
+        "__id__": 35
+      },
+      {
+        "__id__": 38
+      },
+      {
+        "__id__": 41
+      }
+    ],
+    "_id": "5aQbLO4gNAt7/OJBwJ5nTI"
   },
   {
     "__type__": "cc.UITransform",
@@ -2196,92 +2303,6 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "Game",
-    "_objFlags": 0,
-    "__editorExtras__": {},
-    "_parent": {
-      "__id__": 1
-    },
-    "_children": [],
-    "_active": true,
-    "_components": [
-      {
-        "__id__": 64
-      }
-    ],
-    "_prefab": null,
-    "_lpos": {
-      "__type__": "cc.Vec3",
-      "x": 0,
-      "y": 0,
-      "z": 0
-    },
-    "_lrot": {
-      "__type__": "cc.Quat",
-      "x": 0,
-      "y": 0,
-      "z": 0,
-      "w": 1
-    },
-    "_lscale": {
-      "__type__": "cc.Vec3",
-      "x": 1,
-      "y": 1,
-      "z": 1
-    },
-    "_mobility": 0,
-    "_layer": 33554432,
-    "_euler": {
-      "__type__": "cc.Vec3",
-      "x": 0,
-      "y": 0,
-      "z": 0
-    },
-    "_id": "d3PFsrTCdJ8qytE2qM16SG"
-  },
-  {
-    "__type__": "20e74dd+xBHxoc3qnrbXr2r",
-    "_name": "",
-    "_objFlags": 0,
-    "__editorExtras__": {},
-    "node": {
-      "__id__": 63
-    },
-    "_enabled": true,
-    "__prefab": null,
-    "rootUI": {
-      "__id__": 59
-    },
-    "characterPos": {
-      "__id__": 10
-    },
-    "rollingSuitPos": {
-      "__id__": 13
-    },
-    "characterRollingPosStart": {
-      "__id__": 16
-    },
-    "characterRollingPosEnd": {
-      "__id__": 19
-    },
-    "resultPos": [
-      {
-        "__id__": 32
-      },
-      {
-        "__id__": 35
-      },
-      {
-        "__id__": 38
-      },
-      {
-        "__id__": 41
-      }
-    ],
-    "_id": "5aQbLO4gNAt7/OJBwJ5nTI"
-  },
-  {
-    "__type__": "cc.Node",
     "_name": "ResourceManager",
     "_objFlags": 0,
     "__editorExtras__": {},
@@ -2292,7 +2313,7 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 66
+        "__id__": 67
       }
     ],
     "_prefab": null,
@@ -2331,7 +2352,7 @@
     "_objFlags": 0,
     "__editorExtras__": {},
     "node": {
-      "__id__": 65
+      "__id__": 66
     },
     "_enabled": true,
     "__prefab": null,
@@ -2348,28 +2369,28 @@
   {
     "__type__": "cc.SceneGlobals",
     "ambient": {
-      "__id__": 69
-    },
-    "shadows": {
       "__id__": 70
     },
-    "_skybox": {
+    "shadows": {
       "__id__": 71
     },
-    "fog": {
+    "_skybox": {
       "__id__": 72
     },
-    "octree": {
+    "fog": {
       "__id__": 73
     },
-    "skin": {
+    "octree": {
       "__id__": 74
     },
-    "lightProbeInfo": {
+    "skin": {
       "__id__": 75
     },
-    "postSettings": {
+    "lightProbeInfo": {
       "__id__": 76
+    },
+    "postSettings": {
+      "__id__": 77
     },
     "bakedWithStationaryMainLight": false,
     "bakedWithHighpLightmap": false

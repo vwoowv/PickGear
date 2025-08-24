@@ -1,9 +1,12 @@
 import { _decorator, Button, Component, Node, ProgressBar, RichText, serializeTag } from 'cc';
 import { GameManager } from './GameManager';
+import { gameInstance } from './gameInstance';
 const { ccclass, property } = _decorator;
 
 @ccclass('RootUI')
 export class RootUI extends Component {
+    @property(gameInstance)
+    private game: gameInstance = null;
     @property(Button)
     private startButton: Button = null;
     @property(RichText)
@@ -14,7 +17,7 @@ export class RootUI extends Component {
     private resultCountText: RichText = null;
 
     public onPickingButtonClick() {
-        // GameManager.I.touchSuit();
+        this.game.onStartButtonClick();
     }
 
     public setCountText(count: number) {
