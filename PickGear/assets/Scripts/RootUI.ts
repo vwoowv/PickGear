@@ -14,7 +14,7 @@ export class RootUI extends Component {
     private resultCountText: RichText = null;
 
     public onPickingButtonClick() {
-        GameManager.I.touchSuit();
+        // GameManager.I.touchSuit();
     }
 
     public setCountText(count: number) {
