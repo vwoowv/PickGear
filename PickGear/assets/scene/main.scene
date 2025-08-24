@@ -2142,6 +2142,20 @@
     "dancerPos": {
       "__id__": 10
     },
+    "dancerResultPos": [
+      {
+        "__id__": 32
+      },
+      {
+        "__id__": 35
+      },
+      {
+        "__id__": 38
+      },
+      {
+        "__id__": 41
+      }
+    ],
     "_id": "c4oADgLKZJsKkuZz427sFL"
   },
   {
