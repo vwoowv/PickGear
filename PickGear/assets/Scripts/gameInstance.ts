@@ -26,6 +26,10 @@ export class gameInstance extends Component {
 
     }
 
+    public startGame(gameType: EGameType) {
+        new switchGameMode(this).switchMode(EGameMode.PlayGame);
+    }
+
     public async onStartButtonClick() {
         // 캐릭터의 기본적인 구성을 먼저 맞춰놓는다
         console.log("onStartButtonClick");

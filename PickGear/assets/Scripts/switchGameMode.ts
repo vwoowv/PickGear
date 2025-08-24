@@ -9,16 +9,28 @@ export class switchGameMode {
     }
 
     public switchMode(gameMode: EGameMode) {
+        this.game.gameMode = gameMode;
+        this.allNodeOff();
         switch (gameMode) {
             case EGameMode.SelectType:
                 this.switchSelectType();
                 break;
+            case EGameMode.PlayGame:
+                this.switchPlayGame();
+                break;
         }
     }
 
-    private switchSelectType() {
-        this.game.gameMode = EGameMode.SelectType;
-        this.game.nodeCollection.selectGameTypeNode.active = true;
+    private allNodeOff() {
+        this.game.nodeCollection.selectGameTypeNode.active = false;
         this.game.nodeCollection.gameNode.active = false;
+    }
+
+    private switchSelectType() {
+        this.game.nodeCollection.selectGameTypeNode.active = true;
+    }
+
+    private switchPlayGame() {
+        this.game.nodeCollection.gameNode.active = true;
     }
 }

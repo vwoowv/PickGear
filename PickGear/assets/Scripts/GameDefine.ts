@@ -16,6 +16,7 @@ export enum ECharacterSuitType {
 
 export enum EGameMode {
     SelectType = 0,
+    PlayGame = 1,
 }
 
 export enum EGameType {
