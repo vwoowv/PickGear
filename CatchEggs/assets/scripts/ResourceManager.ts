@@ -62,4 +62,3 @@ export class ResourceManager extends Component {
         return newNode.getComponent(Component) as T;
     }
 }
-

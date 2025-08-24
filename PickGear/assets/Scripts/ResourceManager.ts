@@ -1,9 +1,10 @@
-import { _decorator, Component, error, resources } from 'cc';
+import { _decorator, AudioClip, Component, error, instantiate, Node, Prefab, resources } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('ResourceManager')
 export class ResourceManager extends Component {
     private static _instance: ResourceManager = null;
+    private resourceCache: Map<string, any> = new Map();
 
     // Singleton 인스턴스에 접근하는 getter
     public static get I(): ResourceManager {
@@ -33,6 +34,10 @@ export class ResourceManager extends Component {
     }
 
     public loadResource<T>(path: string, type: any): Promise<T> {
+        if (this.resourceCache.has(path)) {
+            return Promise.resolve(this.resourceCache.get(path) as T);
+        }
+
         return new Promise((resolve, reject) => {
             resources.load(path, type, (err, asset) => {
                 if (err) {
@@ -40,9 +45,20 @@ export class ResourceManager extends Component {
                     reject(err);
                     return;
                 }
+                this.resourceCache.set(path, asset);
                 resolve(asset as T);
             });
         });
     }
-}
 
+    public loadAudioClip(path: string): Promise<AudioClip> {
+        return this.loadResource<AudioClip>(path, AudioClip);
+    }
+
+    public async spawnPrefab<T extends Component>(path: string, parent: Node): Promise<T> {
+        const prefab = await this.loadResource<Prefab>(path, Prefab);
+        const newNode: Node = instantiate(prefab);
+        parent.addChild(newNode);
+        return newNode.getComponent(Component) as T;
+    }
+}
