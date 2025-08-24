@@ -1,8 +1,9 @@
 import { _decorator, Component, Node } from 'cc';
-import { ECharacterType } from './GameDefine';
+import { ECharacterSuitType, ECharacterType } from './GameDefine';
 import { dancerSprite } from './dancerResource';
 import { ResourceManager } from './ResourceManager';
 import { dancer } from './dancer';
+import { delaySeconds } from './delay';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameInstance')
@@ -34,5 +35,41 @@ export class gameInstance extends Component {
 
         const newDancer4 = await ResourceManager.I.spawnPrefab<dancer>("prefab/character/Dancer", this.dancerResultPos[3]);
         newDancer4.initialize(ECharacterType.SooHana);
+
+        await new delaySeconds().delay(1);
+        newDancer1.suitChange(ECharacterSuitType.HYBE);
+        await new delaySeconds().delay(1);
+        newDancer2.suitChange(ECharacterSuitType.HYBE);
+        await new delaySeconds().delay(1);
+        newDancer3.suitChange(ECharacterSuitType.HYBE);
+        await new delaySeconds().delay(1);
+        newDancer4.suitChange(ECharacterSuitType.HYBE);
+
+        await new delaySeconds().delay(1);
+        newDancer1.suitChange(ECharacterSuitType.YG);
+        await new delaySeconds().delay(1);
+        newDancer2.suitChange(ECharacterSuitType.YG);
+        await new delaySeconds().delay(1);
+        newDancer3.suitChange(ECharacterSuitType.YG);
+        await new delaySeconds().delay(1);
+        newDancer4.suitChange(ECharacterSuitType.YG);
+
+        await new delaySeconds().delay(1);
+        newDancer1.suitChange(ECharacterSuitType.JYP);
+        await new delaySeconds().delay(1);
+        newDancer2.suitChange(ECharacterSuitType.JYP);
+        await new delaySeconds().delay(1);
+        newDancer3.suitChange(ECharacterSuitType.JYP);
+        await new delaySeconds().delay(1);
+        newDancer4.suitChange(ECharacterSuitType.JYP);
+
+        await new delaySeconds().delay(1);
+        newDancer1.suitChange(ECharacterSuitType.SM);
+        await new delaySeconds().delay(1);
+        newDancer2.suitChange(ECharacterSuitType.SM);
+        await new delaySeconds().delay(1);
+        newDancer3.suitChange(ECharacterSuitType.SM);
+        await new delaySeconds().delay(1);
+        newDancer4.suitChange(ECharacterSuitType.SM);
     }
 }

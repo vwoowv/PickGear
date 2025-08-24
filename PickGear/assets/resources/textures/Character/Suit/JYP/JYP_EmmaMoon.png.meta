@@ -11,7 +11,7 @@
     "6c48a": {
       "importer": "texture",
       "uuid": "8998ec7d-0b85-4c7f-a593-624b3fccc978@6c48a",
-      "displayName": "JYPE_EmmaMoon",
+      "displayName": "JYP_EmmaMoon",
       "id": "6c48a",
       "name": "texture",
       "userData": {
@@ -35,7 +35,7 @@
     "f9941": {
       "importer": "sprite-frame",
       "uuid": "8998ec7d-0b85-4c7f-a593-624b3fccc978@f9941",
-      "displayName": "JYPE_EmmaMoon",
+      "displayName": "JYP_EmmaMoon",
       "id": "f9941",
       "name": "spriteFrame",
       "userData": {
