@@ -23,5 +23,3 @@ export class SelectGameTypeNode extends Component {
         this.game.startGame(EGameType.HYBE);
     }
 }
-
-

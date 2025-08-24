@@ -1941,6 +1941,9 @@
     "nodeCollection": {
       "__id__": 110
     },
+    "gameBackground": {
+      "__id__": 56
+    },
     "dancerPos": {
       "__id__": 61
     },

@@ -7,10 +7,10 @@ export enum ECharacterType {
 
 // 캐릭터 타입을 구분하는 enum을 생성합니다.
 export enum ECharacterSuitType {
-    HYBE = 0,
-    YG = 1,
-    JYP = 2,
-    SM = 3,
+    YG = 0,
+    JYP = 1,
+    SM = 2,
+    HYBE = 3,
     NONE = 255
 }
 

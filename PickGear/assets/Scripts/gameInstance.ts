@@ -13,6 +13,9 @@ export class gameInstance extends Component {
     @property(gameNodeCollection)
     public nodeCollection: gameNodeCollection = null;
     @property(Node)
+    public gameBackground: Node = null;
+
+    @property(Node)
     private dancerPos: Node = null;
     @property(Node)
     private dancerResultPos: Node[] = [];
@@ -27,6 +30,7 @@ export class gameInstance extends Component {
     }
 
     public startGame(gameType: EGameType) {
+        this.gameType = gameType;
         new switchGameMode(this).switchMode(EGameMode.PlayGame);
     }
 
