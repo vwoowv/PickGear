@@ -4125,6 +4125,10 @@
     },
     "_enabled": true,
     "__prefab": null,
+    "game": null,
+    "uiNode": {
+      "__id__": 4
+    },
     "_id": "e3l6PkPqxN7JuRvEnpLXp9"
   },
   {

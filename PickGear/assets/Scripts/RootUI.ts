@@ -46,4 +46,12 @@ export class RootUI extends Component {
     public setResultCountText(count: number) {
         this.resultCountText.string = "점수 : " + count.toString();
     }
+
+    public showLevelText(isShow: boolean) {
+        this.levelText.node.active = isShow;
+    }
+
+    public setLevelText(level: number) {
+        this.levelText.string = "LV." + level.toString();
+    }
 }
