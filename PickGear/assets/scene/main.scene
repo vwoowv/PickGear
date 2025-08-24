@@ -912,8 +912,8 @@
     "_prefab": null,
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": -250,
-      "y": 0,
+      "x": -246.445,
+      "y": -1.4000000000000004,
       "z": 0
     },
     "_lrot": {
@@ -925,7 +925,7 @@
     },
     "_lscale": {
       "__type__": "cc.Vec3",
-      "x": 1,
+      "x": 0.9,
       "y": 1,
       "z": 1
     },
@@ -951,8 +951,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 500,
-      "height": 33
+      "width": 547.7777777777777,
+      "height": 18.2
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -977,12 +977,12 @@
     "_color": {
       "__type__": "cc.Color",
       "r": 255,
-      "g": 0,
-      "b": 0,
+      "g": 255,
+      "b": 255,
       "a": 255
     },
     "_spriteFrame": {
-      "__uuid__": "24a704da-2867-446d-8d1a-5e920c75e09d@f9941",
+      "__uuid__": "1000d774-2d76-43b5-bf1b-a772aabef644@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "_type": 1,
@@ -1012,19 +1012,19 @@
     "__prefab": null,
     "_alignFlags": 45,
     "_target": null,
-    "_left": 0,
-    "_right": 0,
-    "_top": 1,
-    "_bottom": 1,
+    "_left": 3.555000000000007,
+    "_right": 3.444999999999993,
+    "_top": 0.28,
+    "_bottom": 7,
     "_horizontalCenter": 0,
     "_verticalCenter": 0,
     "_isAbsLeft": true,
     "_isAbsRight": true,
-    "_isAbsTop": true,
+    "_isAbsTop": false,
     "_isAbsBottom": true,
     "_isAbsHorizontalCenter": true,
     "_isAbsVerticalCenter": true,
-    "_originalWidth": 150,
+    "_originalWidth": 500,
     "_originalHeight": 15,
     "_alignMode": 2,
     "_lockFlags": 0,
@@ -1067,13 +1067,13 @@
     "_dstBlendFactor": 4,
     "_color": {
       "__type__": "cc.Color",
-      "r": 95,
-      "g": 95,
-      "b": 95,
+      "r": 255,
+      "g": 255,
+      "b": 255,
       "a": 255
     },
     "_spriteFrame": {
-      "__uuid__": "9fd900dd-221b-4f89-8f2c-fba34243c835@f9941",
+      "__uuid__": "13e8a5ba-5264-4268-888b-00f87b2980ce@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "_type": 1,
@@ -1105,7 +1105,7 @@
       "__id__": 25
     },
     "_mode": 0,
-    "_totalLength": 500,
+    "_totalLength": 493,
     "_progress": 1,
     "_reverse": false,
     "_id": "491A3Q9NlNTrgXySnpx5NF"
