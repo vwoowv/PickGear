@@ -1,4 +1,4 @@
-import { ECharacterType } from "./GameDefine";
+import { ECharacterType } from "../GameDefine";
 
 export class dancerSprite {
     public resourcePath: string;

@@ -1,10 +1,10 @@
 import { _decorator, Component, instantiate, Node, Prefab, SpriteFrame, Vec3 } from 'cc';
-import { Character } from './Character';
-import { CharacterDataDefinition } from './CharacterDataDefinition';
+import { Character } from './Character/Character';
+import { CharacterDataDefinition } from './Character/CharacterDataDefinition';
 import { ResourceManager } from './ResourceManager';
 import { RootUI } from './RootUI';
 import { ECharacterSuitType, ECharacterType } from './GameDefine';
-import { RollingSuit } from './RollingSuit';
+import { RollingSuit } from './Character/RollingSuit';
 import { delayMS } from './delay';
 const { ccclass, property } = _decorator;
 

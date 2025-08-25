@@ -1,5 +1,5 @@
-import { _decorator, Component, Node, Sprite, SpriteFrame } from 'cc';
-import { ECharacterSuitType } from './GameDefine';
+import { _decorator, Component, Sprite, SpriteFrame } from 'cc';
+import { ECharacterSuitType } from '../GameDefine';
 const { ccclass, property } = _decorator;
 
 @ccclass('RollingSuit')

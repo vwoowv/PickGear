@@ -1,9 +1,5 @@
 import { _decorator, Component, Node } from 'cc';
-import { ECharacterSuitType, ECharacterType, EGameMode, EGameType } from './GameDefine';
-import { dancerSprite } from './dancerResource';
-import { ResourceManager } from './ResourceManager';
-import { dancer } from './dancer';
-import { delaySeconds } from './delay';
+import { EGameMode, EGameType } from './GameDefine';
 import { switchGameMode } from './switchGameMode';
 import { gameNodeCollection } from './gameNodeCollection';
 import { gamePlaying } from './gamePlaying';

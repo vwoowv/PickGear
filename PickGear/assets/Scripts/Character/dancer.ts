@@ -1,7 +1,7 @@
-import { _decorator, Component, Node, Sprite, SpriteFrame } from 'cc';
-import { ECharacterSuitType, ECharacterType } from './GameDefine';
+import { _decorator, Component, Sprite, SpriteFrame } from 'cc';
+import { ECharacterSuitType, ECharacterType } from '../GameDefine';
 import { dancerSprite } from './dancerResource';
-import { ResourceManager } from './ResourceManager';
+import { ResourceManager } from '../ResourceManager';
 import { getDancerSuit } from './getDancerSuit';
 const { ccclass, property } = _decorator;
 

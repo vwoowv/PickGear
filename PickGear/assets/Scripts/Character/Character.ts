@@ -1,8 +1,7 @@
-import { _decorator, Component, Enum, Node, resources, Sprite, SpriteFrame } from 'cc';
-import { ResourceManager } from './ResourceManager';
-import { GameManager } from './GameManager';
+import { _decorator, Component, Enum, Sprite, SpriteFrame } from 'cc';
 import { CharacterDataDefinition } from './CharacterDataDefinition';
-import { ECharacterSuitType, ECharacterType } from './GameDefine';
+import { ECharacterSuitType, ECharacterType } from '../GameDefine';
+
 const { ccclass, property } = _decorator;
 
 @ccclass('Character')

@@ -1,4 +1,4 @@
-import { ECharacterSuitType, ECharacterType } from "./GameDefine";
+import { ECharacterSuitType, ECharacterType } from "../GameDefine";
 
 export class getDancerSuit {
     private dancerType: ECharacterType;
