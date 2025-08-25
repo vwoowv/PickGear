@@ -1,3 +1,6 @@
+import { t } from "typescript-fsm";
+import { EGameModeEvent, EGameModeState } from "./gameModeStateEvent";
+
 export class gameModeManager {
     private static _instance: gameModeManager = null;
     public static get I(): gameModeManager {
@@ -12,5 +15,13 @@ export class gameModeManager {
             throw new Error('gameModeManager는 싱글톤입니다. I 프로퍼티를 통해 접근하세요.');
         }
         gameModeManager._instance = this;
+    }
+
+    public transitions = [
+        t(EGameModeState.ShowSelection, EGameModeEvent.ShowSelectionEnd, EGameModeState.SingleDancerSuitRolling, this.onShowSelectionEnd),
+    ];
+
+    private async onShowSelectionEnd() {
+        console.log('onShowSelectionEnd');
     }
 }
