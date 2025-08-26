@@ -1,8 +1,8 @@
 import { Sprite, SpriteFrame } from "cc";
-import { EGameMode } from "./GameDefine";
 import { gameInstance } from "./gameInstance";
 import { getGameBackground } from "./getGameBackground";
 import { ResourceManager } from "./ResourceManager";
+import { EGameRootModeState } from "./GameMode/gameModeStateEvent";
 
 export class switchGameMode {
     private game: gameInstance;
@@ -11,14 +11,14 @@ export class switchGameMode {
         this.game = game;
     }
 
-    public switchMode(gameMode: EGameMode) {
+    public switchMode(gameMode: EGameRootModeState) {
         this.game.gameMode = gameMode;
         this.allNodeOff();
         switch (gameMode) {
-            case EGameMode.SelectType:
+            case EGameRootModeState.SelectType:
                 this.switchSelectType();
                 break;
-            case EGameMode.PlayGame:
+            case EGameRootModeState.PlayGame:
                 this.switchPlayGame();
                 break;
         }

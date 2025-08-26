@@ -14,11 +14,6 @@ export enum ECharacterSuitType {
     NONE = 255
 }
 
-export enum EGameMode {
-    SelectType = 0,
-    PlayGame = 1,
-}
-
 export enum EGameType {
     YG = 0,
     JYP = 1,

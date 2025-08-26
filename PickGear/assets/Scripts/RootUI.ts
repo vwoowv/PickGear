@@ -1,5 +1,4 @@
-import { _decorator, Button, Component, Node, ProgressBar, RichText, serializeTag } from 'cc';
-import { GameManager } from './GameManager';
+import { _decorator, Button, Component, ProgressBar, RichText } from 'cc';
 import { gameInstance } from './gameInstance';
 const { ccclass, property } = _decorator;
 
