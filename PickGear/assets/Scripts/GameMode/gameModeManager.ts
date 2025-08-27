@@ -1,6 +1,8 @@
 import { StateMachine, t } from "../StateMachine/stateMachine";
 import { EGameModeEvent, EGameModeState, EGameRootModeEvent, EGameRootModeState } from "./gameModeStateEvent";
+import { gameNodePackage } from "./gameNodePackage";
 import { gameRootModeTransition } from "./gameRootModeTransition";
+import { Node } from "cc";
 
 export class gameModeManager {
     private static _instance: gameModeManager = null;
@@ -18,24 +20,24 @@ export class gameModeManager {
         gameModeManager._instance = this;
     }
 
-    private rootTransition = new gameRootModeTransition();
+    private rootTransition: gameRootModeTransition = null;
+    private nodePackage: gameNodePackage = null;
 
-    public transitions = [
-        t(EGameModeState.ShowSelection, EGameModeEvent.ShowSelectionEnd, EGameModeState.SingleDancerSuitRolling, this.onShowSelectionEnd),
-    ];
+    // public transitions = [
+    //     t(EGameModeState.ShowSelection, EGameModeEvent.ShowSelectionEnd, EGameModeState.SingleDancerSuitRolling, this.onShowSelectionEnd),
+    // ];
 
-    public initialize() {
+    public initialize(uiNode: Node, gameInstanceNode: Node) {
+        this.nodePackage = new gameNodePackage();
+        this.nodePackage.uiNode = uiNode;
+        this.nodePackage.gameInstanceNode = gameInstanceNode;
+        this.rootTransition = new gameRootModeTransition(this.nodePackage);
     }
 
-    private async onShowSelectionEnd() {
-        console.log('onShowSelectionEnd');
-    }
+    rootSelectGameType = async () => this.rootTransition.selectType();
+    rootPlayGame = async () => this.rootTransition.playGame();
 
-    private async onSelectType() {
-        console.log('onSelectType');
-    }
-
-    private async onPlayGame() {
-        console.log('onPlayGame');
-    }
+    // private async onShowSelectionEnd() {
+    //     console.log('onShowSelectionEnd');
+    // }
 }

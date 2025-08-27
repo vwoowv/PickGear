@@ -1,9 +1,9 @@
 import { _decorator, Component, Node } from 'cc';
 import { EGameType } from './GameDefine';
-import { switchGameMode } from './switchGameMode';
 import { gameNodeCollection } from './gameNodeCollection';
 import { gamePlaying } from './gamePlaying';
 import { EGameRootModeState } from './GameMode/gameModeStateEvent';
+import { gameModeManager } from './GameMode/gameModeManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameInstance')
@@ -14,6 +14,8 @@ export class gameInstance extends Component {
     public playing: gamePlaying = null;
     @property(Node)
     public gameBackground: Node = null;
+    @property(Node)
+    public uiNode: Node = null;
 
     @property(Node)
     private dancerPos: Node = null;
@@ -22,7 +24,8 @@ export class gameInstance extends Component {
     public gameMode: EGameRootModeState = EGameRootModeState.SelectType;
     public gameType: EGameType = EGameType.YG;
     start() {
-        new switchGameMode(this).switchMode(EGameRootModeState.SelectType);
+        gameModeManager.I.initialize(this.uiNode, this.node);
+        gameModeManager.I.rootSelectGameType();
     }
 
     update(deltaTime: number) {
@@ -31,7 +34,7 @@ export class gameInstance extends Component {
 
     public startGame(gameType: EGameType) {
         this.gameType = gameType;
-        new switchGameMode(this).switchMode(EGameRootModeState.PlayGame);
+        gameModeManager.I.rootPlayGame();
         this.playing.startNewGame(this);
     }
 
