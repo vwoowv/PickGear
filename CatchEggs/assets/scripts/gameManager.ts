@@ -6,6 +6,7 @@ import { dragArea } from './dragArea';
 import { gameModeData } from './gameModeData';
 import { gameManagerExtensions } from './gameManagerExtensions';
 import { playStartingNode } from './playStartingNode';
+import { richTextMaker } from './richTextMaker';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameManager')
@@ -36,6 +37,10 @@ export class gameManager extends Component {
     private dragAreaNode: dragArea = null;
     @property(Node)
     public retryNode: Node = null;
+    @property(RichText)
+    private currentScoreText: RichText = null;
+    @property(RichText)
+    private currentLevelText: RichText = null;
     @property(RichText)
     private scoreText: RichText = null;
     @property(Node)
@@ -94,6 +99,8 @@ export class gameManager extends Component {
         this.retryNode.active = false;
         this.currentScore = 0;
         this.scoreText.string = this.currentScore.toString();
+        this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3).resultText;
+        this.currentLevelText.string = new richTextMaker("LV." + this.gameMode.getCurrentLevelFromVersion().toString(), "#020202", 3).resultText;
     }
 
     private updatePrepare(deltaTime: number) {
@@ -126,6 +133,8 @@ export class gameManager extends Component {
         this.retryNode.active = false;
         this.currentScore = 0;
         this.scoreText.string = this.currentScore.toString();
+        this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3).resultText;
+        this.currentLevelText.string = new richTextMaker("LV." + this.gameMode.getCurrentLevelFromVersion().toString(), "#020202", 3).resultText;
     }
 
     private leftTimeToSpawnEgg: number = 0;
@@ -180,6 +189,7 @@ export class gameManager extends Component {
             if (distance < 100) {
                 console.log("egg in basket : " + eggNode.name);
                 this.currentScore += 1;
+                this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3).resultText;
                 const eggComponent = eggNode.getComponent(egg);
                 eggComponent.onEggCatch();
                 eggInBasket.push(eggNode);

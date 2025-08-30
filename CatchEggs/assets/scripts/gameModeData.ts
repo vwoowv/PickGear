@@ -32,6 +32,19 @@ export class gameModeData extends Component {
         this.completeSelectGameMode();
     }
 
+    public getCurrentLevelFromVersion(): number {
+        if (this.currentGameMode == EGameMode.Version1) {
+            return 1;
+        }
+        else if (this.currentGameMode == EGameMode.Version2) {
+            return 2;
+        }
+        else if (this.currentGameMode == EGameMode.Version3) {
+            return 3;
+        }
+        return 0;
+    }
+
     private completeSelectGameMode() {
         this.enemyParent.forEach(enemy => {
             enemy.active = false;
