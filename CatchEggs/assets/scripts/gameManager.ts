@@ -137,7 +137,8 @@ export class gameManager extends Component {
         this.currentLevelText.string = new richTextMaker("LV." + this.gameMode.getCurrentLevelFromVersion().toString(), "#020202", 3).resultText;
     }
 
-    private leftTimeToSpawnEgg: number = 0;
+    private isSpawningEgg: boolean = false;
+    private leftTimeToSpawnEgg: number = 1;
     private async updatePlaying(deltaTime: number) {
         if (this.gameState != EGameState.Playing) {
             return;
@@ -146,9 +147,11 @@ export class gameManager extends Component {
         const totalDuration = this.gameMode.getCurrentGameDuration();
         this.leftTimeToSpawnEgg -= deltaTime;
         // 끝나기 1초전까지 스폰시킨다
-        if (this.leftTimeToSpawnEgg <= 0 && this.timeLeft - 2 > 0) {
+        if (this.leftTimeToSpawnEgg <= 0 && this.timeLeft - 2 > 0 && this.isSpawningEgg == false) {
+            this.isSpawningEgg = true;
             const spawnTime = await this.extensions.spawnRandomEgg(this.timeLeft, totalDuration, this.gameMode.currentGameMode);
             this.leftTimeToSpawnEgg = spawnTime;
+            this.isSpawningEgg = false;
         }
         this.timeLeft -= deltaTime;
         this.timeProgressBar.progress = this.timeLeft / totalDuration;
