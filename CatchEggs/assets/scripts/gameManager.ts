@@ -99,8 +99,8 @@ export class gameManager extends Component {
         this.retryNode.active = false;
         this.currentScore = 0;
         this.scoreText.string = this.currentScore.toString();
-        this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3).resultText;
-        this.currentLevelText.string = new richTextMaker("LV." + this.gameMode.getCurrentLevelFromVersion().toString(), "#020202", 3).resultText;
+        this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
+        this.currentLevelText.string = new richTextMaker("LV." + this.gameMode.getCurrentLevelFromVersion().toString(), "#020202", 3, "").resultText;
     }
 
     private updatePrepare(deltaTime: number) {
@@ -133,8 +133,8 @@ export class gameManager extends Component {
         this.retryNode.active = false;
         this.currentScore = 0;
         this.scoreText.string = this.currentScore.toString();
-        this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3).resultText;
-        this.currentLevelText.string = new richTextMaker("LV." + this.gameMode.getCurrentLevelFromVersion().toString(), "#020202", 3).resultText;
+        this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
+        this.currentLevelText.string = new richTextMaker("LV." + this.gameMode.getCurrentLevelFromVersion().toString(), "#020202", 3, "").resultText;
     }
 
     private isSpawningEgg: boolean = false;
@@ -192,7 +192,7 @@ export class gameManager extends Component {
             if (distance < 100) {
                 console.log("egg in basket : " + eggNode.name);
                 this.currentScore += 1;
-                this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3).resultText;
+                this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
                 const eggComponent = eggNode.getComponent(egg);
                 eggComponent.onEggCatch();
                 eggInBasket.push(eggNode);

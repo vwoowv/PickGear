@@ -10,7 +10,7 @@ export class eggScore extends Component {
     private scoreAnimation: AnimationComponent = null;
 
     public setScore(score: number) {
-        this.scoreText.string = new richTextMaker(score.toString(), "#020202", 3).resultText;
+        this.scoreText.string = new richTextMaker(score.toString(), "#020202", 3, "").resultText;
         this.scoreAnimation.play(null);
         this.scoreAnimation.on(AnimationComponent.EventType.FINISHED, this.onScoreAnimationFinished, this);
     }

@@ -8404,6 +8404,24 @@
     "animation": {
       "__id__": 331
     },
+    "letsGoText": {
+      "__id__": 301
+    },
+    "saveYourEggBirdsText": {
+      "__id__": 297
+    },
+    "version1Font": {
+      "__uuid__": "110df663-5b3c-4cdf-9e21-c7fab131edb5",
+      "__expectedType__": "cc.TTFFont"
+    },
+    "version2Font": {
+      "__uuid__": "110df663-5b3c-4cdf-9e21-c7fab131edb5",
+      "__expectedType__": "cc.TTFFont"
+    },
+    "version3Font": {
+      "__uuid__": "c44ae739-c305-4cc4-ad9e-8526de9839ef",
+      "__expectedType__": "cc.TTFFont"
+    },
     "_id": "a7QRIu5nZCK5T4/NulA04/"
   },
   {
