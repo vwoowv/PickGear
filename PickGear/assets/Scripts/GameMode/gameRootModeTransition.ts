@@ -19,9 +19,6 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
     }
 
     private nodePackage: gameNodePackage = null;
-    private get gameInstance(): gameInstance {
-        return this.nodePackage.gameInstanceNode.getComponent(gameInstance);
-    }
 
     private get ui(): RootUI {
         return this.nodePackage.uiNode.getComponent(RootUI);
@@ -31,23 +28,23 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
     playGame = async () => this.dispatch(EGameRootModeEvent.PlayGame);
 
     private allNodeOff() {
-        this.gameInstance.nodeCollection.selectGameTypeNode.active = false;
-        this.gameInstance.nodeCollection.gameNode.active = false;
+        gameInstance.I.nodeCollection.selectGameTypeNode.active = false;
+        gameInstance.I.nodeCollection.gameNode.active = false;
     }
 
     private async onSelectType() {
         console.log('onSelectType');
         this.allNodeOff();
-        this.gameInstance.nodeCollection.selectGameTypeNode.active = true;
+        gameInstance.I.nodeCollection.selectGameTypeNode.active = true;
     }
 
     private async onPlayGame() {
         console.log('onPlayGame');
         this.allNodeOff();
-        this.gameInstance.nodeCollection.gameNode.active = true;
+        gameInstance.I.nodeCollection.gameNode.active = true;
 
-        const gameBackgroundPath = new getGameBackground(this.gameInstance.gameType).getBackgroundResourcePath();
-        console.log(`gameBackgroundPath: ${gameBackgroundPath}, gameType: ${this.gameInstance.gameType}`);
-        this.gameInstance.gameBackground.getComponent(Sprite).spriteFrame = await ResourceManager.I.loadResource(gameBackgroundPath, SpriteFrame);
+        const gameBackgroundPath = new getGameBackground(gameInstance.I.gameType).getBackgroundResourcePath();
+        console.log(`gameBackgroundPath: ${gameBackgroundPath}, gameType: ${gameInstance.I.gameType}`);
+        gameInstance.I.gameBackground.getComponent(Sprite).spriteFrame = await ResourceManager.I.loadResource(gameBackgroundPath, SpriteFrame);
     }
 }
