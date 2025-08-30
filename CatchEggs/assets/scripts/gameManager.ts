@@ -11,6 +11,25 @@ const { ccclass, property } = _decorator;
 
 @ccclass('gameManager')
 export class gameManager extends Component {
+    private static _instance: gameManager = null;
+
+    // Singleton 인스턴스에 접근하는 getter
+    public static get I(): gameManager {
+        if (gameManager._instance === null) {
+            console.error('gameManager Singleton이 초기화되지 않았습니다!');
+        }
+        return gameManager._instance;
+    }
+
+    onLoad() {
+        if (gameManager._instance === null) {
+            gameManager._instance = this;
+        }
+        else {
+            this.node.destroy();
+        }
+    }
+
     @property(gameModeData)
     public gameMode: gameModeData = null;
     @property(ProgressBar)

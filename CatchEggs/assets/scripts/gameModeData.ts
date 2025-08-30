@@ -1,4 +1,4 @@
-import { _decorator, Component, Enum, Node, SpriteFrame } from 'cc';
+import { _decorator, Component, Enum, Font, Node, SpriteFrame } from 'cc';
 import { EGameMode } from './gameDefine';
 import { gameManager } from './gameManager';
 import { ResourceManager } from './ResourceManager';
@@ -13,6 +13,8 @@ export class gameModeData extends Component {
     private enemyParent: Node[] = [];
     @property(Node)
     private enemyParent_Result: Node[] = [];
+    @property(Font)
+    private versionFont: Font[] = [null, null, null];
     private backgroundName: string[] = ["background", "backgroundLake", "backgroundCity"];
     private gameDurationInSeconds: number[] = [44, 49, 74];
     private gameBgName: string[] = ["sound/Sanrio1_Full_Version", "sound/Sanrio2_Full_Version", "sound/Sanrio3_Full_Version"];
@@ -73,5 +75,9 @@ export class gameModeData extends Component {
 
     public getCurrentGameBgName(): string {
         return this.gameBgName[this.currentGameMode];
+    }
+
+    public getCurrentVersionFont(): Font {
+        return this.versionFont[this.currentGameMode];
     }
 }
