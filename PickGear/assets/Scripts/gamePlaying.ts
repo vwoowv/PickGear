@@ -1,15 +1,19 @@
 import { _decorator, Component, Node } from 'cc';
 import { RootUI } from './RootUI';
 import { EGameModeState } from './GameMode/gameModeStateEvent';
-import { EPlayingSequence } from './GameDefine';
+import { ECharacterType, EPlayingSequence } from './GameDefine';
 import { getPlaySequenceFromState } from './Utility/getPlaySequenceFromState';
 import { getPlayLevelFromState } from './Utility/getPlayLevelFromState';
+import { ResourceManager } from './ResourceManager';
+import { dancer } from './Character/dancer';
 const { ccclass, property } = _decorator;
 
 @ccclass('gamePlaying')
 export class gamePlaying extends Component {
     @property(Node)
     private uiNode: Node = null;
+    @property(Node)
+    private dancerPos: Node = null;
     private ui: RootUI = null;
     private currentSequence: EPlayingSequence = EPlayingSequence.ShowSuit;
     private currentLevel: number = 1;
@@ -47,7 +51,11 @@ export class gamePlaying extends Component {
         }
     }
 
-    private onShowSuit() {
+    private async onShowSuit() {
+        console.log('onShowSuit');
+        // 현재 레벨의 댄서와 맞출 복장을 보여준다
+        const newDancer1 = await ResourceManager.I.spawnPrefab<dancer>("prefab/character/Dancer", this.dancerPos);
+        newDancer1.initialize(ECharacterType.DoArin);
     }
 
     private onGameRound() {
