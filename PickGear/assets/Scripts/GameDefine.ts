@@ -18,14 +18,6 @@ export enum ECharacterSuitType {
     JYP = 1,
     SM = 2,
     HYBE = 3,
-    NONE = 255
-}
-
-export enum EGameType {
-    YG = 0,
-    JYP = 1,
-    SM = 2,
-    HYBE = 3,
 }
 
 export enum EPlayingSequence {

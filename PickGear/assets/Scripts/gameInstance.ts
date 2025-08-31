@@ -1,9 +1,9 @@
 import { _decorator, Component, Node } from 'cc';
-import { EGameType } from './GameDefine';
 import { gameNodeCollection } from './gameNodeCollection';
 import { gamePlaying } from './gamePlaying';
 import { EGameRootModeState } from './GameMode/gameModeStateEvent';
 import { gameModeManager } from './GameMode/gameModeManager';
+import { ECharacterSuitType } from './GameDefine';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameInstance')
@@ -18,13 +18,7 @@ export class gameInstance extends Component {
     public gameBackground: Node = null;
     @property(Node)
     public uiNode: Node = null;
-
-    @property(Node)
-    private dancerPos: Node = null;
-    @property(Node)
-    private dancerResultPos: Node[] = [];
     public gameMode: EGameRootModeState = EGameRootModeState.SelectType;
-    public gameType: EGameType = EGameType.YG;
 
     public static get I(): gameInstance {
         if (gameInstance._instance === null) {
@@ -61,8 +55,8 @@ export class gameInstance extends Component {
 
     }
 
-    public startGame(gameType: EGameType) {
-        this.gameType = gameType;
+    public startGame(gameType: ECharacterSuitType) {
+        this.playing.setGameType(gameType);
         gameModeManager.I.rootPlayGame();
     }
 

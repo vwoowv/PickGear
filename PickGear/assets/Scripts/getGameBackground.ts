@@ -1,22 +1,22 @@
-import { EGameType } from "./GameDefine";
+import { ECharacterSuitType } from "./GameDefine";
 
 export class getGameBackground {
-    private gameType: EGameType;
+    private gameType: ECharacterSuitType;
     private rootPath = 'textures/Background/';
 
-    public constructor(gameType: EGameType) {
+    public constructor(gameType: ECharacterSuitType) {
         this.gameType = gameType;
     }
 
     public getBackgroundResourcePath() : string {
         switch (this.gameType) {
-            case EGameType.YG:
+            case ECharacterSuitType.YG:
                 return `${this.rootPath}YG Background shorts/spriteFrame`;
-            case EGameType.JYP:
+            case ECharacterSuitType.JYP:
                 return `${this.rootPath}JYP Background shorts/spriteFrame`;
-            case EGameType.SM:
+            case ECharacterSuitType.SM:
                 return `${this.rootPath}SM Background shorts/spriteFrame`;
-            case EGameType.HYBE:
+            case ECharacterSuitType.HYBE:
                 return `${this.rootPath}HYBE Background shorts/spriteFrame`;
             default:
                 return null;

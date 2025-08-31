@@ -1950,23 +1950,6 @@
     "uiNode": {
       "__id__": 4
     },
-    "dancerPos": {
-      "__id__": 59
-    },
-    "dancerResultPos": [
-      {
-        "__id__": 81
-      },
-      {
-        "__id__": 84
-      },
-      {
-        "__id__": 87
-      },
-      {
-        "__id__": 90
-      }
-    ],
     "_id": "c4oADgLKZJsKkuZz427sFL"
   },
   {
@@ -4479,6 +4462,7 @@
     "dancerPos": {
       "__id__": 59
     },
+    "dancerResultPos": [],
     "_id": "e3l6PkPqxN7JuRvEnpLXp9"
   },
   {

@@ -9,8 +9,8 @@ export class playNewGame {
         const game = gameInstance.I;
         game.nodeCollection.allNodeOff();
         game.nodeCollection.gameNode.active = true;
-        const gameBackgroundPath = new getGameBackground(game.gameType).getBackgroundResourcePath();
-        console.log(`gameBackgroundPath: ${gameBackgroundPath}, gameType: ${game.gameType}`);
+        const gameBackgroundPath = new getGameBackground(game.playing.currentSuitType).getBackgroundResourcePath();
+        console.log(`gameBackgroundPath: ${gameBackgroundPath}, gameType: ${game.playing.currentSuitType}`);
         game.gameBackground.getComponent(Sprite).spriteFrame = await ResourceManager.I.loadResource(gameBackgroundPath, SpriteFrame);
 
         gameModeManager.I.playingToPrepare();
