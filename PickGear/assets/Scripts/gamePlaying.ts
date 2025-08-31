@@ -2,6 +2,8 @@ import { _decorator, Component, Node } from 'cc';
 import { RootUI } from './RootUI';
 import { EGameModeState } from './GameMode/gameModeStateEvent';
 import { EPlayingSequence } from './GameDefine';
+import { getPlaySequenceFromState } from './Utility/getPlaySequenceFromState';
+import { getPlayLevelFromState } from './Utility/getPlayLevelFromState';
 const { ccclass, property } = _decorator;
 
 @ccclass('gamePlaying')
@@ -28,6 +30,29 @@ export class gamePlaying extends Component {
 
     public onTransitionChanged(currentMode: EGameModeState) {
         // enum 이름이 찍히도록 출력
+        this.currentSequence = new getPlaySequenceFromState(currentMode).gameSequence;
+        this.currentLevel = new getPlayLevelFromState(currentMode).currentLevel;
         console.log('onTransitionChanged', EGameModeState[currentMode], currentMode);
+        console.log('onTransitionChanged. Level : ', this.currentLevel);
+        console.log('onTransitionChanged. Sequence : ', EPlayingSequence[this.currentSequence], this.currentSequence);
+
+        if (this.currentSequence === EPlayingSequence.ShowSuit) {
+            this.onShowSuit();
+        }
+        else if (this.currentSequence === EPlayingSequence.GameRound) {
+            this.onGameRound();
+        }
+        else if (this.currentSequence === EPlayingSequence.Result) {
+            this.onResult();
+        }
+    }
+
+    private onShowSuit() {
+    }
+
+    private onGameRound() {
+    }
+
+    private onResult() {
     }
 }
