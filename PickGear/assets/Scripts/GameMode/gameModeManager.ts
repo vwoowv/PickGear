@@ -29,7 +29,7 @@ export class gameModeManager {
         this.nodePackage = new gameNodePackage();
         this.nodePackage.uiNode = uiNode;
         this.nodePackage.gameInstanceNode = gameInstanceNode;
-        this.rootTransition = new gameRootModeTransition(this.nodePackage);
+        this.rootTransition = new gameRootModeTransition();
     }
 
     rootSelectGameType = async () => this.rootTransition.selectType();
