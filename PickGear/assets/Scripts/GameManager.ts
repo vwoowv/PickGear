@@ -1,11 +1,8 @@
 import { _decorator, Component, instantiate, Node, Prefab, SpriteFrame, Vec3 } from 'cc';
 import { Character } from './Character/Character';
 import { CharacterDataDefinition } from './Character/CharacterDataDefinition';
-import { ResourceManager } from './ResourceManager';
 import { RootUI } from './RootUI';
 import { ECharacterSuitType, ECharacterType } from './GameDefine';
-import { RollingSuit } from './Character/RollingSuit';
-import { delayMS } from './delay';
 const { ccclass, property } = _decorator;
 
 export enum EGameState {
@@ -270,9 +267,4 @@ export class GameManager extends Component {
     //     this.rootUI.showResultCountText(true);
     //     this.rootUI.setResultCountText(pickCount);
     // }
-}
-
-function delay(ms: number) {
-    // return new Promise(resolve => setTimeout(resolve, ms));
-    return new delayMS().delay(ms);
 }

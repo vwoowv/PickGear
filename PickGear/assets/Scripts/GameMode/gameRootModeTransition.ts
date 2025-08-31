@@ -27,24 +27,20 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
     selectType = async () => this.dispatch(EGameRootModeEvent.SelectType);
     playGame = async () => this.dispatch(EGameRootModeEvent.PlayGame);
 
-    private allNodeOff() {
-        gameInstance.I.nodeCollection.selectGameTypeNode.active = false;
-        gameInstance.I.nodeCollection.gameNode.active = false;
-    }
-
     private async onSelectType() {
         console.log('onSelectType');
-        this.allNodeOff();
-        gameInstance.I.nodeCollection.selectGameTypeNode.active = true;
+        const game = gameInstance.I;
+        game.nodeCollection.allNodeOff();
+        game.nodeCollection.selectGameTypeNode.active = true;
     }
 
     private async onPlayGame() {
         console.log('onPlayGame');
-        this.allNodeOff();
-        gameInstance.I.nodeCollection.gameNode.active = true;
-
-        const gameBackgroundPath = new getGameBackground(gameInstance.I.gameType).getBackgroundResourcePath();
-        console.log(`gameBackgroundPath: ${gameBackgroundPath}, gameType: ${gameInstance.I.gameType}`);
-        gameInstance.I.gameBackground.getComponent(Sprite).spriteFrame = await ResourceManager.I.loadResource(gameBackgroundPath, SpriteFrame);
+        const game = gameInstance.I;
+        game.nodeCollection.allNodeOff();
+        game.nodeCollection.gameNode.active = true;
+        const gameBackgroundPath = new getGameBackground(game.gameType).getBackgroundResourcePath();
+        console.log(`gameBackgroundPath: ${gameBackgroundPath}, gameType: ${game.gameType}`);
+        game.gameBackground.getComponent(Sprite).spriteFrame = await ResourceManager.I.loadResource(gameBackgroundPath, SpriteFrame);
     }
 }

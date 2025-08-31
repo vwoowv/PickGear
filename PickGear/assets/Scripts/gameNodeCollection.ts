@@ -7,6 +7,9 @@ export class gameNodeCollection extends Component {
     public selectGameTypeNode: Node = null;
     @property(Node)
     public gameNode: Node = null;
+
+    public allNodeOff() {
+        this.selectGameTypeNode.active = false;
+        this.gameNode.active = false;
+    }
 }
-
-

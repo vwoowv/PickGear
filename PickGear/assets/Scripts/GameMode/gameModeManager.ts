@@ -1,5 +1,3 @@
-import { StateMachine, t } from "../StateMachine/stateMachine";
-import { EGameModeEvent, EGameModeState, EGameRootModeEvent, EGameRootModeState } from "./gameModeStateEvent";
 import { gameNodePackage } from "./gameNodePackage";
 import { gameRootModeTransition } from "./gameRootModeTransition";
 import { Node } from "cc";
