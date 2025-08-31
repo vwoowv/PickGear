@@ -7,6 +7,7 @@ import { getPlayLevelFromState } from './Utility/getPlayLevelFromState';
 import { ResourceManager } from './ResourceManager';
 import { dancer } from './Character/dancer';
 import { getCharacterTypeFromLevel } from './Utility/getCharacterTypeFromLevel';
+import { gameModeManager } from './GameMode/gameModeManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('gamePlaying')
@@ -18,9 +19,33 @@ export class gamePlaying extends Component {
     private currentSequence: EPlayingSequence = EPlayingSequence.ShowSuit;
     public currentSuitType: ECharacterSuitType = ECharacterSuitType.YG;
     private currentLevel: number = 1;
+    private currentTime: number = 0;
 
     update(deltaTime: number) {
+        switch (this.currentSequence) {
+            case EPlayingSequence.ShowSuit:
+                this.updateShowSuit(deltaTime);
+                break;
+            case EPlayingSequence.GameRound:
+                this.updateGameRound(deltaTime);
+                break;
+            case EPlayingSequence.Result:
+                this.updateResult(deltaTime);
+                break;
+        }
+    }
 
+    private updateShowSuit(deltaTime: number) {
+        this.currentTime += deltaTime;
+        if (this.currentTime > 3) {
+            gameModeManager.I.playingToLevel1GameRound();
+        }
+    }
+
+    private updateGameRound(deltaTime: number) {
+    }
+
+    private updateResult(deltaTime: number) {
     }
 
     // 게임 시작. 이 안에서 게임 라운드를 관리한다
@@ -63,13 +88,16 @@ export class gamePlaying extends Component {
         const currentDancer = await ResourceManager.I.spawnPrefab<dancer>("prefab/character/Dancer", this.dancerPos);
         currentDancer.initialize(new getCharacterTypeFromLevel(this.currentLevel).characterType);
         currentDancer.suitChange(this.currentSuitType);
+        this.currentTime = 0;
     }
 
     private onGameRound() {
         console.log('onGameRound');
         RootUI.I.setupGameRound();
+        this.currentTime = 0;
     }
 
     private onResult() {
+        this.currentTime = 0;
     }
 }
