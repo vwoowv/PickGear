@@ -39,9 +39,6 @@ export class playingModeTransition extends StateMachine<EGameModeState, EGameMod
 
     private async onPrepare() {
         console.log('onPrepare');
-        gameInstance.I.playing.startNewGame();
-
-        // 바로 다음 단계로 이동
         this.level1ShowSuit();
     }
 

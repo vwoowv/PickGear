@@ -35,10 +35,11 @@ export class gamePlaying extends Component {
         }
     }
 
+    private showSuitTime: number = 3;
     private updateShowSuit(deltaTime: number) {
         this.currentTime += deltaTime;
-        if (this.currentTime > 3) {
-            gameModeManager.I.playingToLevel1GameRound();
+        if (this.currentTime > this.showSuitTime) {
+            gameModeManager.I.playingToGameRound(this.currentLevel);
         }
     }
 
@@ -46,16 +47,6 @@ export class gamePlaying extends Component {
     }
 
     private updateResult(deltaTime: number) {
-    }
-
-    // 게임 시작. 이 안에서 게임 라운드를 관리한다
-    public startNewGame() {
-        // this.ui = this.uiNode.getComponent(RootUI);
-        // this.ui.showCountText(false);
-        // this.ui.showTimeProgressBar(false);
-        // this.ui.showResultCountText(false);
-        // this.ui.showLevelText(true);
-        // this.ui.setLevelText(this.currentLevel);
     }
 
     public setGameType(gameType: ECharacterSuitType) {
@@ -81,19 +72,26 @@ export class gamePlaying extends Component {
         }
     }
 
+    private currentDancer: dancer = null;
     private async onShowSuit() {
         console.log('onShowSuit');
         // 현재 레벨의 댄서와 맞출 복장을 보여준다
         RootUI.I.setupShowSuit(this.currentLevel);
-        const currentDancer = await ResourceManager.I.spawnPrefab<dancer>("prefab/character/Dancer", this.dancerPos);
-        currentDancer.initialize(new getCharacterTypeFromLevel(this.currentLevel).characterType);
-        currentDancer.suitChange(this.currentSuitType);
+        if (this.currentDancer != null) {
+            this.dancerPos.removeChild(this.currentDancer.node);
+            this.currentDancer.destroy();
+            this.currentDancer = null;
+        }
+        this.currentDancer = await ResourceManager.I.spawnPrefab<dancer>("prefab/character/Dancer", this.dancerPos);
+        this.currentDancer.initialize(new getCharacterTypeFromLevel(this.currentLevel).characterType);
+        this.currentDancer.suitChange(this.currentSuitType);
         this.currentTime = 0;
     }
 
     private onGameRound() {
         console.log('onGameRound');
         RootUI.I.setupGameRound();
+        this.currentDancer.takeOffSuit();
         this.currentTime = 0;
     }
 
