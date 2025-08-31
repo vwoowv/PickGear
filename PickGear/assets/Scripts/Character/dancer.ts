@@ -29,9 +29,6 @@ export class dancer extends Component {
     }
 
     public takeOffSuit() {
-        if (this.currentSuit.spriteFrame != null) {
-            this.currentSuit.spriteFrame.destroy();
-            this.currentSuit.spriteFrame = null;
-        }
+        this.currentSuit.spriteFrame = null;
     }
 }
