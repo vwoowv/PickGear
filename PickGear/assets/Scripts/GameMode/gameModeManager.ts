@@ -1,6 +1,7 @@
 import { gameNodePackage } from "./gameNodePackage";
 import { gameRootModeTransition } from "./gameRootModeTransition";
 import { Node } from "cc";
+import { playingModeTransition } from "./playingModeTransition";
 
 export class gameModeManager {
     private static _instance: gameModeManager = null;
@@ -20,7 +21,7 @@ export class gameModeManager {
 
     private rootTransition: gameRootModeTransition = null;
     private nodePackage: gameNodePackage = null;
-
+    private playingTransition: playingModeTransition = null;
     // public transitions = [
     //     t(EGameModeState.ShowSelection, EGameModeEvent.ShowSelectionEnd, EGameModeState.SingleDancerSuitRolling, this.onShowSelectionEnd),
     // ];
@@ -30,12 +31,23 @@ export class gameModeManager {
         this.nodePackage.uiNode = uiNode;
         this.nodePackage.gameInstanceNode = gameInstanceNode;
         this.rootTransition = new gameRootModeTransition();
+        this.playingTransition = new playingModeTransition();
     }
 
     rootSelectGameType = async () => this.rootTransition.selectType();
     rootPlayGame = async () => this.rootTransition.playGame();
 
-    // private async onShowSelectionEnd() {
-    //     console.log('onShowSelectionEnd');
-    // }
+    playingToPrepare = async () => this.playingTransition.prepare();
+    playingToLevel1ShowSuit = async () => this.playingTransition.level1ShowSuit();
+    playingToLevel1GameRound = async () => this.playingTransition.level1GameRound();
+    playingToLevel2ShowSuit = async () => this.playingTransition.level2ShowSuit();
+    playingToLevel2GameRound = async () => this.playingTransition.level2GameRound();
+    playingToLevel3ShowSuit = async () => this.playingTransition.level3ShowSuit();
+    playingToLevel3GameRound = async () => this.playingTransition.level3GameRound();
+    playingToLevel4ShowSuit = async () => this.playingTransition.level4ShowSuit();
+    playingToLevel4GameRound = async () => this.playingTransition.level4GameRound();
+    playingToLevel5ShowSuit = async () => this.playingTransition.level5ShowSuit();
+    playingToLevel5GameRound = async () => this.playingTransition.level5GameRound();
+    playingToLevel5Result = async () => this.playingTransition.level5Result();
+    playingToEndGame = async () => this.playingTransition.endGame();
 }
