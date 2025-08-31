@@ -64,7 +64,6 @@ export class gameInstance extends Component {
     public startGame(gameType: EGameType) {
         this.gameType = gameType;
         gameModeManager.I.rootPlayGame();
-        this.playing.startNewGame();
     }
 
     public async onStartButtonClick() {

@@ -1,6 +1,6 @@
 import { _decorator, Component, Node } from 'cc';
-import { EGameRound } from './GameDefine';
 import { RootUI } from './RootUI';
+import { EGameModeState } from './GameMode/gameModeStateEvent';
 const { ccclass, property } = _decorator;
 
 @ccclass('gamePlaying')
@@ -8,7 +8,6 @@ export class gamePlaying extends Component {
     @property(Node)
     private uiNode: Node = null;
     private ui: RootUI = null;
-    private gameRound: EGameRound = EGameRound.Preview;
     private currentLevel: number = 1;
 
     update(deltaTime: number) {
@@ -18,13 +17,15 @@ export class gamePlaying extends Component {
     // 게임 시작. 이 안에서 게임 라운드를 관리한다
     public startNewGame() {
         this.ui = this.uiNode.getComponent(RootUI);
-        this.gameRound = EGameRound.Preview;
-        this.currentLevel = 1;
-
         this.ui.showCountText(false);
         this.ui.showTimeProgressBar(false);
         this.ui.showResultCountText(false);
         this.ui.showLevelText(true);
         this.ui.setLevelText(this.currentLevel);
+    }
+
+    public onTransitionChanged(currentMode: EGameModeState) {
+        // enum 이름이 찍히도록 출력
+        console.log('onTransitionChanged', EGameModeState[currentMode], currentMode);
     }
 }

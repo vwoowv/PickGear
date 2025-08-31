@@ -1,3 +1,4 @@
+import { gameInstance } from "../gameInstance";
 import { StateMachine, t } from "../StateMachine/stateMachine";
 import { EGameModeEvent, EGameModeState } from "./gameModeStateEvent";
 
@@ -38,10 +39,15 @@ export class playingModeTransition extends StateMachine<EGameModeState, EGameMod
 
     private async onPrepare() {
         console.log('onPrepare');
+        gameInstance.I.playing.startNewGame();
+
+        // 바로 다음 단계로 이동
+        this.level1ShowSuit();
     }
 
     private async onLevel1ShowSuit() {
         console.log('onLevel1ShowSuit');
+        gameInstance.I.playing.onTransitionChanged(this.getState());
     }
 
     private async onLevel1GameRound() {
