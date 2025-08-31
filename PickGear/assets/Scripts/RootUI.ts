@@ -52,7 +52,11 @@ export class RootUI extends Component {
     }
 
     public setupShowAllSuit() {
+        this.hideAllGroup();
+    }
 
+    public setupGameRound() {
+        this.hideAllGroup();
     }
 
     // public setCountText(count: number) {

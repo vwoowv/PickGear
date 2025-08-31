@@ -66,6 +66,8 @@ export class gamePlaying extends Component {
     }
 
     private onGameRound() {
+        console.log('onGameRound');
+        RootUI.I.setupGameRound();
     }
 
     private onResult() {
