@@ -1,5 +1,6 @@
-import { _decorator, Button, Component, ProgressBar, RichText } from 'cc';
+import { _decorator, Component, ProgressBar, RichText, Node } from 'cc';
 import { gameInstance } from './gameInstance';
+import { richTextMaker } from './Utility/richTextMaker';
 const { ccclass, property } = _decorator;
 
 @ccclass('RootUI')
@@ -20,51 +21,70 @@ export class RootUI extends Component {
         }
     }
 
-    @property(Button)
-    private startButton: Button = null;
+    @property(Node)
+    private showSuitGroup: Node = null;
     @property(RichText)
-    private CountText: RichText = null;
+    private showSuitLevelText: RichText = null;
     @property(RichText)
     private levelText: RichText = null;
     @property(ProgressBar)
     private timeProgressBar: ProgressBar = null;
+    @property(Node)
+    private currentScoreGroup: Node = null;
     @property(RichText)
-    private resultCountText: RichText = null;
+    private currentScoreText: RichText = null;
 
     public onPickingButtonClick() {
         gameInstance.I.onStartButtonClick();
     }
 
-    public setCountText(count: number) {
-        this.showCountText(true);
-        this.CountText.string = count.toString();
+    private hideAllGroup() {
+        this.currentScoreGroup.active = false;
+        this.timeProgressBar.node.active = false;
+        this.levelText.node.active = false;
+        this.showSuitGroup.active = false;
     }
 
-    public showCountText(isShow: boolean) {
-        this.CountText.node.active = isShow;
+    public setupShowSuit(currentLevel: number) {
+        this.hideAllGroup();
+        this.showSuitGroup.active = true;
+        this.showSuitLevelText.string = new richTextMaker("LV." + currentLevel.toString(), "020202", 3, "FFFFFF").resultText;
     }
 
-    public showTimeProgressBar(isShow: boolean) {
-        this.timeProgressBar.node.active = isShow;
+    public setupShowAllSuit() {
+
     }
 
-    public setTimeProgressBar(value: number) {
-        this.timeProgressBar.progress = value;
-    }
+    // public setCountText(count: number) {
+    //     this.showCountText(true);
+    //     this.CountText.string = count.toString();
+    // }
 
-    public showResultCountText(isShow: boolean) {
-        this.resultCountText.node.active = isShow;
-    }
+    // public showCountText(isShow: boolean) {
+    //     this.CountText.node.active = isShow;
+    // }
 
-    public setResultCountText(count: number) {
-        this.resultCountText.string = "점수 : " + count.toString();
-    }
+    // public showTimeProgressBar(isShow: boolean) {
+    //     this.timeProgressBar.node.active = isShow;
+    // }
 
-    public showLevelText(isShow: boolean) {
-        this.levelText.node.active = isShow;
-    }
+    // public setTimeProgressBar(value: number) {
+    //     this.timeProgressBar.progress = value;
+    // }
 
-    public setLevelText(level: number) {
-        this.levelText.string = "LV." + level.toString();
-    }
+    // public showResultCountText(isShow: boolean) {
+    //     this.resultCountText.node.active = isShow;
+    // }
+
+    // public setResultCountText(count: number) {
+    //     this.resultCountText.string = "점수 : " + count.toString();
+    // }
+
+    // public showLevelText(isShow: boolean) {
+    //     this.levelText.node.active = isShow;
+    // }
+
+    // public setLevelText(level: number) {
+    //     this.levelText.string = "LV." + level.toString();
+    // }
 }

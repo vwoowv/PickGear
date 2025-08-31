@@ -12,12 +12,9 @@ const { ccclass, property } = _decorator;
 @ccclass('gamePlaying')
 export class gamePlaying extends Component {
     @property(Node)
-    private uiNode: Node = null;
-    @property(Node)
     private dancerPos: Node = null;
     @property(Node)
     private dancerResultPos: Node[] = [];
-    private ui: RootUI = null;
     private currentSequence: EPlayingSequence = EPlayingSequence.ShowSuit;
     public currentSuitType: ECharacterSuitType = ECharacterSuitType.YG;
     private currentLevel: number = 1;
@@ -28,12 +25,12 @@ export class gamePlaying extends Component {
 
     // 게임 시작. 이 안에서 게임 라운드를 관리한다
     public startNewGame() {
-        this.ui = this.uiNode.getComponent(RootUI);
-        this.ui.showCountText(false);
-        this.ui.showTimeProgressBar(false);
-        this.ui.showResultCountText(false);
-        this.ui.showLevelText(true);
-        this.ui.setLevelText(this.currentLevel);
+        // this.ui = this.uiNode.getComponent(RootUI);
+        // this.ui.showCountText(false);
+        // this.ui.showTimeProgressBar(false);
+        // this.ui.showResultCountText(false);
+        // this.ui.showLevelText(true);
+        // this.ui.setLevelText(this.currentLevel);
     }
 
     public setGameType(gameType: ECharacterSuitType) {
@@ -62,6 +59,7 @@ export class gamePlaying extends Component {
     private async onShowSuit() {
         console.log('onShowSuit');
         // 현재 레벨의 댄서와 맞출 복장을 보여준다
+        RootUI.I.setupShowSuit(this.currentLevel);
         const currentDancer = await ResourceManager.I.spawnPrefab<dancer>("prefab/character/Dancer", this.dancerPos);
         currentDancer.initialize(new getCharacterTypeFromLevel(this.currentLevel).characterType);
         currentDancer.suitChange(this.currentSuitType);
