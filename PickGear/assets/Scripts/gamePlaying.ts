@@ -1,6 +1,7 @@
 import { _decorator, Component, Node } from 'cc';
 import { RootUI } from './RootUI';
 import { EGameModeState } from './GameMode/gameModeStateEvent';
+import { EPlayingSequence } from './GameDefine';
 const { ccclass, property } = _decorator;
 
 @ccclass('gamePlaying')
@@ -8,6 +9,7 @@ export class gamePlaying extends Component {
     @property(Node)
     private uiNode: Node = null;
     private ui: RootUI = null;
+    private currentSequence: EPlayingSequence = EPlayingSequence.ShowSuit;
     private currentLevel: number = 1;
 
     update(deltaTime: number) {

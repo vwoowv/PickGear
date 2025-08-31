@@ -20,3 +20,9 @@ export enum EGameType {
     SM = 2,
     HYBE = 3,
 }
+
+export enum EPlayingSequence {
+    ShowSuit,
+    GameRound,
+    Result,
+}
