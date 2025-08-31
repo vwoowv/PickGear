@@ -1,8 +1,15 @@
+// 각 레벨당 인물 할당
+// 1 : 도아린
+// 2 : 수하나
+// 3 : 송은비
+// 4 : 엠마문
+// 5 : 전부다
+
 export enum ECharacterType {
     DoArin = 0,
-    EmmaMoon = 1,
-    SongUnbee = 2,
-    SooHana = 3
+    SooHana,
+    SongUnbee,
+    EmmaMoon,
 }
 
 // 캐릭터 타입을 구분하는 enum을 생성합니다.
