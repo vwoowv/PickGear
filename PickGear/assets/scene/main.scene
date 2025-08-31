@@ -4218,7 +4218,6 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "game": null,
     "uiNode": {
       "__id__": 4
     },
@@ -4234,9 +4233,6 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "game": {
-      "__id__": 49
-    },
     "startButton": {
       "__id__": 109
     },
