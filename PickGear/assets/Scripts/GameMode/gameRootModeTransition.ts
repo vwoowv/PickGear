@@ -1,10 +1,7 @@
 import { gameInstance } from "../gameInstance";
 import { StateMachine, t } from "../StateMachine/stateMachine";
 import { EGameRootModeEvent, EGameRootModeState } from "./gameModeStateEvent";
-import { getGameBackground } from "../getGameBackground";
-import { ResourceManager } from "../ResourceManager";
-import { SpriteFrame } from "cc";
-import { Sprite } from "cc";
+import { playNewGame } from "./playNewGame";
 
 export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGameRootModeEvent> {
     constructor() {
@@ -27,11 +24,6 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
 
     private async onPlayGame() {
         console.log('onPlayGame');
-        const game = gameInstance.I;
-        game.nodeCollection.allNodeOff();
-        game.nodeCollection.gameNode.active = true;
-        const gameBackgroundPath = new getGameBackground(game.gameType).getBackgroundResourcePath();
-        console.log(`gameBackgroundPath: ${gameBackgroundPath}, gameType: ${game.gameType}`);
-        game.gameBackground.getComponent(Sprite).spriteFrame = await ResourceManager.I.loadResource(gameBackgroundPath, SpriteFrame);
+        await new playNewGame().initialize();
     }
 }

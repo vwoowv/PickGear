@@ -22,9 +22,6 @@ export class gameModeManager {
     private rootTransition: gameRootModeTransition = null;
     private nodePackage: gameNodePackage = null;
     private playingTransition: playingModeTransition = null;
-    // public transitions = [
-    //     t(EGameModeState.ShowSelection, EGameModeEvent.ShowSelectionEnd, EGameModeState.SingleDancerSuitRolling, this.onShowSelectionEnd),
-    // ];
 
     public initialize(uiNode: Node, gameInstanceNode: Node) {
         this.nodePackage = new gameNodePackage();
