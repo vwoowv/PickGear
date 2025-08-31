@@ -39,7 +39,7 @@ export class playingModeTransition extends StateMachine<EGameModeState, EGameMod
 
     private async onPrepare() {
         console.log('onPrepare');
-        this.level1ShowSuit();
+        gameInstance.I.playing.onTransitionChanged(this.getState());
     }
 
     private async onLevel1ShowSuit() {

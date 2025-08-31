@@ -21,6 +21,7 @@ export enum ECharacterSuitType {
 }
 
 export enum EPlayingSequence {
+    Prepare,
     ShowSuit,
     GameRound,
     Result,

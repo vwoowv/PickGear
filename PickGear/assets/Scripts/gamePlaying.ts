@@ -60,8 +60,10 @@ export class gamePlaying extends Component {
         console.log('onTransitionChanged', EGameModeState[currentMode], currentMode);
         console.log('onTransitionChanged. Level : ', this.currentLevel);
         console.log('onTransitionChanged. Sequence : ', EPlayingSequence[this.currentSequence], this.currentSequence);
-
-        if (this.currentSequence === EPlayingSequence.ShowSuit) {
+        if (this.currentSequence === EPlayingSequence.Prepare) {
+            this.onPrepare();
+        }
+        else if (this.currentSequence === EPlayingSequence.ShowSuit) {
             this.onShowSuit();
         }
         else if (this.currentSequence === EPlayingSequence.GameRound) {
@@ -70,6 +72,11 @@ export class gamePlaying extends Component {
         else if (this.currentSequence === EPlayingSequence.Result) {
             this.onResult();
         }
+    }
+
+    private async onPrepare() {
+        console.log('onPrepare');
+        gameModeManager.I.playingToLevel1ShowSuit();
     }
 
     private currentDancer: dancer = null;
@@ -90,7 +97,7 @@ export class gamePlaying extends Component {
 
     private onGameRound() {
         console.log('onGameRound');
-        RootUI.I.setupGameRound();
+        RootUI.I.setupGameRound(this.currentLevel);
         this.currentDancer.takeOffSuit();
         this.currentTime = 0;
     }
