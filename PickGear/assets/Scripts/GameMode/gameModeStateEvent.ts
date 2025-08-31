@@ -12,7 +12,8 @@ export enum EGameRootModeEvent {
 // Level1 Show suit -> Level1 Game Round -> Level2 Show Suit -> Level2 Game Round -> Level3 Show Suit -> Level3 Game Round
 // -> Level4 Show Suit -> Level4 Game Round -> Level5 Show all Suit -> Level5 Game Round -> Level5 Result -> End Game
 export enum EGameModeState {
-    Prepare = 0,
+    None = 0,
+    Prepare,
     Level1ShowSuit,
     Level1GameRound,
     Level2ShowSuit,

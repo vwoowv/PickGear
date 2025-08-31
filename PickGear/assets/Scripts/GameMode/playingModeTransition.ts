@@ -3,8 +3,9 @@ import { EGameModeEvent, EGameModeState } from "./gameModeStateEvent";
 
 export class playingModeTransition extends StateMachine<EGameModeState, EGameModeEvent> {
     constructor() {
-        super(EGameModeState.Prepare, []);
+        super(EGameModeState.None, []);
         this.addTransitions([
+            t(EGameModeState.None, EGameModeEvent.ToPrepare, EGameModeState.Prepare, this.onPrepare),
             t(EGameModeState.Prepare, EGameModeEvent.ToLevel1ShowSuit, EGameModeState.Level1ShowSuit, this.onLevel1ShowSuit),
             t(EGameModeState.Level1ShowSuit, EGameModeEvent.ToLevel1GameRound, EGameModeState.Level1GameRound, this.onLevel1GameRound),
             t(EGameModeState.Level1GameRound, EGameModeEvent.ToLevel2ShowSuit, EGameModeState.Level2ShowSuit, this.onLevel2ShowSuit),
