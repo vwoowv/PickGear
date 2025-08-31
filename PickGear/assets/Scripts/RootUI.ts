@@ -4,8 +4,22 @@ const { ccclass, property } = _decorator;
 
 @ccclass('RootUI')
 export class RootUI extends Component {
-    @property(gameInstance)
-    private game: gameInstance = null;
+    private static _instance: RootUI = null;
+    public static get I(): RootUI {
+        if (RootUI._instance === null) {
+            RootUI._instance = new RootUI();
+        }
+        return RootUI._instance;
+    }
+
+    protected onLoad(): void {
+        if (RootUI._instance === null) {
+            RootUI._instance = this;
+        } else {
+            this.node.destroy();
+        }
+    }
+
     @property(Button)
     private startButton: Button = null;
     @property(RichText)
@@ -18,7 +32,7 @@ export class RootUI extends Component {
     private resultCountText: RichText = null;
 
     public onPickingButtonClick() {
-        this.game.onStartButtonClick();
+        gameInstance.I.onStartButtonClick();
     }
 
     public setCountText(count: number) {
