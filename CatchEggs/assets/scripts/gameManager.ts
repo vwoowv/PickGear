@@ -1,7 +1,7 @@
 import { _decorator, AudioClip, AudioSource, Component, instantiate, Node, ParticleSystem, Prefab, ProgressBar, RichText, Sprite, Vec3 } from 'cc';
 import { ResourceManager } from './ResourceManager';
 import { egg } from './egg';
-import { EggType, EGameState } from './gameDefine';
+import { EggType, EGameState, EGameMode } from './gameDefine';
 import { dragArea } from './dragArea';
 import { gameModeData } from './gameModeData';
 import { gameManagerExtensions } from './gameManagerExtensions';
@@ -56,6 +56,10 @@ export class gameManager extends Component {
     private dragAreaNode: dragArea = null;
     @property(Node)
     public retryNode: Node = null;
+    @property(Node)
+    public retryNodeHeartNormal: Node = null;
+    @property(Node)
+    public retryNodeHeartVersion3: Node = null;
     @property(RichText)
     private currentScoreText: RichText = null;
     @property(RichText)
@@ -191,6 +195,9 @@ export class gameManager extends Component {
         this.prepareNode.active = false;
         this.retryNode.active = true;
         this.scoreText.string = this.currentScore.toString();
+        const isVersion3 = this.gameMode.currentGameMode == EGameMode.Version3;
+        this.retryNodeHeartNormal.active = !isVersion3;
+        this.retryNodeHeartVersion3.active = isVersion3;
         this.gameMode.resultGame();
     }
 
