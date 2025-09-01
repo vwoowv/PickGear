@@ -27,4 +27,8 @@ export class dancer extends Component {
         const resourcePath = new getDancerSuit(this.dancerType).getSuitResourcePath(suitType);
         this.currentSuit.spriteFrame = await ResourceManager.I.loadResource(resourcePath, SpriteFrame);
     }
+
+    public takeOffSuit() {
+        this.currentSuit.spriteFrame = null;
+    }
 }

@@ -5,6 +5,9 @@ export class getPlaySequenceFromState {
     public gameSequence: EPlayingSequence;
     public constructor(currentMode: EGameModeState) {
         switch (currentMode) {
+            case EGameModeState.Prepare:
+                this.gameSequence = EPlayingSequence.Prepare;
+                break;
             case EGameModeState.Level1ShowSuit:
             case EGameModeState.Level2ShowSuit:
             case EGameModeState.Level3ShowSuit:

@@ -55,8 +55,15 @@ export class RootUI extends Component {
         this.hideAllGroup();
     }
 
-    public setupGameRound() {
+    public setupGameRound(currentLevel: number) {
         this.hideAllGroup();
+        this.levelText.node.active = true;
+        this.timeProgressBar.node.active = true;
+        this.currentScoreGroup.active = true;
+    
+        this.levelText.string = new richTextMaker("LV." + currentLevel.toString(), "020202", 3, "FFFFFF").resultText;
+        this.timeProgressBar.progress = 1;
+        this.currentScoreText.string = new richTextMaker("0", "020202", 3, "FFFFFF").resultText;
     }
 
     // public setCountText(count: number) {

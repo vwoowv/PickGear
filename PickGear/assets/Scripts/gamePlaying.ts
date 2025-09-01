@@ -7,6 +7,7 @@ import { getPlayLevelFromState } from './Utility/getPlayLevelFromState';
 import { ResourceManager } from './ResourceManager';
 import { dancer } from './Character/dancer';
 import { getCharacterTypeFromLevel } from './Utility/getCharacterTypeFromLevel';
+import { gameModeManager } from './GameMode/gameModeManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('gamePlaying')
@@ -18,19 +19,34 @@ export class gamePlaying extends Component {
     private currentSequence: EPlayingSequence = EPlayingSequence.ShowSuit;
     public currentSuitType: ECharacterSuitType = ECharacterSuitType.YG;
     private currentLevel: number = 1;
+    private currentTime: number = 0;
 
     update(deltaTime: number) {
-
+        switch (this.currentSequence) {
+            case EPlayingSequence.ShowSuit:
+                this.updateShowSuit(deltaTime);
+                break;
+            case EPlayingSequence.GameRound:
+                this.updateGameRound(deltaTime);
+                break;
+            case EPlayingSequence.Result:
+                this.updateResult(deltaTime);
+                break;
+        }
     }
 
-    // 게임 시작. 이 안에서 게임 라운드를 관리한다
-    public startNewGame() {
-        // this.ui = this.uiNode.getComponent(RootUI);
-        // this.ui.showCountText(false);
-        // this.ui.showTimeProgressBar(false);
-        // this.ui.showResultCountText(false);
-        // this.ui.showLevelText(true);
-        // this.ui.setLevelText(this.currentLevel);
+    private showSuitTime: number = 3;
+    private updateShowSuit(deltaTime: number) {
+        this.currentTime += deltaTime;
+        if (this.currentTime > this.showSuitTime) {
+            gameModeManager.I.playingToGameRound(this.currentLevel);
+        }
+    }
+
+    private updateGameRound(deltaTime: number) {
+    }
+
+    private updateResult(deltaTime: number) {
     }
 
     public setGameType(gameType: ECharacterSuitType) {
@@ -44,8 +60,10 @@ export class gamePlaying extends Component {
         console.log('onTransitionChanged', EGameModeState[currentMode], currentMode);
         console.log('onTransitionChanged. Level : ', this.currentLevel);
         console.log('onTransitionChanged. Sequence : ', EPlayingSequence[this.currentSequence], this.currentSequence);
-
-        if (this.currentSequence === EPlayingSequence.ShowSuit) {
+        if (this.currentSequence === EPlayingSequence.Prepare) {
+            this.onPrepare();
+        }
+        else if (this.currentSequence === EPlayingSequence.ShowSuit) {
             this.onShowSuit();
         }
         else if (this.currentSequence === EPlayingSequence.GameRound) {
@@ -56,20 +74,35 @@ export class gamePlaying extends Component {
         }
     }
 
+    private async onPrepare() {
+        console.log('onPrepare');
+        gameModeManager.I.playingToLevel1ShowSuit();
+    }
+
+    private currentDancer: dancer = null;
     private async onShowSuit() {
         console.log('onShowSuit');
         // 현재 레벨의 댄서와 맞출 복장을 보여준다
         RootUI.I.setupShowSuit(this.currentLevel);
-        const currentDancer = await ResourceManager.I.spawnPrefab<dancer>("prefab/character/Dancer", this.dancerPos);
-        currentDancer.initialize(new getCharacterTypeFromLevel(this.currentLevel).characterType);
-        currentDancer.suitChange(this.currentSuitType);
+        if (this.currentDancer != null) {
+            this.dancerPos.removeChild(this.currentDancer.node);
+            this.currentDancer.destroy();
+            this.currentDancer = null;
+        }
+        this.currentDancer = await ResourceManager.I.spawnPrefab<dancer>("prefab/character/Dancer", this.dancerPos);
+        this.currentDancer.initialize(new getCharacterTypeFromLevel(this.currentLevel).characterType);
+        this.currentDancer.suitChange(this.currentSuitType);
+        this.currentTime = 0;
     }
 
     private onGameRound() {
         console.log('onGameRound');
-        RootUI.I.setupGameRound();
+        RootUI.I.setupGameRound(this.currentLevel);
+        this.currentDancer.takeOffSuit();
+        this.currentTime = 0;
     }
 
     private onResult() {
+        this.currentTime = 0;
     }
 }

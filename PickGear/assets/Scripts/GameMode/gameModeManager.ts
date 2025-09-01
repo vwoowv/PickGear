@@ -47,4 +47,22 @@ export class gameModeManager {
     playingToLevel5GameRound = async () => this.playingTransition.level5GameRound();
     playingToLevel5Result = async () => this.playingTransition.level5Result();
     playingToEndGame = async () => this.playingTransition.endGame();
+
+    playingToGameRound = async (level: number) => {
+        if (level === 1) {
+            this.playingToLevel1GameRound();
+        }
+        else if (level === 2) {
+            this.playingToLevel2GameRound();
+        }
+        else if (level === 3) {
+            this.playingToLevel3GameRound();
+        }
+        else if (level === 4) {
+            this.playingToLevel4GameRound();
+        }
+        else if (level === 5) {
+            this.playingToLevel5GameRound();
+        }
+    }
 }
