@@ -107,28 +107,47 @@ export class gamePlaying extends Component {
             this.currentDancer.destroy();
             this.currentDancer = null;
         }
+
         if (this.currentLevel > 4) {
             // 4명 전부 나온다
             for (let i = 0; i < 4; i++) {
-                this.allDancer[i] = await ResourceManager.I.spawnPrefab<dancer>("prefab/character/Dancer", this.dancerResultPos[i]);
-                this.allDancer[i].initialize(new getCharacterTypeFromLevel(i + 1).characterType);
+                this.allDancer[i] = await this.newDancer(i + 1, this.dancerResultPos[i]);
                 this.allDancer[i].suitChange(this.currentSuitType);
             }
         }
         else {
-            this.currentDancer = await ResourceManager.I.spawnPrefab<dancer>("prefab/character/Dancer", this.dancerPos);
-            this.currentDancer.initialize(new getCharacterTypeFromLevel(this.currentLevel).characterType);
+            this.currentDancer = await this.newDancer(this.currentLevel, this.dancerPos);
             this.currentDancer.suitChange(this.currentSuitType);
         }
         this.currentTime = 0;
     }
 
-    private onGameRound() {
+    private async newDancer(level: number, dancerPos: Node) {
+        const newDancer = await ResourceManager.I.spawnPrefab<dancer>("prefab/character/Dancer", dancerPos);
+        newDancer.initialize(new getCharacterTypeFromLevel(level).characterType);
+        return newDancer;
+    }
+
+    private async onGameRound() {
         console.log('onGameRound');
-        RootUI.I.setupGameRound(this.currentLevel);
-        this.currentDancer.takeOffSuit();
+        if (this.currentLevel > 4) {
+            // 마지막 레벨에서는 4명이 한번씩 번갈아 가면서 나온다
+            // 우선 첫번째 댄서를 준비한다
+            for (let i = 0; i < 4; i++) {
+                this.dancerResultPos[i].removeChild(this.allDancer[i].node);
+                this.allDancer[i].destroy();
+                this.allDancer[i] = null;
+            }
+            this.currentDancer = await this.newDancer(1, this.dancerPos);
+            this.currentDancer.takeOffSuit();
+        }
+        else {
+            this.currentDancer.takeOffSuit();
+        }
+
         this.currentGameRoundTime = this.gameRoundTime;
         this.currentTime = 0;
+        RootUI.I.setupGameRound(this.currentLevel);
         RootUI.I.setTimeProgressBar(this.gameRoundTimeRateReverse);
     }
 
