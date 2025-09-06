@@ -26,6 +26,7 @@ export class gamePlaying extends Component {
     private currentGameRoundTime: number = 0;
     // private readonly gameRoundTime: number = 14;
     private readonly gameRoundTime: number = 1;
+    private readonly resultTime: number = 1;
     private get gameRoundTimeRate(): number {
         return this.currentTime / this.currentGameRoundTime;
     }
@@ -79,6 +80,15 @@ export class gamePlaying extends Component {
     }
 
     private updateResult(deltaTime: number) {
+        this.currentTime += deltaTime;
+        if (this.currentTime > this.finalRoundTime[this.finalRoundSequence]) {
+            this.finalRoundSequence++;
+            this.dancerPos.removeAllChildren();
+            this.dancerPos.addChild(this.allDancer[this.finalRoundSequence].node);
+            // if (this.finalRoundSequence >= 4) {
+            //     gameModeManager.I.playingToPrepare();
+            // }
+        }
     }
 
     public setGameType(gameType: ECharacterSuitType) {
@@ -192,6 +202,12 @@ export class gamePlaying extends Component {
 
     private onResult() {
         this.currentTime = 0;
-        this.garbageDancer();
+        this.finalRoundSequence = 0;
+        this.dancerPos.removeAllChildren();
+        for (let i = 0; i < 4; i++) {
+            this.allDancer[i].suitChange(this.currentSuitType);
+        }
+        this.dancerPos.addChild(this.allDancer[this.finalRoundSequence].node);
+        RootUI.I.hideAllGroup();
     }
 }

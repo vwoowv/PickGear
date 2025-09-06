@@ -40,7 +40,7 @@ export class RootUI extends Component {
         gameInstance.I.onStartButtonClick();
     }
 
-    private hideAllGroup() {
+    public hideAllGroup() {
         this.currentScoreGroup.active = false;
         this.timeProgressBar.node.active = false;
         this.levelText.node.active = false;
@@ -52,10 +52,6 @@ export class RootUI extends Component {
         this.showSuitGroup.active = true;
         this.showSuitArrow.active = currentLevel < 5;
         this.showSuitLevelText.string = new richTextMaker("LV." + currentLevel.toString(), "020202", 3, "FFFFFF").resultText;
-    }
-
-    public setupShowAllSuit() {
-        this.hideAllGroup();
     }
 
     public setupGameRound(currentLevel: number) {
