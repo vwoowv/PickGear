@@ -222,6 +222,10 @@ export class gamePlaying extends Component {
         for (let i = 0; i < 4; i++) {
             this.dancerResultPos[i].addChild(this.allDancer[i].node);
         }
-        // gameModeManager.I.playingToPrepare();
+    }
+
+    public onTouchRetryButton() {
+        this.garbageDancer();
+        gameModeManager.I.rootSelectGameType();
     }
 }
