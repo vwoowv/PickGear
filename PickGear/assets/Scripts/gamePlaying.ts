@@ -58,15 +58,22 @@ export class gamePlaying extends Component {
     private updateGameRound(deltaTime: number) {
         this.currentTime += deltaTime;
         RootUI.I.setTimeProgressBar(this.gameRoundTimeRateReverse);
-        if (this.currentTime > this.currentGameRoundTime) {
-            // 이번 라운드 종료. 게임 결과로 넘어간다
-            gameModeManager.I.playingToShowSuit(this.currentLevel + 1);
-        }
-
         if (this.currentLevel > 4) {
             if (this.currentTime > this.finalRoundTime[this.finalRoundSequence]) {
                 this.finalRoundSequence++;
-                this.setupFinalRound();
+                if (this.finalRoundSequence >= 4) {
+                    // 게임 종료. 결과 보여준다
+                    gameModeManager.I.playingToLevel5Result();
+                }
+                else {
+                    this.setupFinalRound();
+                }
+            }
+        }
+        else {
+            if (this.currentTime > this.currentGameRoundTime) {
+                // 이번 라운드 종료. 게임 결과로 넘어간다
+                gameModeManager.I.playingToShowSuit(this.currentLevel + 1);
             }
         }
     }
@@ -185,5 +192,6 @@ export class gamePlaying extends Component {
 
     private onResult() {
         this.currentTime = 0;
+        this.garbageDancer();
     }
 }
