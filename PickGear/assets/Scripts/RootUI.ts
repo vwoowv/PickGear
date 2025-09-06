@@ -23,6 +23,8 @@ export class RootUI extends Component {
 
     @property(Node)
     private showSuitGroup: Node = null;
+    @property(Node)
+    private showSuitArrow: Node = null;
     @property(RichText)
     private showSuitLevelText: RichText = null;
     @property(RichText)
@@ -48,6 +50,7 @@ export class RootUI extends Component {
     public setupShowSuit(currentLevel: number) {
         this.hideAllGroup();
         this.showSuitGroup.active = true;
+        this.showSuitArrow.active = currentLevel < 5;
         this.showSuitLevelText.string = new richTextMaker("LV." + currentLevel.toString(), "020202", 3, "FFFFFF").resultText;
     }
 

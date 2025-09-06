@@ -21,7 +21,8 @@ export class gamePlaying extends Component {
     public currentSuitType: ECharacterSuitType = ECharacterSuitType.YG;
     private currentLevel: number = 1;
     private currentTime: number = 0;
-    private showSuitTime: number = 3;
+    // private showSuitTime: number = 3;
+    private showSuitTime: number = 1;
     private currentGameRoundTime: number = 0;
     // private readonly gameRoundTime: number = 14;
     private readonly gameRoundTime: number = 1;
@@ -96,6 +97,7 @@ export class gamePlaying extends Component {
     }
 
     private currentDancer: dancer = null;
+    private allDancer: dancer[] = [];
     private async onShowSuit() {
         console.log('onShowSuit');
         // 현재 레벨의 댄서와 맞출 복장을 보여준다
@@ -105,9 +107,19 @@ export class gamePlaying extends Component {
             this.currentDancer.destroy();
             this.currentDancer = null;
         }
-        this.currentDancer = await ResourceManager.I.spawnPrefab<dancer>("prefab/character/Dancer", this.dancerPos);
-        this.currentDancer.initialize(new getCharacterTypeFromLevel(this.currentLevel).characterType);
-        this.currentDancer.suitChange(this.currentSuitType);
+        if (this.currentLevel > 4) {
+            // 4명 전부 나온다
+            for (let i = 0; i < 4; i++) {
+                this.allDancer[i] = await ResourceManager.I.spawnPrefab<dancer>("prefab/character/Dancer", this.dancerResultPos[i]);
+                this.allDancer[i].initialize(new getCharacterTypeFromLevel(i + 1).characterType);
+                this.allDancer[i].suitChange(this.currentSuitType);
+            }
+        }
+        else {
+            this.currentDancer = await ResourceManager.I.spawnPrefab<dancer>("prefab/character/Dancer", this.dancerPos);
+            this.currentDancer.initialize(new getCharacterTypeFromLevel(this.currentLevel).characterType);
+            this.currentDancer.suitChange(this.currentSuitType);
+        }
         this.currentTime = 0;
     }
 

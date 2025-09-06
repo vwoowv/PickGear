@@ -4759,7 +4759,20 @@
     "dancerPos": {
       "__id__": 55
     },
-    "dancerResultPos": [],
+    "dancerResultPos": [
+      {
+        "__id__": 77
+      },
+      {
+        "__id__": 80
+      },
+      {
+        "__id__": 83
+      },
+      {
+        "__id__": 86
+      }
+    ],
     "_id": "e3l6PkPqxN7JuRvEnpLXp9"
   },
   {
@@ -4774,6 +4787,9 @@
     "__prefab": null,
     "showSuitGroup": {
       "__id__": 106
+    },
+    "showSuitArrow": {
+      "__id__": 110
     },
     "showSuitLevelText": {
       "__id__": 109
