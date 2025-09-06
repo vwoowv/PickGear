@@ -32,6 +32,7 @@ export class gamePlaying extends Component {
     private get gameRoundTimeRateReverse(): number {
         return 1 - this.gameRoundTimeRate;
     }
+    private finalRoundSequence: number = 0;
 
     update(deltaTime: number) {
         switch (this.currentSequence) {
@@ -60,6 +61,13 @@ export class gamePlaying extends Component {
         if (this.currentTime > this.currentGameRoundTime) {
             // 이번 라운드 종료. 게임 결과로 넘어간다
             gameModeManager.I.playingToShowSuit(this.currentLevel + 1);
+        }
+
+        if (this.currentLevel > 4) {
+            if (this.currentTime > this.finalRoundTime[this.finalRoundSequence]) {
+                this.finalRoundSequence++;
+                this.setupFinalRound();
+            }
         }
     }
 
@@ -142,17 +150,28 @@ export class gamePlaying extends Component {
         return newDancer;
     }
 
+    private finalRoundTime: number[] = [1, 1, 1, 1];
+    private setupFinalRound() {
+        this.dancerPos.removeAllChildren();
+        this.currentDancer = this.allDancer[this.finalRoundSequence];
+        this.currentDancer.node.setParent(this.dancerPos);
+        this.currentDancer.takeOffSuit();
+    }
+
     private async onGameRound() {
         console.log('onGameRound');
         if (this.currentLevel > 4) {
             // 마지막 레벨에서는 4명이 한번씩 번갈아 가면서 나온다
             // 우선 첫번째 댄서를 준비한다
+            let finalRoundTime: number = 0;
             for (let i = 0; i < 4; i++) {
                 this.dancerResultPos[i].removeChild(this.allDancer[i].node);
+                finalRoundTime += this.gameRoundTime * 0.25;
+                this.finalRoundTime[i] = finalRoundTime;
             }
-            this.currentDancer = this.allDancer[0];
-            this.currentDancer.node.setParent(this.dancerPos);
-            this.currentDancer.takeOffSuit();
+
+            this.finalRoundSequence = 0;
+            this.setupFinalRound();
         }
         else {
             this.currentDancer.takeOffSuit();
