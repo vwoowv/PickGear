@@ -35,6 +35,10 @@ export class RootUI extends Component {
     private currentScoreGroup: Node = null;
     @property(RichText)
     private currentScoreText: RichText = null;
+    @property(Node)
+    private resultGroup: Node = null;
+    @property(RichText)
+    private resultScoreText: RichText = null;
 
     public onPickingButtonClick() {
         gameInstance.I.onStartButtonClick();
@@ -45,6 +49,7 @@ export class RootUI extends Component {
         this.timeProgressBar.node.active = false;
         this.levelText.node.active = false;
         this.showSuitGroup.active = false;
+        this.resultGroup.active = false;
     }
 
     public setupShowSuit(currentLevel: number) {
@@ -63,6 +68,12 @@ export class RootUI extends Component {
         this.levelText.string = new richTextMaker("LV." + currentLevel.toString(), "020202", 3, "FFFFFF").resultText;
         this.timeProgressBar.progress = 1;
         this.currentScoreText.string = new richTextMaker("0", "020202", 3, "FFFFFF").resultText;
+    }
+
+    public setupResult() {
+        this.hideAllGroup();
+        this.resultGroup.active = true;
+        this.resultScoreText.string = new richTextMaker("Total : 9", "020202", 3, "FFFFFF").resultText;
     }
 
     public setTimeProgressBar(value: number) {

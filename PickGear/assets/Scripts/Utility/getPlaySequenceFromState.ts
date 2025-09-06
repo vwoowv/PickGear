@@ -25,6 +25,9 @@ export class getPlaySequenceFromState {
             case EGameModeState.Level5Result:
                 this.gameSequence = EPlayingSequence.Result;
                 break;
+            case EGameModeState.EndGame:
+                this.gameSequence = EPlayingSequence.EndGame;
+                break;
         }
     }
 }

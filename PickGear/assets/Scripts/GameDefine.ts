@@ -25,4 +25,5 @@ export enum EPlayingSequence {
     ShowSuit,
     GameRound,
     Result,
+    EndGame,
 }

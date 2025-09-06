@@ -83,11 +83,12 @@ export class gamePlaying extends Component {
         this.currentTime += deltaTime;
         if (this.currentTime > this.finalRoundTime[this.finalRoundSequence]) {
             this.finalRoundSequence++;
+            if (this.finalRoundSequence >= 4) {
+                gameModeManager.I.playingToEndGame();
+                return;
+            }
             this.dancerPos.removeAllChildren();
             this.dancerPos.addChild(this.allDancer[this.finalRoundSequence].node);
-            // if (this.finalRoundSequence >= 4) {
-            //     gameModeManager.I.playingToPrepare();
-            // }
         }
     }
 
@@ -113,6 +114,9 @@ export class gamePlaying extends Component {
         }
         else if (this.currentSequence === EPlayingSequence.Result) {
             this.onResult();
+        }
+        else if (this.currentSequence === EPlayingSequence.EndGame) {
+            this.onEndGame();
         }
     }
 
@@ -209,5 +213,11 @@ export class gamePlaying extends Component {
         }
         this.dancerPos.addChild(this.allDancer[this.finalRoundSequence].node);
         RootUI.I.hideAllGroup();
+    }
+
+    private onEndGame() {
+        console.log('onEndGame');
+        RootUI.I.setupResult();
+        // gameModeManager.I.playingToPrepare();
     }
 }
