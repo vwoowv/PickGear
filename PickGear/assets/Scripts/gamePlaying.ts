@@ -22,8 +22,9 @@ export class gamePlaying extends Component {
     private currentLevel: number = 1;
     private currentTime: number = 0;
     private showSuitTime: number = 3;
-    private currentGameRoundTime: number = 14;
-    private readonly gameRoundTime: number = 14;
+    private currentGameRoundTime: number = 0;
+    // private readonly gameRoundTime: number = 14;
+    private readonly gameRoundTime: number = 1;
     private get gameRoundTimeRate(): number {
         return this.currentTime / this.currentGameRoundTime;
     }
@@ -57,6 +58,7 @@ export class gamePlaying extends Component {
         RootUI.I.setTimeProgressBar(this.gameRoundTimeRateReverse);
         if (this.currentTime > this.currentGameRoundTime) {
             // 이번 라운드 종료. 게임 결과로 넘어간다
+            gameModeManager.I.playingToShowSuit(this.currentLevel + 1);
         }
     }
 
@@ -90,7 +92,7 @@ export class gamePlaying extends Component {
 
     private async onPrepare() {
         console.log('onPrepare');
-        gameModeManager.I.playingToLevel1ShowSuit();
+        gameModeManager.I.playingToShowSuit(1);
     }
 
     private currentDancer: dancer = null;
