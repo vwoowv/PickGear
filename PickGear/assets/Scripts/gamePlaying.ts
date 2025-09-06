@@ -218,6 +218,10 @@ export class gamePlaying extends Component {
     private onEndGame() {
         console.log('onEndGame');
         RootUI.I.setupResult();
+        this.dancerPos.removeAllChildren();
+        for (let i = 0; i < 4; i++) {
+            this.dancerResultPos[i].addChild(this.allDancer[i].node);
+        }
         // gameModeManager.I.playingToPrepare();
     }
 }
