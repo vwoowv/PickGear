@@ -8,6 +8,7 @@ import { ResourceManager } from './ResourceManager';
 import { dancer } from './Character/dancer';
 import { getCharacterTypeFromLevel } from './Utility/getCharacterTypeFromLevel';
 import { gameModeManager } from './GameMode/gameModeManager';
+import { delayMS, delaySeconds } from './Utility/delay';
 const { ccclass, property } = _decorator;
 
 @ccclass('gamePlaying')
@@ -20,6 +21,15 @@ export class gamePlaying extends Component {
     public currentSuitType: ECharacterSuitType = ECharacterSuitType.YG;
     private currentLevel: number = 1;
     private currentTime: number = 0;
+    private showSuitTime: number = 3;
+    private currentGameRoundTime: number = 14;
+    private readonly gameRoundTime: number = 14;
+    private get gameRoundTimeRate(): number {
+        return this.currentTime / this.currentGameRoundTime;
+    }
+    private get gameRoundTimeRateReverse(): number {
+        return 1 - this.gameRoundTimeRate;
+    }
 
     update(deltaTime: number) {
         switch (this.currentSequence) {
@@ -35,7 +45,6 @@ export class gamePlaying extends Component {
         }
     }
 
-    private showSuitTime: number = 3;
     private updateShowSuit(deltaTime: number) {
         this.currentTime += deltaTime;
         if (this.currentTime > this.showSuitTime) {
@@ -44,6 +53,11 @@ export class gamePlaying extends Component {
     }
 
     private updateGameRound(deltaTime: number) {
+        this.currentTime += deltaTime;
+        RootUI.I.setTimeProgressBar(this.gameRoundTimeRateReverse);
+        if (this.currentTime > this.currentGameRoundTime) {
+            // 이번 라운드 종료. 게임 결과로 넘어간다
+        }
     }
 
     private updateResult(deltaTime: number) {
@@ -99,7 +113,9 @@ export class gamePlaying extends Component {
         console.log('onGameRound');
         RootUI.I.setupGameRound(this.currentLevel);
         this.currentDancer.takeOffSuit();
+        this.currentGameRoundTime = this.gameRoundTime;
         this.currentTime = 0;
+        RootUI.I.setTimeProgressBar(this.gameRoundTimeRateReverse);
     }
 
     private onResult() {
