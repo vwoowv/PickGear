@@ -102,12 +102,7 @@ export class gamePlaying extends Component {
         console.log('onShowSuit');
         // 현재 레벨의 댄서와 맞출 복장을 보여준다
         RootUI.I.setupShowSuit(this.currentLevel);
-        if (this.currentDancer != null) {
-            this.dancerPos.removeChild(this.currentDancer.node);
-            this.currentDancer.destroy();
-            this.currentDancer = null;
-        }
-
+        this.garbageDancer();
         if (this.currentLevel > 4) {
             // 4명 전부 나온다
             for (let i = 0; i < 4; i++) {
@@ -120,6 +115,25 @@ export class gamePlaying extends Component {
             this.currentDancer.suitChange(this.currentSuitType);
         }
         this.currentTime = 0;
+    }
+
+    private garbageDancer() {
+        if (this.allDancer.length > 0) {
+            for (let i = 0; i < 4; i++) {
+                if (this.allDancer[i] === null) {
+                    continue;
+                }
+                this.dancerResultPos[i].removeChild(this.allDancer[i].node);
+                this.allDancer[i].destroy();
+                this.allDancer[i] = null;
+            }
+        }
+
+        if (this.currentDancer != null) {
+            this.dancerPos.removeChild(this.currentDancer.node);
+            this.currentDancer.destroy();
+            this.currentDancer = null;
+        }
     }
 
     private async newDancer(level: number, dancerPos: Node) {
@@ -135,10 +149,9 @@ export class gamePlaying extends Component {
             // 우선 첫번째 댄서를 준비한다
             for (let i = 0; i < 4; i++) {
                 this.dancerResultPos[i].removeChild(this.allDancer[i].node);
-                this.allDancer[i].destroy();
-                this.allDancer[i] = null;
             }
-            this.currentDancer = await this.newDancer(1, this.dancerPos);
+            this.currentDancer = this.allDancer[0];
+            this.currentDancer.node.setParent(this.dancerPos);
             this.currentDancer.takeOffSuit();
         }
         else {
