@@ -1,4 +1,4 @@
-import { _decorator, Component, ProgressBar, RichText, Node } from 'cc';
+import { _decorator, Component, ProgressBar, RichText, Node, Label, AnimationComponent } from 'cc';
 import { gameInstance } from './gameInstance';
 import { richTextMaker } from './Utility/richTextMaker';
 const { ccclass, property } = _decorator;
@@ -39,6 +39,10 @@ export class RootUI extends Component {
     private resultGroup: Node = null;
     @property(RichText)
     private resultScoreText: RichText = null;
+    @property(Node)
+    private currentShowScoreGroup: Node = null;
+    @property(Label)
+    private currentShowScoreText: Label = null;
 
     public hideAllGroup() {
         this.currentScoreGroup.active = false;
@@ -46,6 +50,7 @@ export class RootUI extends Component {
         this.levelText.node.active = false;
         this.showSuitGroup.active = false;
         this.resultGroup.active = false;
+        this.currentShowScoreGroup.active = false;
     }
 
     public setupShowSuit(currentLevel: number) {
@@ -64,6 +69,8 @@ export class RootUI extends Component {
         this.levelText.string = new richTextMaker("LV." + currentLevel.toString(), "020202", 3, "FFFFFF").resultText;
         this.timeProgressBar.progress = 1;
         this.setCurrentScoreText(currentPoint);
+        this.currentShowScoreGroup.active = true;
+        this.currentShowScoreGroup.getComponent(AnimationComponent).play("stop");
     }
 
     public setupResult(currentPoint: number) {
@@ -78,5 +85,6 @@ export class RootUI extends Component {
 
     public setCurrentScoreText(currentPoint: number) {
         this.currentScoreText.string = new richTextMaker(currentPoint.toString(), "020202", 3, "FFFFFF").resultText;
+        this.currentShowScoreGroup.getComponent(AnimationComponent).play("Idle");
     }
 }
