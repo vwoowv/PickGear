@@ -25,7 +25,7 @@ export class gamePlaying extends Component {
     private showSuitTime: number = 1;
     private currentGameRoundTime: number = 0;
     // private readonly gameRoundTime: number = 14;
-    private readonly gameRoundTime: number = 1;
+    private readonly gameRoundTime: number = 5;
     private readonly resultTime: number = 1;
     private get gameRoundTimeRate(): number {
         return this.currentTime / this.currentGameRoundTime;
@@ -60,22 +60,30 @@ export class gamePlaying extends Component {
         this.currentTime += deltaTime;
         RootUI.I.setTimeProgressBar(this.gameRoundTimeRateReverse);
         if (this.currentLevel > 4) {
-            if (this.currentTime > this.finalRoundTime[this.finalRoundSequence]) {
-                this.finalRoundSequence++;
-                if (this.finalRoundSequence >= 4) {
-                    // 게임 종료. 결과 보여준다
-                    gameModeManager.I.playingToLevel5Result();
-                }
-                else {
-                    this.setupFinalRound();
-                }
-            }
+            this.updateGameRoundOverLevel5(deltaTime);
         }
         else {
-            if (this.currentTime > this.currentGameRoundTime) {
-                // 이번 라운드 종료. 게임 결과로 넘어간다
-                gameModeManager.I.playingToShowSuit(this.currentLevel + 1);
+            this.updateGameRoundUnderLevel5(deltaTime);
+        }
+    }
+
+    private updateGameRoundUnderLevel5(deltaTime: number) {
+        if (this.currentTime > this.currentGameRoundTime) {
+            // 이번 라운드 종료. 게임 결과로 넘어간다
+            gameModeManager.I.playingToShowSuit(this.currentLevel + 1);
+        }
+    }
+
+    private updateGameRoundOverLevel5(deltaTime: number) {
+        if (this.currentTime > this.finalRoundTime[this.finalRoundSequence]) {
+            this.finalRoundSequence++;
+            if (this.finalRoundSequence >= 4) {
+                // 게임 종료. 결과 보여준다
+                gameModeManager.I.playingToLevel5Result();
+                return;
             }
+
+            this.setupFinalRound();
         }
     }
 
