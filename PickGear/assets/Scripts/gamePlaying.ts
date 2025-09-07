@@ -74,17 +74,21 @@ export class gamePlaying extends Component {
         }
     }
 
+    private garbageRollingSuit() {
+        for (let i = 0; i < this.rollingSuitList.length; i++) {
+            this.rollingSuitPos.removeChild(this.rollingSuitList[i].node);
+            this.rollingSuitList[i].destroy();
+        }
+        this.rollingSuitList = [];
+    }
+
     private nextRollingSuitTime: number = 0;
     private rollingSuitList: RollingSuit[] = [];
     private async updateGameRoundUnderLevel5(deltaTime: number) {
         if (this.currentTime > this.currentGameRoundTime) {
             // 이번 라운드 종료. 게임 결과로 넘어간다
             gameModeManager.I.playingToShowSuit(this.currentLevel + 1);
-            for (let i = 0; i < this.rollingSuitList.length; i++) {
-                this.rollingSuitPos.removeChild(this.rollingSuitList[i].node);
-                this.rollingSuitList[i].destroy();
-            }
-            this.rollingSuitList = [];
+            this.garbageRollingSuit();
         }
 
         this.nextRollingSuitTime -= deltaTime;
@@ -111,16 +115,27 @@ export class gamePlaying extends Component {
         }
     }
 
-    private updateGameRoundOverLevel5(deltaTime: number) {
+    private async updateGameRoundOverLevel5(deltaTime: number) {
         if (this.currentTime > this.finalRoundTime[this.finalRoundSequence]) {
             this.finalRoundSequence++;
             if (this.finalRoundSequence >= 4) {
                 // 게임 종료. 결과 보여준다
                 gameModeManager.I.playingToLevel5Result();
+                this.garbageRollingSuit();
                 return;
             }
 
             this.setupFinalRound();
+        }
+
+        this.nextRollingSuitTime -= deltaTime;
+        if (this.nextRollingSuitTime <= 0 && this.currentGameRoundTime - this.currentTime > 0.5) {
+            this.nextRollingSuitTime = 1;
+            await this.newRandomRollingSuit();
+        }
+
+        for (let i = 0; i < this.rollingSuitList.length; i++) {
+            this.rollingSuitList[i].roll(deltaTime);
         }
     }
 
