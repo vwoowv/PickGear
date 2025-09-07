@@ -1,4 +1,4 @@
-import { _decorator, Component, Node } from 'cc';
+import { _decorator, Component, Node, Vec3 } from 'cc';
 import { RootUI } from './RootUI';
 import { EGameModeState } from './GameMode/gameModeStateEvent';
 import { ECharacterSuitType, ECharacterType, EPlayingSequence } from './GameDefine';
@@ -80,16 +80,34 @@ export class gamePlaying extends Component {
         if (this.currentTime > this.currentGameRoundTime) {
             // 이번 라운드 종료. 게임 결과로 넘어간다
             gameModeManager.I.playingToShowSuit(this.currentLevel + 1);
+            for (let i = 0; i < this.rollingSuitList.length; i++) {
+                this.rollingSuitPos.removeChild(this.rollingSuitList[i].node);
+                this.rollingSuitList[i].destroy();
+            }
+            this.rollingSuitList = [];
         }
 
         this.nextRollingSuitTime -= deltaTime;
-        if (this.nextRollingSuitTime <= 0) {
-            this.nextRollingSuitTime = 0.5;
+        if (this.nextRollingSuitTime <= 0 && this.currentGameRoundTime - this.currentTime > 0.5) {
+            this.nextRollingSuitTime = 1;
+            await this.newRandomRollingSuit();
+        }
 
-            const newRollingSuit = await ResourceManager.I.spawnPrefab<RollingSuit>("prefab/suit/RollingSuit", this.rollingSuitPos);
-            newRollingSuit.node.setPosition(this.characterRollingPosStart.position);
-            newRollingSuit.Initialize(this.currentDancer.dancerType, this.currentSuitType);
-            this.rollingSuitList.push(newRollingSuit);
+        for (let i = 0; i < this.rollingSuitList.length; i++) {
+            this.rollingSuitList[i].roll(deltaTime);
+        }
+    }
+
+    private randomCharacterType: number = 0;
+    private async newRandomRollingSuit() {
+        const newRollingSuit = await ResourceManager.I.spawnPrefab<RollingSuit>("prefab/suit/RollingSuit", this.rollingSuitPos);
+        const startPosition: Vec3 = new Vec3(this.characterRollingPosStart.position.x, 0, this.characterRollingPosStart.position.z);
+        newRollingSuit.node.setPosition(startPosition);
+        newRollingSuit.Initialize(this.randomCharacterType, this.currentSuitType);
+        this.rollingSuitList.push(newRollingSuit);
+        this.randomCharacterType++;
+        if (this.randomCharacterType >= ECharacterType.TotalCount) {
+            this.randomCharacterType = 0;
         }
     }
 

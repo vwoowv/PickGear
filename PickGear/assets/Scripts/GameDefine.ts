@@ -10,6 +10,7 @@ export enum ECharacterType {
     SooHana,
     SongUnbee,
     EmmaMoon,
+    TotalCount = 4,
 }
 
 // 캐릭터 타입을 구분하는 enum을 생성합니다.
