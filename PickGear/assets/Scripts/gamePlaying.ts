@@ -28,12 +28,12 @@ export class gamePlaying extends Component {
     public currentSuitType: ECharacterSuitType = ECharacterSuitType.YG;
     private currentLevel: number = 1;
     private currentTime: number = 0;
-    // private showSuitTime: number = 3;
-    private showSuitTime: number = 1;
+    private showSuitTime: number = 3;
+    // private showSuitTime: number = 1;
     private currentGameRoundTime: number = 0;
-    // private readonly gameRoundTime: number = 14;
-    private readonly gameRoundTime: number = 5;
-    private readonly resultTime: number = 1;
+    private readonly gameRoundTime: number = 14;
+    // private readonly gameRoundTime: number = 5;
+    private readonly resultTime: number = 3;
     private get gameRoundTimeRate(): number {
         return this.currentTime / this.currentGameRoundTime;
     }
@@ -268,8 +268,11 @@ export class gamePlaying extends Component {
         this.currentTime = 0;
         this.finalRoundSequence = 0;
         this.dancerPos.removeAllChildren();
+        let finalRoundTime: number = 0;
         for (let i = 0; i < 4; i++) {
             this.allDancer[i].suitChange(this.currentSuitType);
+            finalRoundTime += this.resultTime * 0.25;
+            this.finalRoundTime[i] = finalRoundTime;
         }
         this.dancerPos.addChild(this.allDancer[this.finalRoundSequence].node);
         RootUI.I.hideAllGroup();
