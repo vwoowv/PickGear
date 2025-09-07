@@ -55,7 +55,7 @@ export class RootUI extends Component {
         this.showSuitLevelText.string = new richTextMaker("LV." + currentLevel.toString(), "020202", 3, "FFFFFF").resultText;
     }
 
-    public setupGameRound(currentLevel: number) {
+    public setupGameRound(currentLevel: number, currentPoint: number) {
         this.hideAllGroup();
         this.levelText.node.active = true;
         this.timeProgressBar.node.active = true;
@@ -63,46 +63,20 @@ export class RootUI extends Component {
 
         this.levelText.string = new richTextMaker("LV." + currentLevel.toString(), "020202", 3, "FFFFFF").resultText;
         this.timeProgressBar.progress = 1;
-        this.currentScoreText.string = new richTextMaker("0", "020202", 3, "FFFFFF").resultText;
+        this.setCurrentScoreText(currentPoint);
     }
 
-    public setupResult() {
+    public setupResult(currentPoint: number) {
         this.hideAllGroup();
         this.resultGroup.active = true;
-        this.resultScoreText.string = new richTextMaker("Total : 9", "020202", 3, "FFFFFF").resultText;
+        this.resultScoreText.string = new richTextMaker("Total : " + currentPoint.toString(), "020202", 3, "FFFFFF").resultText;
     }
 
     public setTimeProgressBar(value: number) {
         this.timeProgressBar.progress = value;
     }
 
-    // public setCountText(count: number) {
-    //     this.showCountText(true);
-    //     this.CountText.string = count.toString();
-    // }
-
-    // public showCountText(isShow: boolean) {
-    //     this.CountText.node.active = isShow;
-    // }
-
-    // public showTimeProgressBar(isShow: boolean) {
-    //     this.timeProgressBar.node.active = isShow;
-    // }
-
-
-    // public showResultCountText(isShow: boolean) {
-    //     this.resultCountText.node.active = isShow;
-    // }
-
-    // public setResultCountText(count: number) {
-    //     this.resultCountText.string = "점수 : " + count.toString();
-    // }
-
-    // public showLevelText(isShow: boolean) {
-    //     this.levelText.node.active = isShow;
-    // }
-
-    // public setLevelText(level: number) {
-    //     this.levelText.string = "LV." + level.toString();
-    // }
+    public setCurrentScoreText(currentPoint: number) {
+        this.currentScoreText.string = new richTextMaker(currentPoint.toString(), "020202", 3, "FFFFFF").resultText;
+    }
 }

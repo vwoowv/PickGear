@@ -27,6 +27,7 @@ export class gamePlaying extends Component {
     private currentSequence: EPlayingSequence = EPlayingSequence.ShowSuit;
     public currentSuitType: ECharacterSuitType = ECharacterSuitType.YG;
     private currentLevel: number = 1;
+    private currentPoint: number = 0;
     private currentTime: number = 0;
     private showSuitTime: number = 3;
     // private showSuitTime: number = 1;
@@ -182,6 +183,7 @@ export class gamePlaying extends Component {
 
     private async onPrepare() {
         console.log('onPrepare');
+        this.currentPoint = 0;
         gameModeManager.I.playingToShowSuit(1);
     }
 
@@ -260,7 +262,7 @@ export class gamePlaying extends Component {
 
         this.currentGameRoundTime = this.gameRoundTime;
         this.currentTime = 0;
-        RootUI.I.setupGameRound(this.currentLevel);
+        RootUI.I.setupGameRound(this.currentLevel, this.currentPoint);
         RootUI.I.setTimeProgressBar(this.gameRoundTimeRateReverse);
     }
 
@@ -280,7 +282,7 @@ export class gamePlaying extends Component {
 
     private onEndGame() {
         console.log('onEndGame');
-        RootUI.I.setupResult();
+        RootUI.I.setupResult(this.currentPoint);
         this.dancerPos.removeAllChildren();
         for (let i = 0; i < 4; i++) {
             this.dancerResultPos[i].addChild(this.allDancer[i].node);
@@ -293,5 +295,46 @@ export class gamePlaying extends Component {
     }
 
     public onTouchPickSuitButton() {
+        if (this.currentSequence != EPlayingSequence.GameRound) {
+            return;
+        }
+
+        // 가장 가까운 복장을 찾는다
+        const [nearestSuit, nearestDistance] = this.getNearestSuit();
+        if (nearestSuit == null) {
+            return;
+        }
+
+        // 거리가 적절한지 판단
+        console.log('nearestDistance', nearestDistance);
+        if (nearestDistance > 50) {
+            return;
+        }
+
+        console.log('pickSuit', nearestSuit.dancerType, nearestSuit.suitType);
+        nearestSuit.pickSuit();
+        if (nearestSuit.dancerType == this.currentDancer.dancerType && nearestSuit.suitType == this.currentSuitType) {
+            this.currentPoint++;
+            RootUI.I.setCurrentScoreText(this.currentPoint);
+        }
+        else {
+        }
+    }
+
+    private getNearestSuit(): [RollingSuit, number] {
+        let nearestSuit: RollingSuit = null;
+        let nearestDistance: number = Number.POSITIVE_INFINITY;
+        if (this.rollingSuitList.length == 0) {
+            return [nearestSuit, nearestDistance];
+        }
+
+        for (let i = 0; i < this.rollingSuitList.length; i++) {
+            const distance = Math.abs(this.rollingSuitList[i].node.position.x);
+            if (nearestSuit == null || distance < nearestDistance) {
+                nearestSuit = this.rollingSuitList[i];
+                nearestDistance = distance;
+            }
+        }
+        return [nearestSuit, nearestDistance];
     }
 }
