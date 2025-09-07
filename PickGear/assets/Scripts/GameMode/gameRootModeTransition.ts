@@ -1,4 +1,5 @@
 import { gameInstance } from "../gameInstance";
+import { RootUI } from "../RootUI";
 import { StateMachine, t } from "../StateMachine/stateMachine";
 import { EGameRootModeEvent, EGameRootModeState } from "./gameModeStateEvent";
 import { playNewGame } from "./playNewGame";
@@ -20,6 +21,7 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
         console.log('onSelectType');
         const game = gameInstance.I;
         game.nodeCollection.allNodeOff();
+        RootUI.I.hideAllGroup();
         game.nodeCollection.selectGameTypeNode.active = true;
     }
 
