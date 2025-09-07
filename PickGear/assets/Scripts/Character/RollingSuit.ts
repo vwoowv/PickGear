@@ -1,5 +1,6 @@
 import { _decorator, Component, Sprite, SpriteFrame } from 'cc';
-import { ECharacterSuitType } from '../GameDefine';
+import { ECharacterSuitType, ECharacterType } from '../GameDefine';
+import { getDancerSuitSpriteFrame } from '../Utility/getDancerSuitSpriteFrame';
 const { ccclass, property } = _decorator;
 
 @ccclass('RollingSuit')
@@ -8,9 +9,9 @@ export class RollingSuit extends Component {
     private suitSprite: Sprite = null;
     public suitType: ECharacterSuitType = ECharacterSuitType.HYBE;
 
-    public Initialize(suitSprite: SpriteFrame, suitType: ECharacterSuitType) {
-        this.suitSprite.spriteFrame = suitSprite;
+    public async Initialize(dancerType: ECharacterType, suitType: ECharacterSuitType) {
         this.suitType = suitType;
+        this.suitSprite.spriteFrame = await new getDancerSuitSpriteFrame().getAsync(dancerType, suitType);
     }
 
     public roll(deltaTime: number) {

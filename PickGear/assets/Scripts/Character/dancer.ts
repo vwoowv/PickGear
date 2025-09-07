@@ -3,6 +3,7 @@ import { ECharacterSuitType, ECharacterType } from '../GameDefine';
 import { dancerSprite } from './dancerResource';
 import { ResourceManager } from '../ResourceManager';
 import { getDancerSuit } from './getDancerSuit';
+import { getDancerSuitSpriteFrame } from '../Utility/getDancerSuitSpriteFrame';
 const { ccclass, property } = _decorator;
 
 @ccclass('dancer')
@@ -11,7 +12,7 @@ export class dancer extends Component {
     private characterSprite: Sprite = null;
     @property(Sprite)
     private currentSuit: Sprite = null;
-    private dancerType: ECharacterType;
+    public dancerType: ECharacterType;
 
     update(deltaTime: number) {
 
@@ -24,8 +25,7 @@ export class dancer extends Component {
     }
 
     public async suitChange(suitType: ECharacterSuitType) {
-        const resourcePath = new getDancerSuit(this.dancerType).getSuitResourcePath(suitType);
-        this.currentSuit.spriteFrame = await ResourceManager.I.loadResource(resourcePath, SpriteFrame);
+        this.currentSuit.spriteFrame = await new getDancerSuitSpriteFrame().getAsync(this.dancerType, suitType);
     }
 
     public takeOffSuit() {

@@ -9,6 +9,7 @@ import { dancer } from './Character/dancer';
 import { getCharacterTypeFromLevel } from './Utility/getCharacterTypeFromLevel';
 import { gameModeManager } from './GameMode/gameModeManager';
 import { delayMS, delaySeconds } from './Utility/delay';
+import { RollingSuit } from './Character/RollingSuit';
 const { ccclass, property } = _decorator;
 
 @ccclass('gamePlaying')
@@ -17,6 +18,12 @@ export class gamePlaying extends Component {
     private dancerPos: Node = null;
     @property(Node)
     private dancerResultPos: Node[] = [];
+    @property(Node)
+    private rollingSuitPos: Node = null;
+    @property(Node)
+    private characterRollingPosStart: Node = null;
+    @property(Node)
+    private characterRollingPosEnd: Node = null;
     private currentSequence: EPlayingSequence = EPlayingSequence.ShowSuit;
     public currentSuitType: ECharacterSuitType = ECharacterSuitType.YG;
     private currentLevel: number = 1;
@@ -67,10 +74,22 @@ export class gamePlaying extends Component {
         }
     }
 
-    private updateGameRoundUnderLevel5(deltaTime: number) {
+    private nextRollingSuitTime: number = 0;
+    private rollingSuitList: RollingSuit[] = [];
+    private async updateGameRoundUnderLevel5(deltaTime: number) {
         if (this.currentTime > this.currentGameRoundTime) {
             // 이번 라운드 종료. 게임 결과로 넘어간다
             gameModeManager.I.playingToShowSuit(this.currentLevel + 1);
+        }
+
+        this.nextRollingSuitTime -= deltaTime;
+        if (this.nextRollingSuitTime <= 0) {
+            this.nextRollingSuitTime = 0.5;
+
+            const newRollingSuit = await ResourceManager.I.spawnPrefab<RollingSuit>("prefab/suit/RollingSuit", this.rollingSuitPos);
+            newRollingSuit.node.setPosition(this.characterRollingPosStart.position);
+            newRollingSuit.Initialize(this.currentDancer.dancerType, this.currentSuitType);
+            this.rollingSuitList.push(newRollingSuit);
         }
     }
 
