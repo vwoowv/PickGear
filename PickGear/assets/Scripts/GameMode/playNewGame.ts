@@ -1,5 +1,5 @@
 import { Sprite, SpriteFrame } from "cc";
-import { getGameBackground } from "../getGameBackground";
+import { getGameBackground } from "../Utility/getGameBackground";
 import { ResourceManager } from "../ResourceManager";
 import { gameInstance } from "../gameInstance";
 import { gameModeManager } from "./gameModeManager";

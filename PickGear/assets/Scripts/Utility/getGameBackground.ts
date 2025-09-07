@@ -1,4 +1,4 @@
-import { ECharacterSuitType } from "./GameDefine";
+import { ECharacterSuitType } from "../GameDefine";
 
 export class getGameBackground {
     private gameType: ECharacterSuitType;
