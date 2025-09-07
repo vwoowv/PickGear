@@ -51,17 +51,8 @@ export class gameInstance extends Component {
         gameModeManager.I.rootSelectGameType();
     }
 
-    update(deltaTime: number) {
-
-    }
-
     public startGame(gameType: ECharacterSuitType) {
         this.playing.setGameType(gameType);
         gameModeManager.I.rootPlayGame();
-    }
-
-    public async onStartButtonClick() {
-        // 캐릭터의 기본적인 구성을 먼저 맞춰놓는다
-        console.log("onStartButtonClick");
     }
 }

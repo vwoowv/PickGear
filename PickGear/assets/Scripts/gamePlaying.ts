@@ -291,4 +291,7 @@ export class gamePlaying extends Component {
         this.garbageDancer();
         gameModeManager.I.rootSelectGameType();
     }
+
+    public onTouchPickSuitButton() {
+    }
 }

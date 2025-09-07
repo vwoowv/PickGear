@@ -4569,11 +4569,11 @@
   {
     "__type__": "cc.ClickEvent",
     "target": {
-      "__id__": 4
+      "__id__": 53
     },
     "component": "",
-    "_componentId": "bd931BxGbND5pTb3ufY9uY8",
-    "handler": "onPickingButtonClick",
+    "_componentId": "636bbo1nq9MfazDlo6G31/y",
+    "handler": "onTouchPickSuitButton",
     "customEventData": ""
   },
   {

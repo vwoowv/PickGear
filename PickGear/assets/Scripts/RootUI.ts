@@ -40,10 +40,6 @@ export class RootUI extends Component {
     @property(RichText)
     private resultScoreText: RichText = null;
 
-    public onPickingButtonClick() {
-        gameInstance.I.onStartButtonClick();
-    }
-
     public hideAllGroup() {
         this.currentScoreGroup.active = false;
         this.timeProgressBar.node.active = false;
