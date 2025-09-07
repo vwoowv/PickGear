@@ -98,9 +98,7 @@ export class gamePlaying extends Component {
             await this.newRandomRollingSuit();
         }
 
-        for (let i = 0; i < this.rollingSuitList.length; i++) {
-            this.rollingSuitList[i].roll(deltaTime);
-        }
+        this.updateRollingSuitList(deltaTime);
     }
 
     private randomCharacterType: number = 0;
@@ -133,6 +131,20 @@ export class gamePlaying extends Component {
         if (this.nextRollingSuitTime <= 0 && this.currentGameRoundTime - this.currentTime > 0.5) {
             this.nextRollingSuitTime = 1;
             await this.newRandomRollingSuit();
+        }
+
+        this.updateRollingSuitList(deltaTime);
+    }
+
+    private showPickSuitTime: number = 0.1;
+    private updateRollingSuitList(deltaTime: number) {
+        if (this.showPickSuit == true) {
+            this.showPickSuitTime -= deltaTime;
+            if (this.showPickSuitTime <= 0) {
+                this.showPickSuit = false;
+                this.showPickSuitTime = 0.1;
+            }
+            return;
         }
 
         for (let i = 0; i < this.rollingSuitList.length; i++) {
@@ -294,6 +306,7 @@ export class gamePlaying extends Component {
         gameModeManager.I.rootSelectGameType();
     }
 
+    private showPickSuit: boolean = false;
     public onTouchPickSuitButton() {
         if (this.currentSequence != EPlayingSequence.GameRound) {
             return;
@@ -316,8 +329,7 @@ export class gamePlaying extends Component {
         if (nearestSuit.dancerType == this.currentDancer.dancerType && nearestSuit.suitType == this.currentSuitType) {
             this.currentPoint++;
             RootUI.I.setCurrentScoreText(this.currentPoint);
-        }
-        else {
+            this.showPickSuit = true;
         }
     }
 
