@@ -9,15 +9,17 @@ export class RollingSuit extends Component {
     private suitSprite: Sprite = null;
     public suitType: ECharacterSuitType = ECharacterSuitType.HYBE;
     public dancerType: ECharacterType = ECharacterType.DoArin;
+    private moveSpeed: number = 0;
 
-    public async Initialize(dancerType: ECharacterType, suitType: ECharacterSuitType) {
+    public async Initialize(dancerType: ECharacterType, suitType: ECharacterSuitType, moveSpeed: number) {
         this.suitType = suitType;
         this.dancerType = dancerType;
         this.suitSprite.spriteFrame = await new getDancerSuitSpriteFrame().getAsync(dancerType, suitType);
+        this.moveSpeed = moveSpeed;
     }
 
     public roll(deltaTime: number) {
-        this.node.setPosition(this.node.position.x - deltaTime * 700, this.node.position.y, this.node.position.z);
+        this.node.setPosition(this.node.position.x - deltaTime * (600 + this.moveSpeed), this.node.position.y, this.node.position.z);
     }
 
     public pickSuit() {

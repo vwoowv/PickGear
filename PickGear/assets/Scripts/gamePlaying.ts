@@ -96,11 +96,15 @@ export class gamePlaying extends Component {
 
         this.nextRollingSuitTime -= deltaTime;
         if (this.nextRollingSuitTime <= 0 && this.currentGameRoundTime - this.currentTime > 0.5) {
-            this.nextRollingSuitTime = 1;
+            this.nextRollingSuitTime = 1 - this.currentLevel * 0.1;
             await this.newRandomRollingSuit();
         }
 
         this.updateRollingSuitList(deltaTime);
+    }
+
+    private getMoveSpeed(): number {
+        return this.currentLevel * 120;
     }
 
     private randomCharacterType: number = 0;
@@ -108,7 +112,7 @@ export class gamePlaying extends Component {
         const newRollingSuit = await ResourceManager.I.spawnPrefab<RollingSuit>("prefab/suit/RollingSuit", this.rollingSuitPos);
         const startPosition: Vec3 = new Vec3(this.characterRollingPosStart.position.x, 0, this.characterRollingPosStart.position.z);
         newRollingSuit.node.setPosition(startPosition);
-        newRollingSuit.Initialize(this.randomCharacterType, this.currentSuitType);
+        newRollingSuit.Initialize(this.randomCharacterType, this.currentSuitType, this.getMoveSpeed());
         this.rollingSuitList.push(newRollingSuit);
         this.randomCharacterType++;
         if (this.randomCharacterType >= ECharacterType.TotalCount) {

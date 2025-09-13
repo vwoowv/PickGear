@@ -6,6 +6,7 @@ import { gameModeManager } from "./gameModeManager";
 import { getDancerSuit } from "../Character/getDancerSuit";
 import { ECharacterType } from "../GameDefine";
 import { dancerSprite } from "../Character/dancerResource";
+import { delaySeconds } from "../Utility/delay";
 
 export class playNewGame {
     async initialize() {
@@ -22,6 +23,7 @@ export class playNewGame {
         console.log(`gameBackgroundPath: ${gameBackgroundPath}, gameType: ${game.playing.currentSuitType}`);
         backgroundSprite.spriteFrame = await ResourceManager.I.loadResource(gameBackgroundPath, SpriteFrame);
 
+        await new delaySeconds().delay(0.5);
         gameModeManager.I.playingToPrepare();
     }
 }
