@@ -1,3 +1,12 @@
 {
-  "__version__": "1.3.9"
+  "__version__": "1.3.9",
+  "splash-setting": {
+    "background": {
+      "type": "default",
+      "image": "project://settings/JYP Background shorts.png"
+    },
+    "logo": {
+      "type": "none"
+    }
+  }
 }
