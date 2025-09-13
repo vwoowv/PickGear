@@ -12,10 +12,10 @@ export class playNewGame {
     async initialize() {
         const game = gameInstance.I;
         game.nodeCollection.allNodeOff();
-        const dancerSuitResourcePathList = new getDancerSuit(ECharacterType.DoArin).getSuitResourcePathList(game.playing.currentSuitType);
-        await ResourceManager.I.loadResourceAndCache(dancerSuitResourcePathList, SpriteFrame);
-        const dancerResourcePathList = dancerSprite.getAllResourcePath();
-        await ResourceManager.I.loadResourceAndCache(dancerResourcePathList, SpriteFrame);
+        // const dancerSuitResourcePathList = new getDancerSuit(ECharacterType.DoArin).getSuitResourcePathList(game.playing.currentSuitType);
+        // await ResourceManager.I.loadResourceAndCache(dancerSuitResourcePathList, SpriteFrame);
+        // const dancerResourcePathList = dancerSprite.getAllResourcePath();
+        // await ResourceManager.I.loadResourceAndCache(dancerResourcePathList, SpriteFrame);
         game.nodeCollection.gameNode.active = true;
         const backgroundSprite = game.gameBackground.getComponent(Sprite);
         backgroundSprite.spriteFrame = null;
