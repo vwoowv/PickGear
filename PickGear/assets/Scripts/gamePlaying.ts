@@ -11,6 +11,7 @@ import { gameModeManager } from './GameMode/gameModeManager';
 import { delayMS, delaySeconds } from './Utility/delay';
 import { RollingSuit } from './Character/RollingSuit';
 import { gameInstance } from './gameInstance';
+import { PickedSuitManager } from './PickedSuitManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('gamePlaying')
@@ -43,6 +44,7 @@ export class gamePlaying extends Component {
     private finalRoundSequence: number = 0;
 
     update(deltaTime: number) {
+        this.pickedSuitList.update(deltaTime);
         switch (this.currentSequence) {
             case EPlayingSequence.ShowSuit:
                 this.updateShowSuit(deltaTime);
@@ -84,6 +86,7 @@ export class gamePlaying extends Component {
 
     private nextRollingSuitTime: number = 0;
     private rollingSuitList: RollingSuit[] = [];
+    private pickedSuitList: PickedSuitManager = new PickedSuitManager();
     private async updateGameRoundUnderLevel5(deltaTime: number) {
         if (this.currentTime > this.currentGameRoundTime) {
             // 이번 라운드 종료. 게임 결과로 넘어간다
@@ -327,6 +330,8 @@ export class gamePlaying extends Component {
         console.log('pickSuit', nearestSuit.dancerType, nearestSuit.suitType);
         nearestSuit.pickSuit();
         if (nearestSuit.dancerType == this.currentDancer.dancerType && nearestSuit.suitType == this.currentSuitType) {
+            this.rollingSuitList.splice(this.rollingSuitList.indexOf(nearestSuit), 1);
+            this.pickedSuitList.addPickedSuit(nearestSuit);
             nearestSuit.node.setPosition(0, nearestSuit.node.position.y, nearestSuit.node.position.z);
             this.currentPoint++;
             RootUI.I.setCurrentScoreText(this.currentPoint);

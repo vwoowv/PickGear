@@ -8,24 +8,12 @@ export class getDancerSuit {
         this.dancerType = dancerType;
     }
 
-    public getSuitResourcePathList() : string[] {
+    public getSuitResourcePathList(suitType: ECharacterSuitType) : string[] {
         return [
-            this.getDoArinSuitResourcePath(ECharacterSuitType.HYBE),
-            this.getDoArinSuitResourcePath(ECharacterSuitType.YG),
-            this.getDoArinSuitResourcePath(ECharacterSuitType.JYP),
-            this.getDoArinSuitResourcePath(ECharacterSuitType.SM),
-            this.getEmmaMoonSuitResourcePath(ECharacterSuitType.HYBE),
-            this.getEmmaMoonSuitResourcePath(ECharacterSuitType.YG),
-            this.getEmmaMoonSuitResourcePath(ECharacterSuitType.JYP),
-            this.getEmmaMoonSuitResourcePath(ECharacterSuitType.SM),
-            this.getSongUnbeeSuitResourcePath(ECharacterSuitType.HYBE),
-            this.getSongUnbeeSuitResourcePath(ECharacterSuitType.YG),
-            this.getSongUnbeeSuitResourcePath(ECharacterSuitType.JYP),
-            this.getSongUnbeeSuitResourcePath(ECharacterSuitType.SM),
-            this.getSooHanaSuitResourcePath(ECharacterSuitType.HYBE),
-            this.getSooHanaSuitResourcePath(ECharacterSuitType.YG),
-            this.getSooHanaSuitResourcePath(ECharacterSuitType.JYP),
-            this.getSooHanaSuitResourcePath(ECharacterSuitType.SM),
+            this.getDoArinSuitResourcePath(suitType),
+            this.getEmmaMoonSuitResourcePath(suitType),
+            this.getSongUnbeeSuitResourcePath(suitType),
+            this.getSooHanaSuitResourcePath(suitType)
         ];
     }
 

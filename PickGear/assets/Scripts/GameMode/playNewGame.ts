@@ -5,15 +5,16 @@ import { gameInstance } from "../gameInstance";
 import { gameModeManager } from "./gameModeManager";
 import { getDancerSuit } from "../Character/getDancerSuit";
 import { ECharacterType } from "../GameDefine";
+import { dancerSprite } from "../Character/dancerResource";
 
 export class playNewGame {
     async initialize() {
         const game = gameInstance.I;
         game.nodeCollection.allNodeOff();
-        const backgroundResourcePathList = new getGameBackground(game.playing.currentSuitType).getBackgroundResourcePathList();
-        await ResourceManager.I.loadResourceAndCache(backgroundResourcePathList, SpriteFrame);
-        const dancerSuitResourcePathList = new getDancerSuit(ECharacterType.DoArin).getSuitResourcePathList();
+        const dancerSuitResourcePathList = new getDancerSuit(ECharacterType.DoArin).getSuitResourcePathList(game.playing.currentSuitType);
         await ResourceManager.I.loadResourceAndCache(dancerSuitResourcePathList, SpriteFrame);
+        const dancerResourcePathList = dancerSprite.getAllResourcePath();
+        await ResourceManager.I.loadResourceAndCache(dancerResourcePathList, SpriteFrame);
         game.nodeCollection.gameNode.active = true;
         const backgroundSprite = game.gameBackground.getComponent(Sprite);
         backgroundSprite.spriteFrame = null;
