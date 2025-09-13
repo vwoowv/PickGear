@@ -10,7 +10,13 @@
     }
   },
   "textureCompressConfig": {
-    "genMipmaps": false
+    "genMipmaps": false,
+    "customConfigs": {},
+    "userPreset": {
+      "b6Pvzp7SFE6o1GmvbWTyKP": null,
+      "1fcYwkJ0RPLqiT4RnDY/QG": null,
+      "5c04O9ARlO/4pZtTApYcQC": null
+    }
   },
   "bundleConfig": {
     "custom": {
@@ -20,7 +26,7 @@
           "native": {
             "preferredOptions": {
               "isRemote": false,
-              "compressionType": "merge_dep"
+              "compressionType": "merge_all_json"
             }
           },
           "web": {
