@@ -33,6 +33,15 @@ export class ResourceManager extends Component {
         }
     }
 
+    public async loadResourceAndCache(pathList: string[], type: any) {
+        for (const path of pathList) {
+            if (this.resourceCache.has(path)) {
+                continue;
+            }
+            await this.loadResource(path, type);
+        }
+    }
+
     public loadResource<T>(path: string, type: any): Promise<T> {
         if (this.resourceCache.has(path)) {
             return Promise.resolve(this.resourceCache.get(path) as T);
@@ -61,4 +70,6 @@ export class ResourceManager extends Component {
         parent.addChild(newNode);
         return newNode.getComponent(Component) as T;
     }
+
+    // public async cachingResource(path: string) {
 }

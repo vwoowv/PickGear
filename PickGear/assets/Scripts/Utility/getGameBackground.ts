@@ -8,7 +8,7 @@ export class getGameBackground {
         this.gameType = gameType;
     }
 
-    public getBackgroundResourcePath() : string {
+    public getBackgroundResourcePath(): string {
         switch (this.gameType) {
             case ECharacterSuitType.YG:
                 return `${this.rootPath}YG Background shorts/spriteFrame`;
@@ -21,5 +21,14 @@ export class getGameBackground {
             default:
                 return null;
         }
+    }
+
+    public getBackgroundResourcePathList(): string[] {
+        return [
+            `${this.rootPath}YG Background shorts/spriteFrame`,
+            `${this.rootPath}JYP Background shorts/spriteFrame`,
+            `${this.rootPath}SM Background shorts/spriteFrame`,
+            `${this.rootPath}HYBE Background shorts/spriteFrame`,
+        ];
     }
 }
