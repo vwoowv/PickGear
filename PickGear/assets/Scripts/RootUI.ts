@@ -43,6 +43,8 @@ export class RootUI extends Component {
     private currentShowScoreGroup: Node = null;
     @property(Label)
     private currentShowScoreText: Label = null;
+    @property(Node)
+    private loadingGroup: Node = null;
 
     public hideAllGroup() {
         this.currentScoreGroup.active = false;
@@ -86,5 +88,13 @@ export class RootUI extends Component {
     public setCurrentScoreText(currentPoint: number) {
         this.currentScoreText.string = new richTextMaker(currentPoint.toString(), "020202", 3, "FFFFFF").resultText;
         this.currentShowScoreGroup.getComponent(AnimationComponent).play("Idle");
+    }
+
+    public showLoadingGroup() {
+        this.loadingGroup.active = true;
+    }
+
+    public hideLoadingGroup() {
+        this.loadingGroup.active = false;
     }
 }
