@@ -30,11 +30,9 @@ export class gamePlaying extends Component {
     private currentLevel: number = 1;
     private currentPoint: number = 0;
     private currentTime: number = 0;
-    private showSuitTime: number = 3;
-    // private showSuitTime: number = 1;
+    private showSuitTime: number = 2;
     private currentGameRoundTime: number = 0;
-    private readonly gameRoundTime: number = 14;
-    // private readonly gameRoundTime: number = 5;
+    private readonly gameRoundTime: number = 13;
     private readonly resultTime: number = 3;
     private get gameRoundTimeRate(): number {
         return this.currentTime / this.currentGameRoundTime;
