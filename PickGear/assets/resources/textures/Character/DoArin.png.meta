@@ -130,6 +130,10 @@
     "hasAlpha": true,
     "fixAlphaTransparencyArtifacts": false,
     "redirect": "fe074843-564b-4510-865a-8d565ccfe760@6c48a",
-    "flipVertical": false
+    "flipVertical": false,
+    "compressSettings": {
+      "useCompressTexture": true,
+      "presetId": "transparent"
+    }
   }
 }
