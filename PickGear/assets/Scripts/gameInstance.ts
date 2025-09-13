@@ -1,9 +1,10 @@
-import { _decorator, Component, Node } from 'cc';
+import { _decorator, AudioSource, Component, Node } from 'cc';
 import { gameNodeCollection } from './gameNodeCollection';
 import { gamePlaying } from './gamePlaying';
 import { EGameRootModeState } from './GameMode/gameModeStateEvent';
 import { gameModeManager } from './GameMode/gameModeManager';
 import { ECharacterSuitType } from './GameDefine';
+import { ResourceManager } from './ResourceManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameInstance')
@@ -18,6 +19,8 @@ export class gameInstance extends Component {
     public gameBackground: Node = null;
     @property(Node)
     public uiNode: Node = null;
+    @property(AudioSource)
+    public audioSource: AudioSource = null;
     public gameMode: EGameRootModeState = EGameRootModeState.SelectType;
 
     public static get I(): gameInstance {
@@ -54,5 +57,10 @@ export class gameInstance extends Component {
     public startGame(gameType: ECharacterSuitType) {
         this.playing.setGameType(gameType);
         gameModeManager.I.rootPlayGame();
+    }
+
+    public async playAudioClip(soundName: string) {
+        const audioCLip = await ResourceManager.I.loadAudioClip(soundName);
+        this.audioSource.playOneShot(audioCLip);
     }
 }

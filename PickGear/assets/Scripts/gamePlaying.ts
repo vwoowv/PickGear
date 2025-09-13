@@ -10,6 +10,7 @@ import { getCharacterTypeFromLevel } from './Utility/getCharacterTypeFromLevel';
 import { gameModeManager } from './GameMode/gameModeManager';
 import { delayMS, delaySeconds } from './Utility/delay';
 import { RollingSuit } from './Character/RollingSuit';
+import { gameInstance } from './gameInstance';
 const { ccclass, property } = _decorator;
 
 @ccclass('gamePlaying')
@@ -196,6 +197,7 @@ export class gamePlaying extends Component {
     private async onPrepare() {
         console.log('onPrepare');
         this.currentPoint = 0;
+        await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
         gameModeManager.I.playingToShowSuit(1);
     }
 
