@@ -24,8 +24,8 @@ export class RollingSuit extends Component {
         // 살짝 커지게
         const scale = this.node.scale;
         tween(this.node)
-            .to(0.1, { scale: new Vec3(scale.x * 1.1, scale.y * 1.1, scale.z * 1.1) })
-            .to(0.1, { scale: new Vec3(scale.x, scale.y, scale.z) })
+            .to(0.05, { scale: new Vec3(scale.x * 1.1, scale.y * 1.1, scale.z * 1.1) })
+            .to(0.05, { scale: new Vec3(scale.x, scale.y, scale.z) })
             .start();
     }
 }

@@ -135,13 +135,13 @@ export class gamePlaying extends Component {
         this.updateRollingSuitList(deltaTime);
     }
 
-    private showPickSuitTime: number = 0.1;
+    private showPickSuitTime: number = 0.5;
     private updateRollingSuitList(deltaTime: number) {
         if (this.showPickSuit == true) {
             this.showPickSuitTime -= deltaTime;
             if (this.showPickSuitTime <= 0) {
                 this.showPickSuit = false;
-                this.showPickSuitTime = 0.1;
+                this.showPickSuitTime = 0.5;
             }
             return;
         }
@@ -327,6 +327,7 @@ export class gamePlaying extends Component {
         console.log('pickSuit', nearestSuit.dancerType, nearestSuit.suitType);
         nearestSuit.pickSuit();
         if (nearestSuit.dancerType == this.currentDancer.dancerType && nearestSuit.suitType == this.currentSuitType) {
+            nearestSuit.node.setPosition(0, nearestSuit.node.position.y, nearestSuit.node.position.z);
             this.currentPoint++;
             RootUI.I.setCurrentScoreText(this.currentPoint);
             this.showPickSuit = true;
