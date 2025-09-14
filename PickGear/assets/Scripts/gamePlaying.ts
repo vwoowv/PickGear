@@ -149,7 +149,7 @@ export class gamePlaying extends Component {
                 this.showPickSuit = false;
                 this.showPickSuitTime = 0.5;
             }
-            return;
+            // return;
         }
 
         for (let i = 0; i < this.rollingSuitList.length; i++) {
