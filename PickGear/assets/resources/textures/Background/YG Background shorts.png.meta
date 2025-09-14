@@ -131,7 +131,8 @@
     "fixAlphaTransparencyArtifacts": false,
     "redirect": "b68650b3-dfa0-4a1e-b7b9-d2c787f14b7e@6c48a",
     "compressSettings": {
-      "useCompressTexture": true
+      "useCompressTexture": true,
+      "presetId": "a8asHtczdNIpAogUguAvqg"
     }
   }
 }

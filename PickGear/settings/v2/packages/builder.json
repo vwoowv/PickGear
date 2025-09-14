@@ -17,7 +17,17 @@
       "1fcYwkJ0RPLqiT4RnDY/QG": null,
       "5c04O9ARlO/4pZtTApYcQC": null,
       "b2GYoUfPtPXJbdpM4D4VhW": null,
-      "68c/eClpZMfLf3VheoOoKC": null
+      "68c/eClpZMfLf3VheoOoKC": null,
+      "a8asHtczdNIpAogUguAvqg": {
+        "name": "Custom",
+        "options": {
+          "web": {
+            "webp": {
+              "quality": 80
+            }
+          }
+        }
+      }
     }
   },
   "bundleConfig": {
