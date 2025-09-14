@@ -8,7 +8,6 @@ import { ResourceManager } from './ResourceManager';
 import { dancer } from './Character/dancer';
 import { getCharacterTypeFromLevel } from './Utility/getCharacterTypeFromLevel';
 import { gameModeManager } from './GameMode/gameModeManager';
-import { delayMS, delaySeconds } from './Utility/delay';
 import { RollingSuit } from './Character/RollingSuit';
 import { gameInstance } from './gameInstance';
 import { PickedSuitManager } from './PickedSuitManager';

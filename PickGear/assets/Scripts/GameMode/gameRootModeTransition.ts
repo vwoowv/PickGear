@@ -29,13 +29,13 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
         RootUI.I.hideAllGroup();
         // 여기서 리소스 로딩을 해야 한다
         RootUI.I.showLoadingGroup();
-        const dancerSuitResourcePathList = new getDancerSuit(ECharacterType.DoArin).getSuitResourcePathList(ECharacterSuitType.JYP);
-        dancerSuitResourcePathList.concat(new getDancerSuit(ECharacterType.DoArin).getSuitResourcePathList(ECharacterSuitType.SM));
-        dancerSuitResourcePathList.concat(new getDancerSuit(ECharacterType.DoArin).getSuitResourcePathList(ECharacterSuitType.YG));
-        dancerSuitResourcePathList.concat(new getDancerSuit(ECharacterType.DoArin).getSuitResourcePathList(ECharacterSuitType.HYBE));
-        await ResourceManager.I.loadResourceAndCache(dancerSuitResourcePathList, SpriteFrame);
-        const dancerResourcePathList = dancerSprite.getAllResourcePath();
-        await ResourceManager.I.loadResourceAndCache(dancerResourcePathList, SpriteFrame);
+        // const dancerSuitResourcePathList = new getDancerSuit(ECharacterType.DoArin).getSuitResourcePathList(ECharacterSuitType.JYP);
+        // dancerSuitResourcePathList.concat(new getDancerSuit(ECharacterType.DoArin).getSuitResourcePathList(ECharacterSuitType.SM));
+        // dancerSuitResourcePathList.concat(new getDancerSuit(ECharacterType.DoArin).getSuitResourcePathList(ECharacterSuitType.YG));
+        // dancerSuitResourcePathList.concat(new getDancerSuit(ECharacterType.DoArin).getSuitResourcePathList(ECharacterSuitType.HYBE));
+        // await ResourceManager.I.loadResourceAndCache(dancerSuitResourcePathList, SpriteFrame);
+        // const dancerResourcePathList = dancerSprite.getAllResourcePath();
+        // await ResourceManager.I.loadResourceAndCache(dancerResourcePathList, SpriteFrame);
         RootUI.I.hideLoadingGroup();
         game.nodeCollection.selectGameTypeNode.active = true;
     }

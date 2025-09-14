@@ -1,6 +1,7 @@
-import { _decorator, Component, Sprite, SpriteFrame, tween, Vec3 } from 'cc';
+import { _decorator, Component, Sprite, SpriteAtlas, SpriteFrame, tween, Vec3 } from 'cc';
 import { ECharacterSuitType, ECharacterType } from '../GameDefine';
 import { getDancerSuitSpriteFrame } from '../Utility/getDancerSuitSpriteFrame';
+import { ResourceManager } from '../ResourceManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('RollingSuit')
