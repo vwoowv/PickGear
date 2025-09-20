@@ -4,5 +4,19 @@
     "logo": {
       "type": "none"
     }
+  },
+  "textureCompressConfig": {
+    "userPreset": {
+      "4ewlGpyIJCi4sLhFC+9evD": {
+        "name": "ExportWeb",
+        "options": {
+          "web": {
+            "png": {
+              "quality": 80
+            }
+          }
+        }
+      }
+    }
   }
 }
