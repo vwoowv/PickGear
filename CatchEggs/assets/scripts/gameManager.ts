@@ -7,6 +7,7 @@ import { gameModeData } from './gameModeData';
 import { gameManagerExtensions } from './gameManagerExtensions';
 import { playStartingNode } from './playStartingNode';
 import { richTextMaker } from './richTextMaker';
+import { gameProperty } from './gameProperty';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameManager')
@@ -217,19 +218,31 @@ export class gameManager extends Component {
         this.selectGameMode();
     }
 
-    private currentComboScore: number = 1;
+    private currentComboScore: number = 0;
     private checkEggsInBasket() {
         const eggInBasket: Node[] = [];
         for (const eggNode of this.eggParent.children) {
             const distance: number = eggNode.position.clone().subtract(this.basket.position).length();
             if (distance < 100) {
                 console.log("egg in basket : " + eggNode.name);
+                const currentEggScore = this.getCurrentComboScore(eggNode.getComponent(egg).currentType);
+                if (currentEggScore > 0) {
+                    this.currentComboScore += currentEggScore;
+                }
+                else {
+                    this.currentComboScore = currentEggScore;
+                }
                 this.currentScore += this.currentComboScore;
+                if (this.currentScore < 0) {
+                    this.currentScore = 0;
+                }
                 this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
                 const eggComponent = eggNode.getComponent(egg);
                 eggComponent.onEggCatch(this.currentComboScore);
+                if (this.currentComboScore < 0) {
+                    this.currentComboScore = 0;
+                }
                 eggInBasket.push(eggNode);
-                this.currentComboScore++;
                 break;
             }
         }
@@ -242,8 +255,29 @@ export class gameManager extends Component {
         }
     }
 
+    private getCurrentComboScore(eggType: EggType) {
+        switch (eggType) {
+            case EggType.DoArin:
+                return gameProperty.I.DoArin_Score;
+            case EggType.EmmaMoon:
+                return gameProperty.I.EmmaMoon_Score;
+            case EggType.Happy:
+                return gameProperty.I.Happy_Score;
+            case EggType.Howsam:
+                return gameProperty.I.Howsam_Score;
+            case EggType.Hoyang:
+                return gameProperty.I.Hoyang_Score;
+            case EggType.SongUnbee:
+                return gameProperty.I.SongUnbee_Score;
+            case EggType.SooHana:
+                return gameProperty.I.SooHana_Score;
+            default:
+                return 1;
+        }
+    }
+
     public resetComboScore() {
-        this.currentComboScore = 1;
+        this.currentComboScore = 0;
     }
 
     public onDragAreaTouchMove(x: number, y: number) {
