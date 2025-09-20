@@ -9,10 +9,6 @@ export class gameModeData extends Component {
     private gameManagerInstance: gameManager = null;
     @property({ type: Enum(EGameMode) })
     public currentGameMode: EGameMode = EGameMode.Version1;
-    @property(Node)
-    private enemyParent: Node[] = [];
-    @property(Node)
-    private enemyParent_Result: Node[] = [];
     @property(Font)
     private versionFont: Font[] = [null, null, null];
     private backgroundName: string[] = ["background", "backgroundLake", "backgroundCity"];
@@ -48,10 +44,6 @@ export class gameModeData extends Component {
     }
 
     private completeSelectGameMode() {
-        this.enemyParent.forEach(enemy => {
-            enemy.active = false;
-        });
-        this.enemyParent[this.currentGameMode].active = true;
         if (this.gameManagerInstance == null) {
             this.gameManagerInstance = this.node.getComponent(gameManager)
         }
@@ -59,10 +51,6 @@ export class gameModeData extends Component {
     }
 
     public resultGame() {
-        this.enemyParent_Result.forEach(enemy => {
-            enemy.active = false;
-        });
-        this.enemyParent_Result[this.currentGameMode].active = true;
     }
 
     public async getCurrentBackground(): Promise<SpriteFrame> {
