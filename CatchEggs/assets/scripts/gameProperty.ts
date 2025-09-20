@@ -1,4 +1,4 @@
-import { _decorator, Component, CCFloat } from 'cc';
+import { _decorator, Component, CCFloat, CCInteger } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameProperty')
@@ -21,6 +21,21 @@ export class gameProperty extends Component {
             this.node.destroy();
         }
     }
+
+    @property({ type: CCInteger })
+    public DoArin_Score: number = 100;
+    @property({ type: CCInteger })
+    public EmmaMoon_Score: number = 100;
+    @property({ type: CCInteger })
+    public Happy_Score: number = 100;
+    @property({ type: CCInteger })
+    public Howsam_Score: number = 100;
+    @property({ type: CCInteger })
+    public Hoyang_Score: number = 100;
+    @property({ type: CCInteger })
+    public SongUnbee_Score: number = 100;
+    @property({ type: CCInteger })
+    public SooHana_Score: number = 100;
 
     @property({ type: CCFloat, group: "Level 1" })
     public level1FallDownSpeedRate_Normal: number = 1.2;
