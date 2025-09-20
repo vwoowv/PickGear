@@ -245,7 +245,7 @@ export class gameManager extends Component {
     }
 
     public onDragAreaTouchMove(x: number, y: number) {
-        y = -170;
+        y = -410;
         // if (y > 0) {
         //     y = -170;
         // }
