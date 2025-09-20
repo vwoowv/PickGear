@@ -261,3 +261,4 @@ export class gameManager extends Component {
         this.basket.setPosition(x, y, 0);
     }
 }
+//
