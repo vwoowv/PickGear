@@ -15,17 +15,7 @@ export class RichTextFontSetupWithVersion extends Component {
         this.originalString = richTextString.replace(/<[^>]*>/g, "");
     }
     protected onEnable(): void {
-        const text = this.node.getComponent(RichText);  
-        const versionFont = gameManager.I.gameMode.getCurrentVersionFont();
-        text.font = versionFont as any;
-        console.log(text.string);
-        if (gameManager.I.gameMode.currentGameMode == EGameMode.Version3) {
-            text.fontSize = 40;
-            text.string = new richTextMaker(this.originalString, "#020202", 3, "FFFFFF").resultText;
-        }
-        else {
-            text.fontSize = this.fontSize;
-            text.string = new richTextMaker(this.originalString, "", 3, "020202").resultText;;
-        }
+        const text = this.node.getComponent(RichText);
+        text.string = new richTextMaker(this.originalString, "#020202", 3, "FFFFFF").resultText;
     }
 }

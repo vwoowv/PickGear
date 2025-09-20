@@ -62,14 +62,14 @@ export class gameManager extends Component {
     public retryNode: Node = null;
     @property(Node)
     public retryNodeHeartNormal: Node = null;
-    @property(Node)
-    public retryNodeHeartVersion3: Node = null;
     @property(RichText)
     private currentScoreText: RichText = null;
     @property(RichText)
     private currentLevelText: RichText = null;
     @property(RichText)
     private scoreText: RichText = null;
+    @property(RichText)
+    private coinText: RichText = null;
     @property(Node)
     private basket: Node = null;
     @property(AudioSource)
@@ -125,7 +125,8 @@ export class gameManager extends Component {
         this.prepareNode.active = true;
         this.retryNode.active = false;
         this.currentScore = 0;
-        this.scoreText.string = this.currentScore.toString();
+        this.scoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
+        this.coinText.string = new richTextMaker("0000", "#020202", 3, "").resultText;
         this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
         this.currentLevelText.string = new richTextMaker("LV." + this.gameMode.getCurrentLevelFromVersion().toString(), "#020202", 3, "").resultText;
     }
@@ -159,7 +160,8 @@ export class gameManager extends Component {
         this.timeLeft = this.gameMode.getCurrentGameDuration();
         this.retryNode.active = false;
         this.currentScore = 0;
-        this.scoreText.string = this.currentScore.toString();
+        this.scoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
+        this.coinText.string = new richTextMaker("0000", "#020202", 3, "").resultText;
         this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
         this.currentLevelText.string = new richTextMaker("LV." + this.gameMode.getCurrentLevelFromVersion().toString(), "#020202", 3, "").resultText;
     }
@@ -200,10 +202,8 @@ export class gameManager extends Component {
         this.playingNode.active = false;
         this.prepareNode.active = false;
         this.retryNode.active = true;
-        this.scoreText.string = this.currentScore.toString();
-        const isVersion3 = this.gameMode.currentGameMode == EGameMode.Version3;
-        this.retryNodeHeartNormal.active = !isVersion3;
-        this.retryNodeHeartVersion3.active = isVersion3;
+        this.scoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
+        this.coinText.string = new richTextMaker("0000", "#020202", 3, "").resultText;
         this.gameMode.resultGame();
     }
 
