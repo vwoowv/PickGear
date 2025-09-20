@@ -1,4 +1,4 @@
-import { _decorator, AudioClip, AudioSource, Component, instantiate, Node, ParticleSystem, Prefab, ProgressBar, RichText, Sprite, Vec3 } from 'cc';
+import { _decorator, AudioClip, AudioSource, Component, instantiate, Label, Node, ParticleSystem, Prefab, ProgressBar, RichText, Sprite, Vec3 } from 'cc';
 import { ResourceManager } from './ResourceManager';
 import { egg } from './egg';
 import { EggType, EGameState, EGameMode } from './gameDefine';
@@ -32,6 +32,10 @@ export class gameManager extends Component {
 
     @property(gameModeData)
     public gameMode: gameModeData = null;
+    @property(Label)
+    private currentTimeText: Label = null;
+    @property(Label)
+    private leftTimeText: Label = null;
     @property(ProgressBar)
     private timeProgressBar: ProgressBar = null;
     @property(Node)
