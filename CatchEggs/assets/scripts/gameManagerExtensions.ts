@@ -4,6 +4,7 @@ import { ResourceManager } from './ResourceManager';
 import { egg } from './egg';
 import { EGameMode, EggType } from './gameDefine';
 import { eggScore } from './eggScore';
+import { gameProperty } from './gameProperty';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameManagerExtensions')
@@ -80,35 +81,35 @@ export class gameManagerExtensions extends Component {
         const leftTimeRate = currentTime / totalDuration;
         if (gameMode == EGameMode.Version1) {
             if (leftTimeRate < 0.3) {
-                return 0.5;
+                return gameProperty.I.level1SpawnTime_High;
             }
             else if (leftTimeRate < 0.7) {
-                return 0.7;
+                return gameProperty.I.level1SpawnTime_Middle;
             }
             else {
-                return 1;
+                return gameProperty.I.level1SpawnTime_Normal;
             }
         }
         else if (gameMode == EGameMode.Version2) {
             if (leftTimeRate < 0.3) {
-                return 0.4;
+                return gameProperty.I.level2SpawnTime_High;
             }
             else if (leftTimeRate < 0.7) {
-                return 0.55;
+                return gameProperty.I.level2SpawnTime_Middle;
             }
             else {
-                return 0.9;
+                return gameProperty.I.level2SpawnTime_Normal;
             }
         }
         else if (gameMode == EGameMode.Version3) {
             if (leftTimeRate < 0.3) {
-                return 0.3;
+                return gameProperty.I.level3SpawnTime_High;
             }
             else if (leftTimeRate < 0.7) {
-                return 0.5;
+                return gameProperty.I.level3SpawnTime_Middle;
             }
             else {
-                return 0.8;
+                return gameProperty.I.level3SpawnTime_Normal;
             }
         }
         return 1;
