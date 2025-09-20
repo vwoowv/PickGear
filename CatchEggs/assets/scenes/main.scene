@@ -945,7 +945,7 @@
     "_enabled": true,
     "__prefab": null,
     "level1FallDownSpeedRate_Normal": 1.2,
-    "level1FallDownSpeedRate_High": 1.4,
+    "level1FallDownSpeedRate_High": 1.5,
     "level1SpawnTime_Normal": 1,
     "level1SpawnTime_Middle": 0.7,
     "level1SpawnTime_High": 0.5,
