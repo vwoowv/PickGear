@@ -35,7 +35,7 @@ export class gameManagerExtensions extends Component {
     }
 
     public async loadSprite(egg: EggType): Promise<SpriteFrame> {
-        return ResourceManager.I.loadResource(`textures/character/${EggType[egg]}/spriteFrame`, SpriteFrame);
+        return ResourceManager.I.loadResource(`textures/character/Game/${EggType[egg]}/spriteFrame`, SpriteFrame);
     }
 
     public async spawnEggScore(position: Vec3, score: number): Promise<eggScore> {
