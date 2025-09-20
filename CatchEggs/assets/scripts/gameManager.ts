@@ -186,6 +186,8 @@ export class gameManager extends Component {
             this.gameOver();
         }
         this.checkEggsInBasket();
+        this.currentTimeText.string = (totalDuration - this.timeLeft).toFixed(1);
+        this.leftTimeText.string = this.timeLeft.toFixed(1);
     }
 
     private gameOver() {
