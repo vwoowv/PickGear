@@ -1,9 +1,7 @@
 import { _decorator, AudioSource, Component, Node, random, Sprite, SpriteFrame } from 'cc';
 import { EGameMode, EggType } from './gameDefine';
-import { ResourceManager } from './ResourceManager';
-import { eggScore } from './eggScore';
-import { Vec3 } from 'cc';
 import { gameManagerExtensions } from './gameManagerExtensions';
+import { gameProperty } from './gameProperty';
 const { ccclass, property } = _decorator;
 
 @ccclass('egg')
@@ -29,21 +27,21 @@ export class egg extends Component {
         this.fallDownSpeed = this.defaultFallDownSpeed;
         const leftTimeRate = currentTime / totalDuration;
         if (gameMode == EGameMode.Version1) {
-            this.fallDownSpeed = this.defaultFallDownSpeed * 1.0;
+            this.fallDownSpeed = this.defaultFallDownSpeed * gameProperty.I.level1FallDownSpeedRate_Normal;
             if (leftTimeRate < 0.5) {
-                this.fallDownSpeed = this.defaultFallDownSpeed * 1.2;
+                this.fallDownSpeed = this.defaultFallDownSpeed * gameProperty.I.level1FallDownSpeedRate_High;
             }
         }
         else if (gameMode == EGameMode.Version2) {
-            this.fallDownSpeed = this.defaultFallDownSpeed * 1.1;
+            this.fallDownSpeed = this.defaultFallDownSpeed * gameProperty.I.level2FallDownSpeedRate_Normal;
             if (leftTimeRate < 0.5) {
-                this.fallDownSpeed = this.defaultFallDownSpeed * 1.3;
+                this.fallDownSpeed = this.defaultFallDownSpeed * gameProperty.I.level2FallDownSpeedRate_High;
             }
         }
         else if (gameMode == EGameMode.Version3) {
-            this.fallDownSpeed = this.defaultFallDownSpeed * 1.2;
+            this.fallDownSpeed = this.defaultFallDownSpeed * gameProperty.I.level3FallDownSpeedRate_Normal;
             if (leftTimeRate < 0.5) {
-                this.fallDownSpeed = this.defaultFallDownSpeed * 1.4;
+                this.fallDownSpeed = this.defaultFallDownSpeed * gameProperty.I.level3FallDownSpeedRate_High;
             }
         }
     }
