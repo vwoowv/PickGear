@@ -211,17 +211,19 @@ export class gameManager extends Component {
         this.selectGameMode();
     }
 
+    private currentComboScore: number = 1;
     private checkEggsInBasket() {
         const eggInBasket: Node[] = [];
         for (const eggNode of this.eggParent.children) {
             const distance: number = eggNode.position.clone().subtract(this.basket.position).length();
             if (distance < 100) {
                 console.log("egg in basket : " + eggNode.name);
-                this.currentScore += 1;
+                this.currentScore += this.currentComboScore;
                 this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
                 const eggComponent = eggNode.getComponent(egg);
-                eggComponent.onEggCatch();
+                eggComponent.onEggCatch(this.currentComboScore);
                 eggInBasket.push(eggNode);
+                this.currentComboScore++;
                 break;
             }
         }
@@ -232,6 +234,10 @@ export class gameManager extends Component {
                 eggNode.destroy();
             }
         }
+    }
+
+    public resetComboScore() {
+        this.currentComboScore = 1;
     }
 
     public onDragAreaTouchMove(x: number, y: number) {

@@ -13,13 +13,11 @@ export class egg extends Component {
     public currentType: EggType = EggType.DoArin;
     private defaultFallDownSpeed: number = 500;
     private fallDownSpeed: number = this.defaultFallDownSpeed;
-
     public async initialize(egg: EggType, endLine: Node, currentTime: number, totalDuration: number, gameMode: EGameMode, extensions: gameManagerExtensions) {
         this.eggImage.spriteFrame = await extensions.loadSprite(egg);
         this.endLine = endLine;
         this.currentType = egg;
         this.extensions = extensions;
-
         this.setupFallDownSpeed(currentTime, totalDuration, gameMode);
     }
 
@@ -62,7 +60,7 @@ export class egg extends Component {
         }
     }
 
-    public onEggCatch() {
+    public onEggCatch(currentScore: number) {
         if (this.currentType == EggType.Happy) {
             this.extensions.playSound.playOneShot(this.extensions.eggCatchSound[1]);
         }
@@ -70,7 +68,7 @@ export class egg extends Component {
             this.extensions.playSound.playOneShot(this.extensions.eggCatchSound[0]);
         }
         this.extensions.showEggEffect(this.node.position.clone());
-        this.extensions.spawnEggScore(this.node.position.clone(), 1);
+        this.extensions.spawnEggScore(this.node.position.clone(), currentScore);
     }
 
     private fallDown(deltaTime: number) {
@@ -80,7 +78,9 @@ export class egg extends Component {
         }
         if (this.node.position.y < this.endLine.position.y) {
             this.extensions.spawnEggScore(this.node.position.clone(), 0);
+            this.node.parent.removeChild(this.node);
             this.node.destroy();
+            this.extensions.resetComboScore();
         }
     }
 }

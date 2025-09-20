@@ -114,4 +114,8 @@ export class gameManagerExtensions extends Component {
         }
         return 1;
     }
+
+    public resetComboScore() {
+        this.gameManager.resetComboScore();
+    }
 }
