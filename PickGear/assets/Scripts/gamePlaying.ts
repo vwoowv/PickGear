@@ -327,7 +327,10 @@ export class gamePlaying extends Component {
         // 거리가 적절한지 판단
         console.log('nearestDistance', nearestDistance);
         if (nearestDistance > 50) {
-            return;
+            // 전과 후의 위치 사이에 0이 있는지 체크
+            if (nearestSuit.prevPosition.x < 0 || nearestSuit.currentPosition.x > 0) {
+                return;
+            }
         }
 
         console.log('pickSuit', nearestSuit.dancerType, nearestSuit.suitType);

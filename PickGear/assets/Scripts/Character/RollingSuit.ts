@@ -19,8 +19,12 @@ export class RollingSuit extends Component {
         this.moveSpeed = moveSpeed;
     }
 
+    public prevPosition: Vec3 = new Vec3(0, 0, 0);
+    public currentPosition: Vec3 = new Vec3(0, 0, 0);
     public roll(deltaTime: number) {
+        this.prevPosition = this.node.position.clone();
         this.node.setPosition(this.node.position.x - deltaTime * (600 + this.moveSpeed), this.node.position.y, this.node.position.z);
+        this.currentPosition = this.node.position.clone();
     }
 
     public pickSuit() {
