@@ -8,6 +8,7 @@ import { gameManagerExtensions } from './gameManagerExtensions';
 import { playStartingNode } from './playStartingNode';
 import { richTextMaker } from './richTextMaker';
 import { gameProperty } from './gameProperty';
+import { midiJsonData } from './midi/midiJsonData';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameManager')
@@ -87,6 +88,9 @@ export class gameManager extends Component {
         this.extensions = this.node.addComponent(gameManagerExtensions);
         await this.extensions.initialize(this);
         this.selectGameMode();
+
+        const midiData: midiJsonData = new midiJsonData();
+        await midiData.loadMidiJsonData();
     }
 
     update(deltaTime: number) {
