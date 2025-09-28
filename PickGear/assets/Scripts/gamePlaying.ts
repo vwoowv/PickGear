@@ -356,7 +356,7 @@ export class gamePlaying extends Component {
             const currentPosition = this.rollingSuitList[i].node.position.x;
             const prevPosition = this.rollingSuitList[i].prevPosition.x;
             const distance = Math.abs(currentPosition);
-            if (distance < 150 || (prevPosition < 0 && currentPosition > 0)) {
+            if (distance < this.gameProperty.getPickDistanceThreshold(this.currentLevel) || (prevPosition < 0 && currentPosition > 0)) {
                 nearestSuit = this.rollingSuitList[i];
             }
         }
