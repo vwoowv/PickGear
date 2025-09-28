@@ -5918,6 +5918,16 @@
     "level3PickDistance": 150,
     "level4PickDistance": 150,
     "level5PickDistance": 150,
+    "level1Score": 1,
+    "level1Score_Wrong": 0,
+    "level2Score": 1,
+    "level2Score_Wrong": -1,
+    "level3Score": 1,
+    "level3Score_Wrong": -1,
+    "level4Score": 1,
+    "level4Score_Wrong": -1,
+    "level5Score": 1,
+    "level5Score_Wrong": -1,
     "_id": "21vdRH0hdGsL3031vZvhTM"
   },
   {

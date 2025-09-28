@@ -336,12 +336,19 @@ export class gamePlaying extends Component {
             this.rollingSuitList.splice(this.rollingSuitList.indexOf(nearestSuit), 1);
             this.pickedSuitList.addPickedSuit(nearestSuit);
             nearestSuit.node.setPosition(0, nearestSuit.node.position.y, nearestSuit.node.position.z);
-            this.currentPoint++;
-            RootUI.I.setCurrentScoreText(this.currentPoint);
+            const acquirePoint = this.gameProperty.getScore(this.currentLevel, false);
+            this.currentPoint += acquirePoint;
+            RootUI.I.setCurrentScoreText(this.currentPoint, acquirePoint);
             this.showPickSuit = true;
             gameInstance.I.playAudioClip('sound/Kiss and cry_Game_Yes', 0.5);
         }
         else {
+            const acquirePoint = this.gameProperty.getScore(this.currentLevel, true);
+            this.currentPoint += acquirePoint;
+            if (this.currentPoint < 0) {
+                this.currentPoint = 0;
+            }
+            RootUI.I.setCurrentScoreText(this.currentPoint, acquirePoint);
             gameInstance.I.playAudioClip('sound/Kiss and cry_Game_No', 0.5);
         }
     }

@@ -88,7 +88,7 @@ export class RootUI extends Component {
 
         this.levelText.string = new richTextMaker("LV." + currentLevel.toString(), "020202", 3, "FFFFFF").resultText;
         this.timeProgressBar.progress = 1;
-        this.setCurrentScoreText(currentPoint);
+        this.currentScoreText.string = new richTextMaker(currentPoint.toString(), "020202", 3, "FFFFFF").resultText;
         this.currentShowScoreGroup.active = true;
         this.currentShowScoreGroup.getComponent(AnimationComponent).play("stop");
     }
@@ -103,9 +103,15 @@ export class RootUI extends Component {
         this.timeProgressBar.progress = value;
     }
 
-    public setCurrentScoreText(currentPoint: number) {
+    public setCurrentScoreText(currentPoint: number, acquirePoint: number) {
         this.currentScoreText.string = new richTextMaker(currentPoint.toString(), "020202", 3, "FFFFFF").resultText;
         this.currentShowScoreGroup.getComponent(AnimationComponent).play("Idle");
+        if (acquirePoint > 0) {
+            this.currentShowScoreText.string = "+" + acquirePoint.toString();
+        }
+        else {
+            this.currentShowScoreText.string = acquirePoint.toString();
+        }
     }
 
     public showLoadingGroup() {

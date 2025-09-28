@@ -31,6 +31,28 @@ export class gamePlayProperty extends Component {
     @property({ type: CCInteger, group: { name: 'Distance Settings', id: 'distance_settings' } })
     public level5PickDistance: number = 150;
 
+    // === 스코어 세팅 ===
+    @property({ type: CCInteger, group: { name: 'Score Settings', id: 'score_settings' } })
+    public level1Score: number = 1;
+    @property({ type: CCInteger, group: { name: 'Score Settings', id: 'score_settings' } })
+    public level1Score_Wrong: number = -1;
+    @property({ type: CCInteger, group: { name: 'Score Settings', id: 'score_settings' } })
+    public level2Score: number = 1;
+    @property({ type: CCInteger, group: { name: 'Score Settings', id: 'score_settings' } })
+    public level2Score_Wrong: number = -1;
+    @property({ type: CCInteger, group: { name: 'Score Settings', id: 'score_settings' } })
+    public level3Score: number = 1;
+    @property({ type: CCInteger, group: { name: 'Score Settings', id: 'score_settings' } })
+    public level3Score_Wrong: number = -1;
+    @property({ type: CCInteger, group: { name: 'Score Settings', id: 'score_settings' } })
+    public level4Score: number = 1;
+    @property({ type: CCInteger, group: { name: 'Score Settings', id: 'score_settings' } })
+    public level4Score_Wrong: number = -1;
+    @property({ type: CCInteger, group: { name: 'Score Settings', id: 'score_settings' } })
+    public level5Score: number = 1;
+    @property({ type: CCInteger, group: { name: 'Score Settings', id: 'score_settings' } })
+    public level5Score_Wrong: number = -1;
+
     public getSpeed(level: number): number {
         switch (level) {
             case 1:
@@ -63,5 +85,21 @@ export class gamePlayProperty extends Component {
                 return this.level5PickDistance;
         }
         return this.level1PickDistance;
+    }
+
+    public getScore(level: number, isWrong: boolean): number {
+        switch (level) {
+            case 1:
+                return isWrong ? this.level1Score_Wrong : this.level1Score;
+            case 2:
+                return isWrong ? this.level2Score_Wrong : this.level2Score;
+            case 3:
+                return isWrong ? this.level3Score_Wrong : this.level3Score;
+            case 4:
+                return isWrong ? this.level4Score_Wrong : this.level4Score;
+            case 5:
+                return isWrong ? this.level5Score_Wrong : this.level5Score;
+        }
+        return this.level1Score_Wrong;
     }
 }
