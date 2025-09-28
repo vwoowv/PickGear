@@ -1,22 +1,16 @@
-import { Sprite, SpriteFrame } from "cc";
+import { SpriteFrame } from "cc";
 import { getGameBackground } from "../Utility/getGameBackground";
 import { ResourceManager } from "../ResourceManager";
-import { gameInstance } from "../gameInstance";
 import { gameModeManager } from "./gameModeManager";
-import { getDancerSuit } from "../Character/getDancerSuit";
-import { ECharacterType } from "../GameDefine";
-import { dancerSprite } from "../Character/dancerResource";
 import { delaySeconds } from "../Utility/delay";
+import { gameInstanceUtility } from "./gameInstanceUtility";
 
 export class playNewGame {
     async initialize() {
-        const game = gameInstance.I;
-        game.nodeCollection.allNodeOff();
-        game.nodeCollection.gameNode.active = true;
-        const backgroundSprite = game.gameBackground.getComponent(Sprite);
+        const backgroundSprite = gameInstanceUtility.getBackgroundSprite();
         backgroundSprite.spriteFrame = null;
-        const gameBackgroundPath = new getGameBackground(game.playing.currentSuitType).getBackgroundResourcePath();
-        console.log(`gameBackgroundPath: ${gameBackgroundPath}, gameType: ${game.playing.currentSuitType}`);
+        const gameBackgroundPath = new getGameBackground(gameInstanceUtility.getCurrentSuitType()).getBackgroundResourcePath();
+        console.log(`gameBackgroundPath: ${gameBackgroundPath}, gameType: ${gameInstanceUtility.getCurrentSuitType()}`);
         backgroundSprite.spriteFrame = await ResourceManager.I.loadResource(gameBackgroundPath, SpriteFrame);
 
         await new delaySeconds().delay(0.5);

@@ -1,5 +1,5 @@
 import { _decorator, Component, ProgressBar, RichText, Node, Label, AnimationComponent } from 'cc';
-import { gameInstance } from './gameInstance';
+// import { gameInstance } from './gameInstance';
 import { richTextMaker } from './Utility/richTextMaker';
 const { ccclass, property } = _decorator;
 
@@ -45,6 +45,24 @@ export class RootUI extends Component {
     private currentShowScoreText: Label = null;
     @property(Node)
     private loadingGroup: Node = null;
+    @property(Node)
+    public selectGameTypeNode: Node = null;
+    @property(Node)
+    public gameNode: Node = null;
+
+    public hideAllNodeOff() {
+        this.selectGameTypeNode.active = false;
+        this.gameNode.active = false;
+    }
+
+    public showSelectGameTypeNode() {
+        this.selectGameTypeNode.active = true;
+    }
+
+    public showGameNode() {
+        this.selectGameTypeNode.active = false;
+        this.gameNode.active = true;
+    }
 
     public hideAllGroup() {
         this.currentScoreGroup.active = false;

@@ -321,7 +321,7 @@ export class gamePlaying extends Component {
         // 가장 가까운 복장을 찾는다
         const nearestSuit = this.getPickedSuit();
         // 거리가 적절한지 판단
-        console.log(`nearestSuit.prevPosition.x : ${nearestSuit.prevPosition.x}, nearestSuit.currentPosition.x : ${nearestSuit.currentPosition.x}`);
+        // console.log(`nearestSuit.prevPosition.x : ${nearestSuit.prevPosition.x}, nearestSuit.currentPosition.x : ${nearestSuit.currentPosition.x}`);
         if (nearestSuit == null) {
             return;
         }
@@ -335,10 +335,10 @@ export class gamePlaying extends Component {
             this.currentPoint++;
             RootUI.I.setCurrentScoreText(this.currentPoint);
             this.showPickSuit = true;
-            gameInstance.I.playAudioClip('sound/Kiss and cry_Game_Yes');
+            gameInstance.I.playAudioClip('sound/Kiss and cry_Game_Yes', 0.5);
         }
         else {
-            gameInstance.I.playAudioClip('sound/Kiss and cry_Game_No');
+            gameInstance.I.playAudioClip('sound/Kiss and cry_Game_No', 0.5);
         }
     }
 
