@@ -24,6 +24,9 @@
           "web": {
             "webp": {
               "quality": 80
+            },
+            "png": {
+              "quality": 80
             }
           }
         }

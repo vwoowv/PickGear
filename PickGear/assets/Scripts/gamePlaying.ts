@@ -319,18 +319,11 @@ export class gamePlaying extends Component {
         }
 
         // 가장 가까운 복장을 찾는다
-        const [nearestSuit, nearestDistance] = this.getNearestSuit();
+        const nearestSuit = this.getPickedSuit();
+        // 거리가 적절한지 판단
+        console.log(`nearestSuit.prevPosition.x : ${nearestSuit.prevPosition.x}, nearestSuit.currentPosition.x : ${nearestSuit.currentPosition.x}`);
         if (nearestSuit == null) {
             return;
-        }
-
-        // 거리가 적절한지 판단
-        console.log('nearestDistance', nearestDistance);
-        if (nearestDistance > 50) {
-            // 전과 후의 위치 사이에 0이 있는지 체크
-            if (nearestSuit.prevPosition.x < 0 || nearestSuit.currentPosition.x > 0) {
-                return;
-            }
         }
 
         console.log('pickSuit', nearestSuit.dancerType, nearestSuit.suitType);
@@ -342,23 +335,27 @@ export class gamePlaying extends Component {
             this.currentPoint++;
             RootUI.I.setCurrentScoreText(this.currentPoint);
             this.showPickSuit = true;
+            gameInstance.I.playAudioClip('sound/Kiss and cry_Game_Yes');
+        }
+        else {
+            gameInstance.I.playAudioClip('sound/Kiss and cry_Game_No');
         }
     }
 
-    private getNearestSuit(): [RollingSuit, number] {
+    private getPickedSuit(): RollingSuit {
         let nearestSuit: RollingSuit = null;
-        let nearestDistance: number = Number.POSITIVE_INFINITY;
         if (this.rollingSuitList.length == 0) {
-            return [nearestSuit, nearestDistance];
+            return nearestSuit;
         }
 
         for (let i = 0; i < this.rollingSuitList.length; i++) {
-            const distance = Math.abs(this.rollingSuitList[i].node.position.x);
-            if (nearestSuit == null || distance < nearestDistance) {
+            const currentPosition = this.rollingSuitList[i].node.position.x;
+            const prevPosition = this.rollingSuitList[i].prevPosition.x;
+            const distance = Math.abs(currentPosition);
+            if (distance < 150 || (prevPosition < 0 && currentPosition > 0)) {
                 nearestSuit = this.rollingSuitList[i];
-                nearestDistance = distance;
             }
         }
-        return [nearestSuit, nearestDistance];
+        return nearestSuit;
     }
 }
