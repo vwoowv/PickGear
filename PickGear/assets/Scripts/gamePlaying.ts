@@ -11,6 +11,7 @@ import { gameModeManager } from './GameMode/gameModeManager';
 import { RollingSuit } from './Character/RollingSuit';
 import { gameInstance } from './gameInstance';
 import { PickedSuitManager } from './PickedSuitManager';
+import { gamePlayProperty } from './gamePlayProperty';
 const { ccclass, property } = _decorator;
 
 @ccclass('gamePlaying')
@@ -25,6 +26,8 @@ export class gamePlaying extends Component {
     private characterRollingPosStart: Node = null;
     @property(Node)
     private characterRollingPosEnd: Node = null;
+    @property(gamePlayProperty)
+    private gameProperty: gamePlayProperty = null;
     private currentSequence: EPlayingSequence = EPlayingSequence.ShowSuit;
     public currentSuitType: ECharacterSuitType = ECharacterSuitType.YG;
     private currentLevel: number = 1;
@@ -103,7 +106,8 @@ export class gamePlaying extends Component {
     }
 
     private getMoveSpeed(): number {
-        return this.currentLevel * 120;
+        // return this.currentLevel * 120;
+        return this.gameProperty.getSpeed(this.currentLevel);
     }
 
     private randomCharacterType: number = 0;
