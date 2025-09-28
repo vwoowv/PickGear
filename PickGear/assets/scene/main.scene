@@ -5913,6 +5913,11 @@
     "Level3Speed": 360,
     "Level4Speed": 480,
     "Level5Speed": 600,
+    "level1PickDistance": 150,
+    "level2PickDistance": 150,
+    "level3PickDistance": 150,
+    "level4PickDistance": 150,
+    "level5PickDistance": 150,
     "_id": "21vdRH0hdGsL3031vZvhTM"
   },
   {
