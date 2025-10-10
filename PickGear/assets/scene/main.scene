@@ -6515,6 +6515,12 @@
     "timeProgressBar": {
       "__id__": 98
     },
+    "currentTimeText": {
+      "__id__": 90
+    },
+    "leftTimeText": {
+      "__id__": 94
+    },
     "currentScoreGroup": {
       "__id__": 100
     },

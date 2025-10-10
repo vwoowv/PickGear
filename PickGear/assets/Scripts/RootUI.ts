@@ -31,6 +31,10 @@ export class RootUI extends Component {
     private levelText: RichText = null;
     @property(ProgressBar)
     private timeProgressBar: ProgressBar = null;
+    @property(Label)
+    private currentTimeText: Label = null;
+    @property(Label)
+    private leftTimeText: Label = null;
     @property(Node)
     private currentScoreGroup: Node = null;
     @property(RichText)
@@ -99,8 +103,14 @@ export class RootUI extends Component {
         this.resultScoreText.string = new richTextMaker("Total : " + currentPoint.toString(), "020202", 3, "FFFFFF").resultText;
     }
 
-    public setTimeProgressBar(value: number) {
+    public setTimeProgressBar(value: number, currentTimeInSeconds: number, totalTimeInSeconds: number) {
         this.timeProgressBar.progress = value;
+        const seconds = Math.floor(currentTimeInSeconds);
+        const decimal = Math.floor((currentTimeInSeconds - seconds) * 100);
+        this.currentTimeText.string = `${seconds}:${decimal}`;
+        const leftSeconds = Math.floor(totalTimeInSeconds - currentTimeInSeconds);
+        const leftDecimal = Math.floor((totalTimeInSeconds - currentTimeInSeconds - leftSeconds) * 100);
+        this.leftTimeText.string = `${leftSeconds}:${leftDecimal}`;
     }
 
     public setCurrentScoreText(currentPoint: number, acquirePoint: number) {

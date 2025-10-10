@@ -69,7 +69,7 @@ export class gamePlaying extends Component {
 
     private updateGameRound(deltaTime: number) {
         this.currentTime += deltaTime;
-        RootUI.I.setTimeProgressBar(this.gameRoundTimeRateReverse);
+        RootUI.I.setTimeProgressBar(this.gameRoundTimeRateReverse, this.currentTime, this.currentGameRoundTime);
         if (this.currentLevel > 4) {
             this.updateGameRoundOverLevel5(deltaTime);
         }
@@ -285,7 +285,7 @@ export class gamePlaying extends Component {
         this.currentGameRoundTime = this.gameRoundTime;
         this.currentTime = 0;
         RootUI.I.setupGameRound(this.currentLevel, this.currentPoint);
-        RootUI.I.setTimeProgressBar(this.gameRoundTimeRateReverse);
+        RootUI.I.setTimeProgressBar(this.gameRoundTimeRateReverse, this.currentTime, this.currentGameRoundTime);
     }
 
     private onResult() {
