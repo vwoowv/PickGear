@@ -1,4 +1,4 @@
-import { _decorator, Component, ProgressBar, RichText, Node, Label, AnimationComponent } from 'cc';
+import { _decorator, Component, ProgressBar, RichText, Node, Label, AnimationComponent, Sprite } from 'cc';
 // import { gameInstance } from './gameInstance';
 import { richTextMaker } from './Utility/richTextMaker';
 const { ccclass, property } = _decorator;
@@ -31,6 +31,8 @@ export class RootUI extends Component {
     private levelText: RichText = null;
     @property(Node)
     private faceGroup: Node = null;
+    @property(Sprite)
+    private faceSprite: Sprite = null;
     @property(ProgressBar)
     private timeProgressBar: ProgressBar = null;
     @property(Label)

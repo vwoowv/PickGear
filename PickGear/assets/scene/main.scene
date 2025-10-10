@@ -6731,6 +6731,9 @@
     "faceGroup": {
       "__id__": 111
     },
+    "faceSprite": {
+      "__id__": 114
+    },
     "timeProgressBar": {
       "__id__": 98
     },
