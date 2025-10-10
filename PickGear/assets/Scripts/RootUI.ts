@@ -29,6 +29,8 @@ export class RootUI extends Component {
     private showSuitLevelText: RichText = null;
     @property(RichText)
     private levelText: RichText = null;
+    @property(Node)
+    private faceGroup: Node = null;
     @property(ProgressBar)
     private timeProgressBar: ProgressBar = null;
     @property(Label)
@@ -72,6 +74,7 @@ export class RootUI extends Component {
         this.currentScoreGroup.active = false;
         this.timeProgressBar.node.active = false;
         this.levelText.node.active = false;
+        this.faceGroup.active = false;
         this.showSuitGroup.active = false;
         this.resultGroup.active = false;
         this.currentShowScoreGroup.active = false;
@@ -87,6 +90,7 @@ export class RootUI extends Component {
     public setupGameRound(currentLevel: number, currentPoint: number) {
         this.hideAllGroup();
         this.levelText.node.active = true;
+        this.faceGroup.active = true;
         this.timeProgressBar.node.active = true;
         this.currentScoreGroup.active = true;
 

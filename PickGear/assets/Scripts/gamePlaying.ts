@@ -36,6 +36,7 @@ export class gamePlaying extends Component {
     private showSuitTime: number = 2;
     private currentGameRoundTime: number = 0;
     private readonly gameRoundTime: number = 13;
+    // private readonly gameRoundTime: number = 1;
     private readonly resultTime: number = 3;
     private get gameRoundTimeRate(): number {
         return this.currentTime / this.currentGameRoundTime;
