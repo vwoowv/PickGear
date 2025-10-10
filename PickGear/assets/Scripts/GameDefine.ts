@@ -28,3 +28,9 @@ export enum EPlayingSequence {
     Result,
     EndGame,
 }
+
+export enum EFaceType {
+    Normal,
+    Success,
+    Fail,
+}

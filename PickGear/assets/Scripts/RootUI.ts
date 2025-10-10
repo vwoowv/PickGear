@@ -1,6 +1,6 @@
 import { _decorator, Component, ProgressBar, RichText, Node, Label, AnimationComponent, Sprite } from 'cc';
-// import { gameInstance } from './gameInstance';
 import { richTextMaker } from './Utility/richTextMaker';
+import { ECharacterSuitType, EFaceType } from './GameDefine';
 const { ccclass, property } = _decorator;
 
 @ccclass('RootUI')
@@ -136,5 +136,8 @@ export class RootUI extends Component {
 
     public hideLoadingGroup() {
         this.loadingGroup.active = false;
+    }
+
+    public setFaceSprite(characterSuitType: ECharacterSuitType, faceType: EFaceType) {
     }
 }
