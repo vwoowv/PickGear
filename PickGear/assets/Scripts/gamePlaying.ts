@@ -341,6 +341,7 @@ export class gamePlaying extends Component {
             const acquirePoint = this.gameProperty.getScore(this.currentLevel, false);
             this.currentPoint += acquirePoint;
             RootUI.I.setCurrentScoreText(this.currentPoint, acquirePoint);
+            RootUI.I.setFaceSpriteAndBackToNormal(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Success);
             this.showPickSuit = true;
             gameInstance.I.playAudioClip('sound/Kiss and cry_Game_Yes', 0.5);
         }
@@ -351,6 +352,7 @@ export class gamePlaying extends Component {
                 this.currentPoint = 0;
             }
             RootUI.I.setCurrentScoreText(this.currentPoint, acquirePoint);
+            RootUI.I.setFaceSpriteAndBackToNormal(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Fail);
             gameInstance.I.playAudioClip('sound/Kiss and cry_Game_No', 0.5);
         }
     }

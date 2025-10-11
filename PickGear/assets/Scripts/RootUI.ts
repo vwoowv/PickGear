@@ -60,6 +60,10 @@ export class RootUI extends Component {
     @property(Node)
     public gameNode: Node = null;
 
+    update(deltaTime: number) {
+        this.updateFaceSprite(deltaTime);
+    }
+
     public hideAllNodeOff() {
         this.selectGameTypeNode.active = false;
         this.gameNode.active = false;
@@ -143,5 +147,27 @@ export class RootUI extends Component {
     public async setFaceSprite(dancerType: ECharacterType, characterSuitType: ECharacterSuitType, faceType: EFaceType) {
         const resourcePath = new getDancerFace().getFaceResourcePath(dancerType, characterSuitType, faceType);
         this.faceSprite.spriteFrame = await ResourceManager.I.loadResource(resourcePath, SpriteFrame);
+    }
+
+    public async setFaceSpriteAndBackToNormal(dancerType: ECharacterType, characterSuitType: ECharacterSuitType, faceType: EFaceType) {
+        await this.setFaceSprite(dancerType, characterSuitType, faceType);
+        this.faceDancerType = dancerType;
+        this.faceCharacterSuitType = characterSuitType;
+        this.leftFaceSpriteBackToNormalTime = 1;
+    }
+
+    private leftFaceSpriteBackToNormalTime: number = -1;
+    private faceDancerType: ECharacterType = ECharacterType.DoArin;
+    private faceCharacterSuitType: ECharacterSuitType = ECharacterSuitType.HYBE;
+    private async updateFaceSprite(deltaTime: number) {
+        if (this.leftFaceSpriteBackToNormalTime < 0) {
+            return;
+        }
+
+        this.leftFaceSpriteBackToNormalTime -= deltaTime;
+        if (this.leftFaceSpriteBackToNormalTime <= 0) {
+            this.leftFaceSpriteBackToNormalTime = -1;
+            await this.setFaceSprite(this.faceDancerType, this.faceCharacterSuitType, EFaceType.Normal);
+        }
     }
 }
