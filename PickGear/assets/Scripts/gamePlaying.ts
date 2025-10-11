@@ -262,6 +262,7 @@ export class gamePlaying extends Component {
         this.currentDancer = this.allDancer[this.finalRoundSequence];
         this.currentDancer.node.setParent(this.dancerPos);
         this.currentDancer.takeOffSuit();
+        RootUI.I.setFaceSprite(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Normal);
     }
 
     private async onGameRound() {
