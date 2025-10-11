@@ -1,6 +1,8 @@
-import { _decorator, Component, ProgressBar, RichText, Node, Label, AnimationComponent, Sprite } from 'cc';
+import { _decorator, Component, ProgressBar, RichText, Node, Label, AnimationComponent, Sprite, SpriteFrame } from 'cc';
 import { richTextMaker } from './Utility/richTextMaker';
-import { ECharacterSuitType, EFaceType } from './GameDefine';
+import { ECharacterSuitType, ECharacterType, EFaceType } from './GameDefine';
+import { getDancerFace } from './Character/getDancerFace';
+import { ResourceManager } from './ResourceManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('RootUI')
@@ -138,6 +140,8 @@ export class RootUI extends Component {
         this.loadingGroup.active = false;
     }
 
-    public setFaceSprite(characterSuitType: ECharacterSuitType, faceType: EFaceType) {
+    public async setFaceSprite(dancerType: ECharacterType, characterSuitType: ECharacterSuitType, faceType: EFaceType) {
+        const resourcePath = new getDancerFace().getFaceResourcePath(dancerType, characterSuitType, faceType);
+        this.faceSprite.spriteFrame = await ResourceManager.I.loadResource(resourcePath, SpriteFrame);
     }
 }

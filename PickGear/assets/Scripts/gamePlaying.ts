@@ -1,7 +1,7 @@
 import { _decorator, Component, Node, Vec3 } from 'cc';
 import { RootUI } from './RootUI';
 import { EGameModeState } from './GameMode/gameModeStateEvent';
-import { ECharacterSuitType, ECharacterType, EPlayingSequence } from './GameDefine';
+import { ECharacterSuitType, ECharacterType, EFaceType, EPlayingSequence } from './GameDefine';
 import { getPlaySequenceFromState } from './Utility/getPlaySequenceFromState';
 import { getPlayLevelFromState } from './Utility/getPlayLevelFromState';
 import { ResourceManager } from './ResourceManager';
@@ -287,6 +287,7 @@ export class gamePlaying extends Component {
         this.currentTime = 0;
         RootUI.I.setupGameRound(this.currentLevel, this.currentPoint);
         RootUI.I.setTimeProgressBar(this.gameRoundTimeRateReverse, this.currentTime, this.currentGameRoundTime);
+        RootUI.I.setFaceSprite(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Normal);
     }
 
     private onResult() {
