@@ -14,22 +14,27 @@ export class TriButton extends Component {
 
     private collider: PolygonCollider2D = null;
     private uiTransform: UITransform = null;
+    private originalScale: Vec3 = null;
+    private isPressed: boolean = false;
 
     onLoad() {
         this.collider = this.getComponent(PolygonCollider2D);
         this.uiTransform = this.getComponent(UITransform);
+        this.originalScale = this.node.scale.clone();
     }
 
     onEnable() {
         // 터치(마우스 클릭) 시작 이벤트를 등록합니다.
         input.on(Input.EventType.TOUCH_START, this.onTouchStart, this);
         input.on(Input.EventType.TOUCH_END, this.onTouchEnd, this);
+        input.on(Input.EventType.TOUCH_CANCEL, this.onTouchCancel, this);
     }
 
     onDisable() {
         // 컴포넌트가 비활성화될 때 이벤트를 제거합니다. (메모리 누수 방지)
         input.off(Input.EventType.TOUCH_START, this.onTouchStart, this);
         input.off(Input.EventType.TOUCH_END, this.onTouchEnd, this);
+        input.off(Input.EventType.TOUCH_CANCEL, this.onTouchCancel, this);
     }
 
     private onTouchStart(event: EventTouch) {
@@ -49,12 +54,27 @@ export class TriButton extends Component {
 
         // 이 노드의 콜라이더가 포함되어 있는지 확인합니다.
         if (hitColliders.some(c => c.uuid === this.collider.uuid)) {
+            this.isPressed = true;
+            this.node.setScale(this.originalScale.x * 0.9, this.originalScale.y * 0.9, this.originalScale.z);
+
             console.log("삼각형 버튼이 클릭되었습니다!");
             this.node.emit('TriButton_clicked');
         }
     }
 
+    private onTouchCancel(event: EventTouch) {
+        if (this.isPressed) {
+            this.node.setScale(this.originalScale);
+            this.isPressed = false;
+        }
+    }
+
     private onTouchEnd(event: EventTouch) {
+        if (this.isPressed) {
+            this.node.setScale(this.originalScale);
+            this.isPressed = false;
+        }
+
         if (!this.uiCamera) {
             console.warn("UI Camera is not set!");
             return;
