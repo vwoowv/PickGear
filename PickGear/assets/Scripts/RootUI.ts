@@ -47,6 +47,12 @@ export class RootUI extends Component {
     private currentScoreText: RichText = null;
     @property(Node)
     private resultGroup: Node = null;
+    @property(Node)
+    private resultBackgroundSuccess: Node = null;
+    @property(Node)
+    private resultBackgroundFail: Node = null;
+    @property(Node)
+    private resultBackgroundPass: Node = null;
     @property(RichText)
     private resultScoreText: RichText = null;
     @property(Node)
@@ -109,10 +115,19 @@ export class RootUI extends Component {
         this.currentShowScoreGroup.getComponent(AnimationComponent).play("stop");
     }
 
-    public setupResult(currentPoint: number) {
+    public setupResult(currentPoint: number, perfect: boolean) {
         this.hideAllGroup();
         this.resultGroup.active = true;
-        this.resultScoreText.string = new richTextMaker("Total : " + currentPoint.toString(), "020202", 3, "FFFFFF").resultText;
+        this.resultScoreText.string = new richTextMaker(currentPoint.toString(), "020202", 3, "000000").resultText;
+        this.resultBackgroundSuccess.active = false;
+        this.resultBackgroundFail.active = false;
+        this.resultBackgroundPass.active = false;
+        if (perfect) {
+            this.resultBackgroundSuccess.active = true;
+        }
+        else {
+            this.resultBackgroundFail.active = true;
+        }
     }
 
     public setTimeProgressBar(value: number, currentTimeInSeconds: number, totalTimeInSeconds: number) {

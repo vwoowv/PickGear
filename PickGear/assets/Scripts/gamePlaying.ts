@@ -35,8 +35,8 @@ export class gamePlaying extends Component {
     private currentTime: number = 0;
     private showSuitTime: number = 2;
     private currentGameRoundTime: number = 0;
-    private readonly gameRoundTime: number = 13;
-    // private readonly gameRoundTime: number = 1;
+    // private readonly gameRoundTime: number = 13;
+    private readonly gameRoundTime: number = 1;
     private readonly resultTime: number = 3;
     private get gameRoundTimeRate(): number {
         return this.currentTime / this.currentGameRoundTime;
@@ -307,7 +307,7 @@ export class gamePlaying extends Component {
 
     private onEndGame() {
         console.log('onEndGame');
-        RootUI.I.setupResult(this.currentPoint);
+        RootUI.I.setupResult(this.currentPoint, true);
         this.dancerPos.removeAllChildren();
         for (let i = 0; i < 4; i++) {
             this.dancerResultPos[i].addChild(this.allDancer[i].node);
@@ -315,6 +315,11 @@ export class gamePlaying extends Component {
     }
 
     public onTouchRetryButton() {
+        this.garbageDancer();
+        gameModeManager.I.rootPlayGame();
+    }
+
+    public onTouchHomeButton() {
         this.garbageDancer();
         gameModeManager.I.rootSelectGameType();
     }
