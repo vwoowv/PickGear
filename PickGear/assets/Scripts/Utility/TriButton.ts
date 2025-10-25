@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, input, Input, EventTouch, Vec3, PhysicsSystem2D, PolygonCollider2D, UITransform, Camera, Vec2, EventHandler, Button, math } from 'cc';
+import { _decorator, Component, Node, input, Input, EventTouch, Vec3, PhysicsSystem2D, PolygonCollider2D, UITransform, Camera, Vec2, EventHandler, Button } from 'cc';
 
 const { ccclass, property, requireComponent } = _decorator;
 
@@ -38,26 +38,19 @@ export class TriButton extends Component {
             return;
         }
 
-        // 화면 터치 좌표를 가져옵니다.
-        const touchLocation = event.getUILocation();
+        // 화면 터치 좌표를 가져옵니다. getLocation은 좌하단 기준 좌표입니다.
+        const touchLocation = event.getLocation();
 
         // 월드 좌표로 변환합니다.
         const worldPoint = this.uiCamera.screenToWorld(new Vec3(touchLocation.x, touchLocation.y, 0));
+        
+        // 월드 좌표에 있는 콜라이더들을 가져옵니다.
+        const hitColliders = PhysicsSystem2D.instance.testPoint(new Vec2(worldPoint.x, worldPoint.y));
 
-        // 월드 좌표가 이 노드의 콜라이더 내에 있는지 확인합니다.
-        if (PhysicsSystem2D.instance.testPoint(new Vec2(worldPoint.x, worldPoint.y))) {
-            const hitColliders = PhysicsSystem2D.instance.testPoint(new Vec2(worldPoint.x, worldPoint.y));
-            if (hitColliders.find(collider => collider.node.uuid === this.node.uuid)) {
-                console.log("삼각형 버튼이 클릭되었습니다!");
-
-                // // 등록된 이벤트 핸들러들을 실행합니다.
-                // this.clickEvents.forEach(eventHandler => {
-                //     eventHandler.emit([]);
-                // });
-
-                // 노드 이벤트도 발생시킵니다.
-                this.node.emit('TriButton_clicked');
-            }
+        // 이 노드의 콜라이더가 포함되어 있는지 확인합니다.
+        if (hitColliders.some(c => c.uuid === this.collider.uuid)) {
+            console.log("삼각형 버튼이 클릭되었습니다!");
+            this.node.emit('TriButton_clicked');
         }
     }
 
@@ -67,23 +60,22 @@ export class TriButton extends Component {
             return;
         }
 
-        // 화면 터치 좌표를 가져옵니다.
-        const touchLocation = event.getUILocation();
+        // 화면 터치 좌표를 가져옵니다. getLocation은 좌하단 기준 좌표입니다.
+        const touchLocation = event.getLocation();
 
         // 월드 좌표로 변환합니다.
         const worldPoint = this.uiCamera.screenToWorld(new Vec3(touchLocation.x, touchLocation.y, 0));
 
-        // 월드 좌표가 이 노드의 콜라이더 내에 있는지 확인합니다.
-        if (PhysicsSystem2D.instance.testPoint(new Vec2(worldPoint.x, worldPoint.y))) {
-            const hitColliders = PhysicsSystem2D.instance.testPoint(new Vec2(worldPoint.x, worldPoint.y));
-            if (hitColliders.find(collider => collider.node.uuid === this.node.uuid)) {
-                console.log("삼각형 버튼이 터치 종료되었습니다!");
+        // 월드 좌표에 있는 콜라이더들을 가져옵니다.
+        const hitColliders = PhysicsSystem2D.instance.testPoint(new Vec2(worldPoint.x, worldPoint.y));
 
-                // 등록된 이벤트 핸들러들을 실행합니다.
-                this.clickEvents.forEach(eventHandler => {
-                    eventHandler.emit([]);
-                });
-            }
+        // 이 노드의 콜라이더가 포함되어 있는지 확인합니다.
+        if (hitColliders.some(c => c.uuid === this.collider.uuid)) {
+            console.log("삼각형 버튼이 터치 종료되었습니다!");
+
+            this.clickEvents.forEach(eventHandler => {
+                eventHandler.emit([]);
+            });
         }
         this.node.emit('TriButton_touchEnd');
     }
