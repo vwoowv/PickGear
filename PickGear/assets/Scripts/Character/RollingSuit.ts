@@ -21,10 +21,20 @@ export class RollingSuit extends Component {
 
     public prevPosition: Vec3 = new Vec3(0, 0, 0);
     public currentPosition: Vec3 = new Vec3(0, 0, 0);
-    public roll(deltaTime: number) {
+    public roll(deltaTime: number, pickDistance: number, pickedCharacterType: ECharacterType): boolean {
         this.prevPosition = this.node.position.clone();
         this.node.setPosition(this.node.position.x - deltaTime * (600 + this.moveSpeed), this.node.position.y, this.node.position.z);
         this.currentPosition = this.node.position.clone();
+        if (pickedCharacterType !== this.dancerType) {
+            return true;
+        }
+
+        // 실패 조건
+        if (Math.abs(this.currentPosition.x) > pickDistance && this.prevPosition.x < 0) {
+            return false;
+        }
+
+        return true;
     }
 
     public pickSuit() {

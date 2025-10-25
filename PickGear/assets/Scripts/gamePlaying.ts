@@ -35,8 +35,8 @@ export class gamePlaying extends Component {
     private currentTime: number = 0;
     private showSuitTime: number = 2;
     private currentGameRoundTime: number = 0;
-    // private readonly gameRoundTime: number = 13;
-    private readonly gameRoundTime: number = 1;
+    private readonly gameRoundTime: number = 13;
+    // private readonly gameRoundTime: number = 1;
     private readonly resultTime: number = 3;
     private get gameRoundTimeRate(): number {
         return this.currentTime / this.currentGameRoundTime;
@@ -45,6 +45,7 @@ export class gamePlaying extends Component {
         return 1 - this.gameRoundTimeRate;
     }
     private finalRoundSequence: number = 0;
+    private perfect: boolean = true;
 
     update(deltaTime: number) {
         this.pickedSuitList.update(deltaTime);
@@ -158,7 +159,10 @@ export class gamePlaying extends Component {
         }
 
         for (let i = 0; i < this.rollingSuitList.length; i++) {
-            this.rollingSuitList[i].roll(deltaTime);
+            const isPass = this.rollingSuitList[i].roll(deltaTime, this.gameProperty.getPickDistanceThreshold(this.currentLevel), this.currentDancer.dancerType);
+            if (isPass === false) {
+                this.perfect = false;
+            }
         }
     }
 
@@ -206,6 +210,7 @@ export class gamePlaying extends Component {
     private async onPrepare() {
         console.log('onPrepare');
         this.currentPoint = 0;
+        this.perfect = true;
         await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
         gameModeManager.I.playingToShowSuit(1);
     }
@@ -307,7 +312,7 @@ export class gamePlaying extends Component {
 
     private onEndGame() {
         console.log('onEndGame');
-        RootUI.I.setupResult(this.currentPoint, true);
+        RootUI.I.setupResult(this.currentPoint, this.perfect);
         this.dancerPos.removeAllChildren();
         for (let i = 0; i < 4; i++) {
             this.dancerResultPos[i].addChild(this.allDancer[i].node);
@@ -352,6 +357,7 @@ export class gamePlaying extends Component {
             gameInstance.I.playAudioClip('sound/Kiss and cry_Game_Yes', 0.5);
         }
         else {
+            this.perfect = false;
             const acquirePoint = this.gameProperty.getScore(this.currentLevel, true);
             this.currentPoint += acquirePoint;
             if (this.currentPoint < 0) {

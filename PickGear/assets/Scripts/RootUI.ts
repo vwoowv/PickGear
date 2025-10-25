@@ -126,7 +126,8 @@ export class RootUI extends Component {
             this.resultBackgroundSuccess.active = true;
         }
         else {
-            this.resultBackgroundFail.active = true;
+            this.resultBackgroundFail.active = currentPoint <= 0;
+            this.resultBackgroundPass.active = currentPoint > 0;
         }
     }
 
