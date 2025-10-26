@@ -112,16 +112,22 @@ export class gamePlaying extends Component {
         return this.gameProperty.getSpeed(this.currentLevel);
     }
 
-    private randomCharacterType: number = 0;
+    private randomCharacterTypeList: ECharacterType[] = [ECharacterType.DoArin, ECharacterType.SooHana, ECharacterType.SongUnbee, ECharacterType.EmmaMoon];
+    private currentCharacterTypeIndex: number = 0;
     private async newRandomRollingSuit() {
         const newRollingSuit = await ResourceManager.I.spawnPrefab<RollingSuit>("prefab/suit/RollingSuit", this.rollingSuitPos);
         const startPosition: Vec3 = new Vec3(this.characterRollingPosStart.position.x, 0, this.characterRollingPosStart.position.z);
         newRollingSuit.node.setPosition(startPosition);
-        newRollingSuit.Initialize(this.randomCharacterType, this.currentSuitType, this.getMoveSpeed());
+        newRollingSuit.Initialize(this.randomCharacterTypeList[this.currentCharacterTypeIndex], this.currentSuitType, this.getMoveSpeed());
         this.rollingSuitList.push(newRollingSuit);
-        this.randomCharacterType++;
-        if (this.randomCharacterType >= ECharacterType.TotalCount) {
-            this.randomCharacterType = 0;
+        this.currentCharacterTypeIndex++;
+        if (this.currentCharacterTypeIndex >= this.randomCharacterTypeList.length) {
+            // 배열을 셔플하는 함수가 없으므로 직접 구현
+            for (let i = this.randomCharacterTypeList.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [this.randomCharacterTypeList[i], this.randomCharacterTypeList[j]] = [this.randomCharacterTypeList[j], this.randomCharacterTypeList[i]];
+            }
+            this.currentCharacterTypeIndex = 0;
         }
     }
 
