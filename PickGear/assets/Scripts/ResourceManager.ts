@@ -1,5 +1,11 @@
-import { _decorator, AudioClip, Component, error, instantiate, Node, Prefab, resources } from 'cc';
+import { _decorator, AudioClip, Component, error, instantiate, Node, Prefab, resources, SpriteFrame } from 'cc';
 const { ccclass, property } = _decorator;
+
+export interface IAssetLists {
+    prefabs?: string[];
+    audioClips?: string[];
+    spriteFrames?: string[];
+}
 
 @ccclass('ResourceManager')
 export class ResourceManager extends Component {
@@ -71,5 +77,34 @@ export class ResourceManager extends Component {
         return newNode.getComponent(Component) as T;
     }
 
-    // public async cachingResource(path: string) {
+    public async preloadGameAssets(assetLists: IAssetLists, onProgress?: (progress: number) => void) {
+        const assetGroups = [];
+        if (assetLists.prefabs?.length > 0) {
+            assetGroups.push({ paths: assetLists.prefabs, type: Prefab });
+        }
+        if (assetLists.audioClips?.length > 0) {
+            assetGroups.push({ paths: assetLists.audioClips, type: AudioClip });
+        }
+        if (assetLists.spriteFrames?.length > 0) {
+            assetGroups.push({ paths: assetLists.spriteFrames, type: SpriteFrame });
+        }
+
+        let totalAssets = 0;
+        assetGroups.forEach(group => totalAssets += group.paths.length);
+        if (totalAssets === 0) {
+            onProgress?.(1);
+            return;
+        }
+
+        let loadedAssets = 0;
+        for (const group of assetGroups) {
+            for (const path of group.paths) {
+                if (!this.resourceCache.has(path)) {
+                    await this.loadResource(path, group.type);
+                }
+                loadedAssets++;
+                onProgress?.(loadedAssets / totalAssets);
+            }
+        }
+    }
 }
