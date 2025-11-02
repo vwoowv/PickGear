@@ -52,6 +52,7 @@ export class gameInstance extends Component {
     start() {
         gameModeManager.I.initialize(this.uiNode, this.node);
         gameModeManager.I.rootSelectGameType();
+        this.playing.setGameType(ECharacterSuitType.YG);
     }
 
     public startGame(gameType: ECharacterSuitType) {

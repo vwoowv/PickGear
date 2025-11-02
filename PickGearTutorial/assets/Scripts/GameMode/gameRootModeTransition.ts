@@ -24,7 +24,8 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
         // 여기서 리소스 로딩을 해야 한다
         RootUI.I.showLoadingGroup();
         RootUI.I.hideLoadingGroup();
-        RootUI.I.showSelectGameTypeNode();
+        // RootUI.I.showSelectGameTypeNode();
+        this.playGame();
     }
 
     private async onPlayGame() {
