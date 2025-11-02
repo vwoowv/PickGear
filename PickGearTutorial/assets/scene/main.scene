@@ -238,7 +238,7 @@
         "__id__": 6
       }
     ],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 21
@@ -370,7 +370,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": 511.5,
+      "y": 0,
       "z": 0
     },
     "_lrot": {
@@ -636,7 +636,7 @@
     "_target": null,
     "_left": 0,
     "_right": 0,
-    "_top": 0,
+    "_top": 511.5,
     "_bottom": 0,
     "_horizontalCenter": 0,
     "_verticalCenter": 0,
@@ -752,7 +752,7 @@
     "node": {
       "__id__": 6
     },
-    "_enabled": true,
+    "_enabled": false,
     "__prefab": null,
     "_customMaterial": null,
     "_srcBlendFactor": 2,
