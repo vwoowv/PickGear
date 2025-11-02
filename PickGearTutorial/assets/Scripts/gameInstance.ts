@@ -62,6 +62,15 @@ export class gameInstance extends Component {
 
     public async playAudioClip(soundName: string, volume: number = 1) {
         const audioCLip = await ResourceManager.I.loadAudioClip(soundName);
-        this.audioSource.playOneShot(audioCLip, volume);
+        if (!this.audioSource) {
+            this.audioSource = this.node.addComponent(AudioSource);
+        }
+        try {
+            this.audioSource.playOneShot(audioCLip, volume);
+        } catch (e) {
+            this.audioSource.clip = audioCLip;
+            this.audioSource.volume = volume;
+            this.audioSource.play();
+        }
     }
 }

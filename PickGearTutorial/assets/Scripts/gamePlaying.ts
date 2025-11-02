@@ -213,13 +213,13 @@ export class gamePlaying extends Component {
         }
     }
 
-    private async onPrepare() {
-        console.log('onPrepare');
-        this.currentPoint = 0;
-        this.perfect = true;
-        await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
-        gameModeManager.I.playingToShowSuit(1);
-    }
+	private async onPrepare() {
+		console.log('onPrepare');
+		this.currentPoint = 0;
+		this.perfect = true;
+		await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
+		gameModeManager.I.playingToShowSuit(1);
+	}
 
     private currentDancer: dancer = null;
     private allDancer: dancer[] = [];

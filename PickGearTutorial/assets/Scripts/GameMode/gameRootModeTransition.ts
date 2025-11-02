@@ -26,7 +26,7 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
         RootUI.I.showLoadingGroup();
         await new preLoadGameAsset().preLoadGameAsset();
         RootUI.I.hideLoadingGroup();
-        this.playGame();
+        RootUI.I.showSelectGameTypeNode();
     }
 
     private async onPlayGame() {
