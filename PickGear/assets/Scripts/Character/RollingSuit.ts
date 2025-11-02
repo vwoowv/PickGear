@@ -12,10 +12,14 @@ export class RollingSuit extends Component {
     public dancerType: ECharacterType = ECharacterType.DoArin;
     private moveSpeed: number = 0;
 
-    public async Initialize(dancerType: ECharacterType, suitType: ECharacterSuitType, moveSpeed: number) {
+    public async Initialize(dancerType: ECharacterType, suitType: ECharacterSuitType, correctDancerType: ECharacterType, moveSpeed: number) {
         this.suitType = suitType;
         this.dancerType = dancerType;
-        this.suitSprite.spriteFrame = await new getDancerSuitSpriteFrame().getAsync(dancerType, suitType);
+        if (suitType == ECharacterSuitType.YG) {
+            this.suitSprite.spriteFrame = await new getDancerSuitSpriteFrame().getAsync(dancerType, suitType, dancerType == correctDancerType);
+        } else {
+            this.suitSprite.spriteFrame = await new getDancerSuitSpriteFrame().getAsync(dancerType, suitType, false);
+        }
         this.moveSpeed = moveSpeed;
     }
 

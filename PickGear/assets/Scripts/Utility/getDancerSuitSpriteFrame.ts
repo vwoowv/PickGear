@@ -4,8 +4,8 @@ import { ResourceManager } from "../ResourceManager";
 import { getDancerSuit } from "../Character/getDancerSuit";
 
 export class getDancerSuitSpriteFrame {
-    public async getAsync(dancerType: ECharacterType, suitType: ECharacterSuitType): Promise<SpriteFrame> {
-        const resourcePath = new getDancerSuit(dancerType).getSuitResourcePath(suitType);
+    public async getAsync(dancerType: ECharacterType, suitType: ECharacterSuitType, showCorrectSuit: boolean): Promise<SpriteFrame> {
+        const resourcePath = new getDancerSuit(dancerType).getSuitResourcePath(suitType, showCorrectSuit);
         return await ResourceManager.I.loadResource(resourcePath, SpriteFrame);
     }
 }

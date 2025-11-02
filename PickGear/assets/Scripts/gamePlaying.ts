@@ -118,7 +118,8 @@ export class gamePlaying extends Component {
         const newRollingSuit = await ResourceManager.I.spawnPrefab<RollingSuit>("prefab/suit/RollingSuit", this.rollingSuitPos);
         const startPosition: Vec3 = new Vec3(this.characterRollingPosStart.position.x, 0, this.characterRollingPosStart.position.z);
         newRollingSuit.node.setPosition(startPosition);
-        newRollingSuit.Initialize(this.randomCharacterTypeList[this.currentCharacterTypeIndex], this.currentSuitType, this.getMoveSpeed());
+        const currentCharacterType = this.randomCharacterTypeList[this.currentCharacterTypeIndex];
+        newRollingSuit.Initialize(currentCharacterType, this.currentSuitType, this.currentDancer.dancerType, this.getMoveSpeed());
         this.rollingSuitList.push(newRollingSuit);
         this.currentCharacterTypeIndex++;
         if (this.currentCharacterTypeIndex >= this.randomCharacterTypeList.length) {

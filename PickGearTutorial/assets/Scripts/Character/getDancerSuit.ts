@@ -8,35 +8,30 @@ export class getDancerSuit {
         this.dancerType = dancerType;
     }
 
-    public getSuitResourcePathList(suitType: ECharacterSuitType) : string[] {
-        return [
-            this.getDoArinSuitResourcePath(suitType),
-            this.getEmmaMoonSuitResourcePath(suitType),
-            this.getSongUnbeeSuitResourcePath(suitType),
-            this.getSooHanaSuitResourcePath(suitType)
-        ];
-    }
-
-    public getSuitResourcePath(suitType: ECharacterSuitType) {
+    public getSuitResourcePath(suitType: ECharacterSuitType, showCorrectSuit: boolean) {
         switch (this.dancerType) {
             case ECharacterType.DoArin:
-                return this.getDoArinSuitResourcePath(suitType);
+                return this.getDoArinSuitResourcePath(suitType, showCorrectSuit);
             case ECharacterType.EmmaMoon:
-                return this.getEmmaMoonSuitResourcePath(suitType);
+                return this.getEmmaMoonSuitResourcePath(suitType, showCorrectSuit);
             case ECharacterType.SongUnbee:
-                return this.getSongUnbeeSuitResourcePath(suitType);
+                return this.getSongUnbeeSuitResourcePath(suitType, showCorrectSuit);
             case ECharacterType.SooHana:
-                return this.getSooHanaSuitResourcePath(suitType);
+                return this.getSooHanaSuitResourcePath(suitType, showCorrectSuit);
                 break;
         }
     }
 
-    private getDoArinSuitResourcePath(suitType: ECharacterSuitType) {
+    private getDoArinSuitResourcePath(suitType: ECharacterSuitType, showCorrectSuit: boolean) {
         switch (suitType) {
             case ECharacterSuitType.HYBE:
                 return `${this.rootPath}HYBE/HYBE_DoArin/spriteFrame`;
             case ECharacterSuitType.YG:
-                return `${this.rootPath}YG/YG_DoArin/spriteFrame`;
+                if (showCorrectSuit) {
+                    return `${this.rootPath}YG/Correct/YG_DoArin/spriteFrame`;
+                } else {
+                    return `${this.rootPath}YG/YG_DoArin/spriteFrame`;
+                }
             case ECharacterSuitType.JYP:
                 return `${this.rootPath}JYP/JYP_DoArin/spriteFrame`;
             case ECharacterSuitType.SM:
@@ -46,12 +41,16 @@ export class getDancerSuit {
         }
     }
 
-    private getEmmaMoonSuitResourcePath(suitType: ECharacterSuitType) {
+    private getEmmaMoonSuitResourcePath(suitType: ECharacterSuitType, showCorrectSuit: boolean) {
         switch (suitType) {
             case ECharacterSuitType.HYBE:
                 return `${this.rootPath}HYBE/HYBE_EmmaMoon/spriteFrame`;
             case ECharacterSuitType.YG:
-                return `${this.rootPath}YG/YG_EmmaMoon/spriteFrame`;
+                if (showCorrectSuit) {
+                    return `${this.rootPath}YG/Correct/YG_EmmaMoon/spriteFrame`;
+                } else {
+                    return `${this.rootPath}YG/YG_EmmaMoon/spriteFrame`;
+                }
             case ECharacterSuitType.JYP:
                 return `${this.rootPath}JYP/JYP_EmmaMoon/spriteFrame`;
             case ECharacterSuitType.SM:
@@ -61,12 +60,16 @@ export class getDancerSuit {
         }
     }
 
-    private getSongUnbeeSuitResourcePath(suitType: ECharacterSuitType) {
+    private getSongUnbeeSuitResourcePath(suitType: ECharacterSuitType, showCorrectSuit: boolean) {
         switch (suitType) {
             case ECharacterSuitType.HYBE:
                 return `${this.rootPath}HYBE/HYBE_SongUnbee/spriteFrame`;
             case ECharacterSuitType.YG:
-                return `${this.rootPath}YG/YG_SongUnbee/spriteFrame`;
+                if (showCorrectSuit) {
+                    return `${this.rootPath}YG/Correct/YG_SongUnbee/spriteFrame`;
+                } else {
+                    return `${this.rootPath}YG/YG_SongUnbee/spriteFrame`;
+                }
             case ECharacterSuitType.JYP:
                 return `${this.rootPath}JYP/JYP_SongUnbee/spriteFrame`;
             case ECharacterSuitType.SM:
@@ -76,12 +79,16 @@ export class getDancerSuit {
         }
     }
 
-    private getSooHanaSuitResourcePath(suitType: ECharacterSuitType) {
+    private getSooHanaSuitResourcePath(suitType: ECharacterSuitType, showCorrectSuit: boolean) {
         switch (suitType) {
             case ECharacterSuitType.HYBE:
                 return `${this.rootPath}HYBE/HYBE_SooHana/spriteFrame`;
             case ECharacterSuitType.YG:
-                return `${this.rootPath}YG/YG_SooHana/spriteFrame`;
+                if (showCorrectSuit) {
+                    return `${this.rootPath}YG/Correct/YG_SooHana/spriteFrame`;
+                } else {
+                    return `${this.rootPath}YG/YG_SooHana/spriteFrame`;
+                }
             case ECharacterSuitType.JYP:
                 return `${this.rootPath}JYP/JYP_SooHana/spriteFrame`;
             case ECharacterSuitType.SM:

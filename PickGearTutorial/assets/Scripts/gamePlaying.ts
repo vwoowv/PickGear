@@ -118,7 +118,8 @@ export class gamePlaying extends Component {
         const newRollingSuit = await ResourceManager.I.spawnPrefab<RollingSuit>("prefab/suit/RollingSuit", this.rollingSuitPos);
         const startPosition: Vec3 = new Vec3(this.characterRollingPosStart.position.x, 0, this.characterRollingPosStart.position.z);
         newRollingSuit.node.setPosition(startPosition);
-        newRollingSuit.Initialize(this.randomCharacterTypeList[this.currentCharacterTypeIndex], this.currentSuitType, this.getMoveSpeed());
+        const currentCharacterType = this.randomCharacterTypeList[this.currentCharacterTypeIndex];
+        newRollingSuit.Initialize(currentCharacterType, this.currentSuitType, this.currentDancer.dancerType, this.getMoveSpeed());
         this.rollingSuitList.push(newRollingSuit);
         this.currentCharacterTypeIndex++;
         if (this.currentCharacterTypeIndex >= this.randomCharacterTypeList.length) {
@@ -213,13 +214,13 @@ export class gamePlaying extends Component {
         }
     }
 
-	private async onPrepare() {
-		console.log('onPrepare');
-		this.currentPoint = 0;
-		this.perfect = true;
-		await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
-		gameModeManager.I.playingToShowSuit(1);
-	}
+    private async onPrepare() {
+        console.log('onPrepare');
+        this.currentPoint = 0;
+        this.perfect = true;
+        await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
+        gameModeManager.I.playingToShowSuit(1);
+    }
 
     private currentDancer: dancer = null;
     private allDancer: dancer[] = [];
