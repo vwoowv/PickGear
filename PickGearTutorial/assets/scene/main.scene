@@ -238,7 +238,7 @@
         "__id__": 6
       }
     ],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 56
@@ -2298,7 +2298,7 @@
         "__id__": 65
       }
     ],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 194
@@ -5438,7 +5438,7 @@
         "__id__": 166
       }
     ],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 171
@@ -7116,7 +7116,7 @@
         "__id__": 199
       }
     ],
-    "_active": false,
+    "_active": true,
     "_components": [
       {
         "__id__": 202
@@ -7215,7 +7215,7 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 178.36990356445312,
+      "width": 202.669921875,
       "height": 100.8
     },
     "_anchorPoint": {

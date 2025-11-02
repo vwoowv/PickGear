@@ -1,5 +1,6 @@
 import { RootUI } from "../RootUI";
 import { StateMachine, t } from "../StateMachine/stateMachine";
+import { preLoadGameAsset } from "../Utility/preLoadGameAsset";
 import { EGameRootModeEvent, EGameRootModeState } from "./gameModeStateEvent";
 import { playNewGame } from "./playNewGame";
 
@@ -23,8 +24,8 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
         RootUI.I.hideAllGroup();
         // 여기서 리소스 로딩을 해야 한다
         RootUI.I.showLoadingGroup();
+        await new preLoadGameAsset().preLoadGameAsset();
         RootUI.I.hideLoadingGroup();
-        // RootUI.I.showSelectGameTypeNode();
         this.playGame();
     }
 
