@@ -25,7 +25,7 @@ export class dancer extends Component {
     }
 
     public async suitChange(suitType: ECharacterSuitType) {
-        this.currentSuit.spriteFrame = await new getDancerSuitSpriteFrame().getAsync(this.dancerType, suitType);
+        this.currentSuit.spriteFrame = await new getDancerSuitSpriteFrame().getAsync(this.dancerType, suitType, true);
     }
 
     public takeOffSuit() {
