@@ -86,10 +86,12 @@ export class gamePlaying extends Component {
             this.rollingSuitList[i].destroy();
         }
         this.rollingSuitList = [];
+        this.wrongSuitList = [];
     }
 
     private nextRollingSuitTime: number = 0;
     private rollingSuitList: RollingSuit[] = [];
+    private wrongSuitList: RollingSuit[] = [];
     private pickedSuitList: PickedSuitManager = new PickedSuitManager();
     private async updateGameRoundUnderLevel5(deltaTime: number) {
         if (this.currentTime > this.currentGameRoundTime) {
@@ -167,8 +169,18 @@ export class gamePlaying extends Component {
 
         for (let i = 0; i < this.rollingSuitList.length; i++) {
             const isPass = this.rollingSuitList[i].roll(deltaTime, this.gameProperty.getPickDistanceThreshold(this.currentLevel), this.currentDancer.dancerType);
-            if (isPass === false) {
+            if (isPass === false && this.wrongSuitList.indexOf(this.rollingSuitList[i]) === -1) {
                 this.perfect = false;
+
+                const acquirePoint = this.gameProperty.getScore(this.currentLevel, true);
+                this.currentPoint += acquirePoint;
+                if (this.currentPoint < 0) {
+                    this.currentPoint = 0;
+                }
+                RootUI.I.setCurrentScoreText(this.currentPoint, acquirePoint);
+                RootUI.I.setFaceSpriteAndBackToNormal(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Fail);
+                gameInstance.I.playAudioClip('sound/Kiss and cry_Game_No', 0.5);
+                this.wrongSuitList.push(this.rollingSuitList[i]);
             }
         }
     }
