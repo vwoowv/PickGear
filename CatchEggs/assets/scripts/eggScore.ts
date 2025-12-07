@@ -10,7 +10,13 @@ export class eggScore extends Component {
     private scoreAnimation: AnimationComponent = null;
 
     public setScore(score: number) {
-        this.scoreText.string = new richTextMaker(score.toString(), "#020202", 3, "").resultText;
+        let scoreString = score.toString();
+        if (score > 0) {
+            scoreString = "+" + scoreString;
+        }
+        // score < 0인 경우는 이미 "-"가 포함되어 있음
+        const color = score > 0 ? "#020202" : "#FF0000";
+        this.scoreText.string = new richTextMaker(scoreString, color, 3, "").resultText;
         this.scoreAnimation.play(null);
         this.scoreAnimation.on(AnimationComponent.EventType.FINISHED, this.onScoreAnimationFinished, this);
     }
