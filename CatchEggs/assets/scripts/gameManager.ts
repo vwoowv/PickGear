@@ -9,6 +9,7 @@ import { playStartingNode } from './playStartingNode';
 import { richTextMaker } from './richTextMaker';
 import { gameProperty } from './gameProperty';
 import { midiJsonData } from './midi/midiJsonData';
+import { openingEgg } from './openingEgg';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameManager')
@@ -82,6 +83,10 @@ export class gameManager extends Component {
     private background: Sprite = null;
     @property(Node)
     private OpeningNerdsGroup: Node = null;
+    @property(openingEgg)
+    private openingEggNormalList: openingEgg[] = [];
+    @property(openingEgg)
+    private openingEggNegativeList: openingEgg[] = [];
     private gameState: EGameState = EGameState.None;
     private timeLeft: number = 0;
     private currentScore: number = 0;
@@ -121,10 +126,10 @@ export class gameManager extends Component {
 
     public async completeSelectGameMode() {
         this.background.spriteFrame = await this.gameMode.getCurrentBackground();
-        this.prepareGame();
+        await this.prepareGame();
     }
 
-    private prepareGame() {
+    private async prepareGame() {
         this.gameState = EGameState.Prepare;
         this.selectGameModeNode.active = false;
         this.playStartingNode.active = false;
@@ -137,42 +142,145 @@ export class gameManager extends Component {
         this.coinText.string = new richTextMaker("0000", "#020202", 3, "").resultText;
         this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
         this.currentLevelText.string = new richTextMaker("LV." + this.gameMode.getCurrentLevelFromVersion().toString(), "#020202", 3, "").resultText;
-        this.setOpeningCharacter();
+        await this.setOpeningCharacter();
     }
 
-    private setOpeningCharacter() {
+    private async setOpeningCharacter() {
         const level = this.gameMode.getCurrentLevelFromVersion();
         const prop = gameProperty.I;
         
+        // 레벨별 스코어와 이미지를 가져오는 헬퍼 함수
+        const getScore = (eggType: EggType): number => {
+            if (level === 1) {
+                switch (eggType) {
+                    case EggType.DoArin: return prop.level1DoArin_Score;
+                    case EggType.EmmaMoon: return prop.level1EmmaMoon_Score;
+                    case EggType.Happy: return prop.level1Happy_Score;
+                    case EggType.Howsam: return prop.level1Howsam_Score;
+                    case EggType.Hoyang: return prop.level1Hoyang_Score;
+                    case EggType.SongUnbee: return prop.level1SongUnbee_Score;
+                    case EggType.SooHana: return prop.level1SooHana_Score;
+                    default: return 0;
+                }
+            } else if (level === 2) {
+                switch (eggType) {
+                    case EggType.DoArin: return prop.level2DoArin_Score;
+                    case EggType.EmmaMoon: return prop.level2EmmaMoon_Score;
+                    case EggType.Happy: return prop.level2Happy_Score;
+                    case EggType.Howsam: return prop.level2Howsam_Score;
+                    case EggType.Hoyang: return prop.level2Hoyang_Score;
+                    case EggType.SongUnbee: return prop.level2SongUnbee_Score;
+                    case EggType.SooHana: return prop.level2SooHana_Score;
+                    default: return 0;
+                }
+            } else {
+                switch (eggType) {
+                    case EggType.DoArin: return prop.level3DoArin_Score;
+                    case EggType.EmmaMoon: return prop.level3EmmaMoon_Score;
+                    case EggType.Happy: return prop.level3Happy_Score;
+                    case EggType.Howsam: return prop.level3Howsam_Score;
+                    case EggType.Hoyang: return prop.level3Hoyang_Score;
+                    case EggType.SongUnbee: return prop.level3SongUnbee_Score;
+                    case EggType.SooHana: return prop.level3SooHana_Score;
+                    default: return 0;
+                }
+            }
+        };
+        
+        const getImage = (eggType: EggType): string => {
+            if (level === 1) {
+                switch (eggType) {
+                    case EggType.DoArin: return prop.level1DoArin_Image;
+                    case EggType.EmmaMoon: return prop.level1EmmaMoon_Image;
+                    case EggType.Happy: return prop.level1Happy_Image;
+                    case EggType.Howsam: return prop.level1Howsam_Image;
+                    case EggType.Hoyang: return prop.level1Hoyang_Image;
+                    case EggType.SongUnbee: return prop.level1SongUnbee_Image;
+                    case EggType.SooHana: return prop.level1SooHana_Image;
+                    default: return "";
+                }
+            } else if (level === 2) {
+                switch (eggType) {
+                    case EggType.DoArin: return prop.level2DoArin_Image;
+                    case EggType.EmmaMoon: return prop.level2EmmaMoon_Image;
+                    case EggType.Happy: return prop.level2Happy_Image;
+                    case EggType.Howsam: return prop.level2Howsam_Image;
+                    case EggType.Hoyang: return prop.level2Hoyang_Image;
+                    case EggType.SongUnbee: return prop.level2SongUnbee_Image;
+                    case EggType.SooHana: return prop.level2SooHana_Image;
+                    default: return "";
+                }
+            } else {
+                switch (eggType) {
+                    case EggType.DoArin: return prop.level3DoArin_Image;
+                    case EggType.EmmaMoon: return prop.level3EmmaMoon_Image;
+                    case EggType.Happy: return prop.level3Happy_Image;
+                    case EggType.Howsam: return prop.level3Howsam_Image;
+                    case EggType.Hoyang: return prop.level3Hoyang_Image;
+                    case EggType.SongUnbee: return prop.level3SongUnbee_Image;
+                    case EggType.SooHana: return prop.level3SooHana_Image;
+                    default: return "";
+                }
+            }
+        };
+        
         // 현재 레벨에서 하나라도 0보다 작은 점수를 가진 캐릭터가 있는지 확인
         let hasNegativeScore = false;
-        if (level === 1) {
-            hasNegativeScore = prop.level1DoArin_Score < 0 || 
-                              prop.level1EmmaMoon_Score < 0 || 
-                              prop.level1Howsam_Score < 0 || 
-                              prop.level1SongUnbee_Score < 0 || 
-                              prop.level1SooHana_Score < 0 || 
-                              prop.level1Happy_Score < 0 || 
-                              prop.level1Hoyang_Score < 0;
-        } else if (level === 2) {
-            hasNegativeScore = prop.level2DoArin_Score < 0 || 
-                              prop.level2EmmaMoon_Score < 0 || 
-                              prop.level2Howsam_Score < 0 || 
-                              prop.level2SongUnbee_Score < 0 || 
-                              prop.level2SooHana_Score < 0 || 
-                              prop.level2Happy_Score < 0 || 
-                              prop.level2Hoyang_Score < 0;
-        } else if (level === 3) {
-            hasNegativeScore = prop.level3DoArin_Score < 0 || 
-                              prop.level3EmmaMoon_Score < 0 || 
-                              prop.level3Howsam_Score < 0 || 
-                              prop.level3SongUnbee_Score < 0 || 
-                              prop.level3SooHana_Score < 0 || 
-                              prop.level3Happy_Score < 0 || 
-                              prop.level3Hoyang_Score < 0;
+        for (let i = 0; i < EggType.TotalCount; i++) {
+            if (getScore(i) < 0) {
+                hasNegativeScore = true;
+                break;
+            }
         }
         
         this.OpeningNerdsGroup.active = hasNegativeScore;
+        
+        // 스코어가 0보다 큰 캐릭터들을 정리
+        const positiveScores: { eggType: EggType, score: number, image: string }[] = [];
+        // 스코어가 0보다 작은 캐릭터들을 정리
+        const negativeScores: { eggType: EggType, score: number, image: string }[] = [];
+        
+        for (let i = 0; i < EggType.TotalCount; i++) {
+            const score = getScore(i);
+            const image = getImage(i);
+            if (score > 0) {
+                positiveScores.push({ eggType: i, score, image });
+            } else if (score < 0) {
+                negativeScores.push({ eggType: i, score, image });
+            }
+        }
+        
+        // openingEggNormalList에 세팅
+        let normalIndex = 0;
+        for (const item of positiveScores) {
+            if (normalIndex < this.openingEggNormalList.length && this.openingEggNormalList[normalIndex] != null) {
+                await this.openingEggNormalList[normalIndex].initialize(item.image, item.score);
+                this.openingEggNormalList[normalIndex].node.active = true;
+                normalIndex++;
+            }
+        }
+        // 나머지는 안 보이게 처리
+        for (let i = normalIndex; i < this.openingEggNormalList.length; i++) {
+            if (this.openingEggNormalList[i] != null) {
+                this.openingEggNormalList[i].node.active = false;
+            }
+        }
+        
+        // openingEggNegativeList에 세팅
+        let negativeIndex = 0;
+        for (const item of negativeScores) {
+            if (negativeIndex < this.openingEggNegativeList.length && this.openingEggNegativeList[negativeIndex] != null) {
+                await this.openingEggNegativeList[negativeIndex].initialize(item.image, item.score);
+                this.openingEggNegativeList[negativeIndex].node.active = true;
+                negativeIndex++;
+            }
+        }
+        // 나머지는 안 보이게 처리
+        for (let i = negativeIndex; i < this.openingEggNegativeList.length; i++) {
+            if (this.openingEggNegativeList[i] != null) {
+                this.openingEggNegativeList[i].node.active = false;
+            }
+        }
     }
 
     private updatePrepare(deltaTime: number) {
