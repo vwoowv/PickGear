@@ -13,8 +13,8 @@ export class egg extends Component {
     public currentType: EggType = EggType.DoArin;
     private defaultFallDownSpeed: number = 500;
     private fallDownSpeed: number = this.defaultFallDownSpeed;
-    public async initialize(egg: EggType, endLine: Node, currentTime: number, totalDuration: number, gameMode: EGameMode, extensions: gameManagerExtensions) {
-        this.eggImage.spriteFrame = await extensions.loadSprite(egg);
+    public async initialize(egg: EggType, endLine: Node, currentTime: number, totalDuration: number, gameMode: EGameMode, extensions: gameManagerExtensions, level: number) {
+        this.eggImage.spriteFrame = await extensions.loadSprite(egg, level);
         this.endLine = endLine;
         this.currentType = egg;
         this.extensions = extensions;

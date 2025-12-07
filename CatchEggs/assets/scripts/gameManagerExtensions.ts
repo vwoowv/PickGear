@@ -38,8 +38,60 @@ export class gameManagerExtensions extends Component {
         this._gameManager = gameManager;
     }
 
-    public async loadSprite(egg: EggType): Promise<SpriteFrame> {
-        return ResourceManager.I.loadResource(`textures/character/Game/${EggType[egg]}/spriteFrame`, SpriteFrame);
+    public async loadSprite(egg: EggType, level: number): Promise<SpriteFrame> {
+        const prop = gameProperty.I;
+        const imageName = this.getImageName(egg, level, prop);
+        return ResourceManager.I.loadResource(`textures/character/Game/${imageName}/spriteFrame`, SpriteFrame);
+    }
+
+    private getImageName(egg: EggType, level: number, prop: gameProperty): string {
+        const imageMap = this.getImageMap(prop);
+        return imageMap[egg]?.[level] ?? EggType[egg];
+    }
+
+    private getImageMap(prop: gameProperty): Record<EggType, Record<number, string>> {
+        return {
+            [EggType.DoArin]: {
+                1: prop.level1DoArin_Image,
+                2: prop.level2DoArin_Image,
+                3: prop.level3DoArin_Image,
+            },
+            [EggType.EmmaMoon]: {
+                1: prop.level1EmmaMoon_Image,
+                2: prop.level2EmmaMoon_Image,
+                3: prop.level3EmmaMoon_Image,
+            },
+            [EggType.Happy]: {
+                1: prop.level1Happy_Image,
+                2: prop.level2Happy_Image,
+                3: prop.level3Happy_Image,
+            },
+            [EggType.Howsam]: {
+                1: prop.level1Howsam_Image,
+                2: prop.level2Howsam_Image,
+                3: prop.level3Howsam_Image,
+            },
+            [EggType.Hoyang]: {
+                1: prop.level1Hoyang_Image,
+                2: prop.level2Hoyang_Image,
+                3: prop.level3Hoyang_Image,
+            },
+            [EggType.SongUnbee]: {
+                1: prop.level1SongUnbee_Image,
+                2: prop.level2SongUnbee_Image,
+                3: prop.level3SongUnbee_Image,
+            },
+            [EggType.SooHana]: {
+                1: prop.level1SooHana_Image,
+                2: prop.level2SooHana_Image,
+                3: prop.level3SooHana_Image,
+            },
+            [EggType.TotalCount]: {
+                1: "",
+                2: "",
+                3: "",
+            },
+        };
     }
 
     public async spawnEggScore(position: Vec3, score: number): Promise<eggScore> {
@@ -62,7 +114,8 @@ export class gameManagerExtensions extends Component {
     public async spawnRandomEgg(currentTime: number, totalDuration: number, gameMode: EGameMode): Promise<number> {
         const newEgg = await ResourceManager.I.spawnPrefab<egg>("prefab/Egg", this.eggParent);
         const randomEgg = Math.floor(Math.random() * EggType.TotalCount);
-        newEgg.initialize(randomEgg, this.eggEndLine, currentTime, totalDuration, gameMode, this);
+        const level = this._gameManager.gameMode.getCurrentLevelFromVersion();
+        newEgg.initialize(randomEgg, this.eggEndLine, currentTime, totalDuration, gameMode, this, level);
         let xPosition = Math.random() * (this.eggSpawnPoint_Right.position.x - this.eggSpawnPoint_Left.position.x) + this.eggSpawnPoint_Left.position.x;
         if (this.prevRandomX == -1) {
             this.prevRandomX = xPosition;
