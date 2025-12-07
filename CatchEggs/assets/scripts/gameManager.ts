@@ -194,8 +194,15 @@ export class gameManager extends Component {
             this.gameOver();
         }
         this.checkEggsInBasket();
-        this.currentTimeText.string = (totalDuration - this.timeLeft).toFixed(1);
-        this.leftTimeText.string = this.timeLeft.toFixed(1);
+        const formatTime = (time: number): string => {
+            const integer = Math.floor(Math.max(0, time));
+            const decimal = (time - integer).toFixed(2).substring(1);
+            const integerStr = integer.toString();
+            const paddedInteger = integerStr.length < 2 ? '0' + integerStr : integerStr;
+            return paddedInteger + decimal;
+        };
+        this.currentTimeText.string = formatTime(totalDuration - this.timeLeft);
+        this.leftTimeText.string = formatTime(this.timeLeft);
     }
 
     private gameOver() {
