@@ -80,6 +80,8 @@ export class gameManager extends Component {
     public eggCatchSound: AudioClip[] = [];
     @property(Sprite)
     private background: Sprite = null;
+    @property(Node)
+    private OpeningNerdsGroup: Node = null;
     private gameState: EGameState = EGameState.None;
     private timeLeft: number = 0;
     private currentScore: number = 0;
@@ -135,6 +137,42 @@ export class gameManager extends Component {
         this.coinText.string = new richTextMaker("0000", "#020202", 3, "").resultText;
         this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
         this.currentLevelText.string = new richTextMaker("LV." + this.gameMode.getCurrentLevelFromVersion().toString(), "#020202", 3, "").resultText;
+        this.setOpeningCharacter();
+    }
+
+    private setOpeningCharacter() {
+        const level = this.gameMode.getCurrentLevelFromVersion();
+        const prop = gameProperty.I;
+        
+        // 현재 레벨에서 하나라도 0보다 작은 점수를 가진 캐릭터가 있는지 확인
+        let hasNegativeScore = false;
+        if (level === 1) {
+            hasNegativeScore = prop.level1DoArin_Score < 0 || 
+                              prop.level1EmmaMoon_Score < 0 || 
+                              prop.level1Howsam_Score < 0 || 
+                              prop.level1SongUnbee_Score < 0 || 
+                              prop.level1SooHana_Score < 0 || 
+                              prop.level1Happy_Score < 0 || 
+                              prop.level1Hoyang_Score < 0;
+        } else if (level === 2) {
+            hasNegativeScore = prop.level2DoArin_Score < 0 || 
+                              prop.level2EmmaMoon_Score < 0 || 
+                              prop.level2Howsam_Score < 0 || 
+                              prop.level2SongUnbee_Score < 0 || 
+                              prop.level2SooHana_Score < 0 || 
+                              prop.level2Happy_Score < 0 || 
+                              prop.level2Hoyang_Score < 0;
+        } else if (level === 3) {
+            hasNegativeScore = prop.level3DoArin_Score < 0 || 
+                              prop.level3EmmaMoon_Score < 0 || 
+                              prop.level3Howsam_Score < 0 || 
+                              prop.level3SongUnbee_Score < 0 || 
+                              prop.level3SooHana_Score < 0 || 
+                              prop.level3Happy_Score < 0 || 
+                              prop.level3Hoyang_Score < 0;
+        }
+        
+        this.OpeningNerdsGroup.active = hasNegativeScore;
     }
 
     private updatePrepare(deltaTime: number) {
