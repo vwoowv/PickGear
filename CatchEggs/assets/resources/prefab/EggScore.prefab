@@ -136,7 +136,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 31,
+      "width": 31.949996948242188,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -177,12 +177,12 @@
     "_maxWidth": 0,
     "_fontFamily": "NanumSquareRoundB",
     "_font": {
-      "__uuid__": "3e1a74a5-e376-43dc-a22f-4adcc90629f0",
+      "__uuid__": "c07f42b8-e0dd-4986-bdf2-dfd325ab552c",
       "__expectedType__": "cc.TTFFont"
     },
     "_isSystemFontUsed": false,
     "_userDefinedFont": {
-      "__uuid__": "3e1a74a5-e376-43dc-a22f-4adcc90629f0",
+      "__uuid__": "c07f42b8-e0dd-4986-bdf2-dfd325ab552c",
       "__expectedType__": "cc.TTFFont"
     },
     "_cacheMode": 0,
