@@ -1,4 +1,4 @@
-import { _decorator, Component, CCFloat, CCInteger, CCString } from 'cc';
+import { _decorator, Component, CCFloat, CCInteger } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameProperty')
@@ -50,19 +50,19 @@ export class gameProperty extends Component {
     @property({ type: CCInteger, group: "Level 1", displayName: "Score - Hoyang" })
     public level1Hoyang_Score: number = 1;
     // Image
-    @property({ type: CCString, group: "Level 1", displayName: "Image - DoArin" })
+    @property({ group: "Level 1", displayName: "Image - DoArin" })
     public level1DoArin_Image: string = "DoArin";
-    @property({ type: CCString, group: "Level 1", displayName: "Image - EmmaMoon" })
+    @property({ group: "Level 1", displayName: "Image - EmmaMoon" })
     public level1EmmaMoon_Image: string = "EmmaMoon";
-    @property({ type: CCString, group: "Level 1", displayName: "Image - Howsam" })
+    @property({ group: "Level 1", displayName: "Image - Howsam" })
     public level1Howsam_Image: string = "Howsam";
-    @property({ type: CCString, group: "Level 1", displayName: "Image - SongUnbee" })
+    @property({ group: "Level 1", displayName: "Image - SongUnbee" })
     public level1SongUnbee_Image: string = "SongUnbee";
-    @property({ type: CCString, group: "Level 1", displayName: "Image - SooHana" })
+    @property({ group: "Level 1", displayName: "Image - SooHana" })
     public level1SooHana_Image: string = "SooHana";
-    @property({ type: CCString, group: "Level 1", displayName: "Image - Happy" })
+    @property({ group: "Level 1", displayName: "Image - Happy" })
     public level1Happy_Image: string = "Happy";
-    @property({ type: CCString, group: "Level 1", displayName: "Image - Hoyang" })
+    @property({ group: "Level 1", displayName: "Image - Hoyang" })
     public level1Hoyang_Image: string = "Hoyang";
 
     // FallDownSpeed
@@ -93,19 +93,19 @@ export class gameProperty extends Component {
     @property({ type: CCInteger, group: "Level 2", displayName: "Score - Hoyang" })
     public level2Hoyang_Score: number = 1;
     // Image
-    @property({ type: CCString, group: "Level 2", displayName: "Image - DoArin" })
+    @property({ group: "Level 2", displayName: "Image - DoArin" })
     public level2DoArin_Image: string = "DoArin";
-    @property({ type: CCString, group: "Level 2", displayName: "Image - EmmaMoon" })
+    @property({ group: "Level 2", displayName: "Image - EmmaMoon" })
     public level2EmmaMoon_Image: string = "EmmaMoon";
-    @property({ type: CCString, group: "Level 2", displayName: "Image - Howsam" })
+    @property({ group: "Level 2", displayName: "Image - Howsam" })
     public level2Howsam_Image: string = "Howsam";
-    @property({ type: CCString, group: "Level 2", displayName: "Image - SongUnbee" })
+    @property({ group: "Level 2", displayName: "Image - SongUnbee" })
     public level2SongUnbee_Image: string = "SongUnbee";
-    @property({ type: CCString, group: "Level 2", displayName: "Image - SooHana" })
+    @property({ group: "Level 2", displayName: "Image - SooHana" })
     public level2SooHana_Image: string = "SooHana";
-    @property({ type: CCString, group: "Level 2", displayName: "Image - Happy" })
+    @property({ group: "Level 2", displayName: "Image - Happy" })
     public level2Happy_Image: string = "Happy";
-    @property({ type: CCString, group: "Level 2", displayName: "Image - Hoyang" })
+    @property({ group: "Level 2", displayName: "Image - Hoyang" })
     public level2Hoyang_Image: string = "Hoyang";
 
     // FallDownSpeed
@@ -136,18 +136,18 @@ export class gameProperty extends Component {
     @property({ type: CCInteger, group: "Level 3", displayName: "Score - Hoyang" })
     public level3Hoyang_Score: number = 1;
     // Image
-    @property({ type: CCString, group: "Level 3", displayName: "Image - DoArin" })
+    @property({ group: "Level 3", displayName: "Image - DoArin" })
     public level3DoArin_Image: string = "DoArin";
-    @property({ type: CCString, group: "Level 3", displayName: "Image - EmmaMoon" })
+    @property({ group: "Level 3", displayName: "Image - EmmaMoon" })
     public level3EmmaMoon_Image: string = "EmmaMoon";
-    @property({ type: CCString, group: "Level 3", displayName: "Image - Howsam" })
+    @property({ group: "Level 3", displayName: "Image - Howsam" })
     public level3Howsam_Image: string = "Howsam";
-    @property({ type: CCString, group: "Level 3", displayName: "Image - SongUnbee" })
+    @property({ group: "Level 3", displayName: "Image - SongUnbee" })
     public level3SongUnbee_Image: string = "SongUnbee";
-    @property({ type: CCString, group: "Level 3", displayName: "Image - SooHana" })
+    @property({ group: "Level 3", displayName: "Image - SooHana" })
     public level3SooHana_Image: string = "SooHana";
-    @property({ type: CCString, group: "Level 3", displayName: "Image - Happy" })
+    @property({ group: "Level 3", displayName: "Image - Happy" })
     public level3Happy_Image: string = "Happy";
-    @property({ type: CCString, group: "Level 3", displayName: "Image - Hoyang" })
+    @property({ group: "Level 3", displayName: "Image - Hoyang" })
     public level3Hoyang_Image: string = "Hoyang";
 }
