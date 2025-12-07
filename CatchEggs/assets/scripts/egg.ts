@@ -83,4 +83,25 @@ export class egg extends Component {
             this.extensions.resetComboScore();
         }
     }
+
+    public getCurrentScore() {
+        switch (this.currentType) {
+            case EggType.DoArin:
+                return gameProperty.I.DoArin_Score;
+            case EggType.EmmaMoon:
+                return gameProperty.I.EmmaMoon_Score;
+            case EggType.Happy:
+                return gameProperty.I.Happy_Score;
+            case EggType.Howsam:
+                return gameProperty.I.Howsam_Score;
+            case EggType.Hoyang:
+                return gameProperty.I.Hoyang_Score;
+            case EggType.SongUnbee:
+                return gameProperty.I.SongUnbee_Score;
+            case EggType.SooHana:
+                return gameProperty.I.SooHana_Score;
+            default:
+                return 1;
+        }
+    }
 }

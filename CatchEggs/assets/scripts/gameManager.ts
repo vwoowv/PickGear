@@ -130,6 +130,7 @@ export class gameManager extends Component {
         this.prepareNode.active = true;
         this.retryNode.active = false;
         this.currentScore = 0;
+        this.currentComboScore = 0;
         this.scoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
         this.coinText.string = new richTextMaker("0000", "#020202", 3, "").resultText;
         this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
@@ -229,23 +230,7 @@ export class gameManager extends Component {
             const distance: number = eggNode.position.clone().subtract(this.basket.position).length();
             if (distance < 100) {
                 console.log("egg in basket : " + eggNode.name);
-                const currentEggScore = this.getCurrentComboScore(eggNode.getComponent(egg).currentType);
-                if (currentEggScore > 0) {
-                    this.currentComboScore += currentEggScore;
-                }
-                else {
-                    this.currentComboScore = currentEggScore;
-                }
-                this.currentScore += this.currentComboScore;
-                if (this.currentScore < 0) {
-                    this.currentScore = 0;
-                }
-                this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
-                const eggComponent = eggNode.getComponent(egg);
-                eggComponent.onEggCatch(this.currentComboScore);
-                if (this.currentComboScore < 0) {
-                    this.currentComboScore = 0;
-                }
+                this.processEggCatch(eggNode);
                 eggInBasket.push(eggNode);
                 break;
             }
@@ -253,30 +238,28 @@ export class gameManager extends Component {
 
         if (eggInBasket.length > 0) {
             for (const eggNode of eggInBasket) {
-                this.eggParent.removeChild(eggNode);
-                eggNode.destroy();
+                eggNode.removeFromParent();
             }
         }
     }
 
-    private getCurrentComboScore(eggType: EggType) {
-        switch (eggType) {
-            case EggType.DoArin:
-                return gameProperty.I.DoArin_Score;
-            case EggType.EmmaMoon:
-                return gameProperty.I.EmmaMoon_Score;
-            case EggType.Happy:
-                return gameProperty.I.Happy_Score;
-            case EggType.Howsam:
-                return gameProperty.I.Howsam_Score;
-            case EggType.Hoyang:
-                return gameProperty.I.Hoyang_Score;
-            case EggType.SongUnbee:
-                return gameProperty.I.SongUnbee_Score;
-            case EggType.SooHana:
-                return gameProperty.I.SooHana_Score;
-            default:
-                return 1;
+    private processEggCatch(eggNode: Node) {
+        const currentEggScore = eggNode.getComponent(egg).getCurrentScore();
+        if (currentEggScore > 0) {
+            this.currentComboScore += currentEggScore;
+        }
+        else {
+            this.currentComboScore = currentEggScore;
+        }
+        this.currentScore += this.currentComboScore;
+        if (this.currentScore < 0) {
+            this.currentScore = 0;
+        }
+        this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
+        const eggComponent = eggNode.getComponent(egg);
+        eggComponent.onEggCatch(this.currentComboScore);
+        if (this.currentComboScore < 0) {
+            this.currentComboScore = 0;
         }
     }
 
