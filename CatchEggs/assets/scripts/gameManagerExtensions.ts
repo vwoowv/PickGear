@@ -9,30 +9,33 @@ const { ccclass, property } = _decorator;
 
 @ccclass('gameManagerExtensions')
 export class gameManagerExtensions extends Component {
-    private gameManager: gameManager = null;
+    private _gameManager: gameManager = null;
+    public get gameManager(): gameManager {
+        return this._gameManager;
+    }
     public get eggParent(): Node {
-        return this.gameManager.eggParent;
+        return this._gameManager.eggParent;
     }
     public get eggEndLine(): Node {
-        return this.gameManager.eggEndLine;
+        return this._gameManager.eggEndLine;
     }
     public get eggSpawnPoint_Right(): Node {
-        return this.gameManager.eggSpawnPoint_Right;
+        return this._gameManager.eggSpawnPoint_Right;
     }
     public get eggSpawnPoint_Left(): Node {
-        return this.gameManager.eggSpawnPoint_Left;
+        return this._gameManager.eggSpawnPoint_Left;
     }
 
     public get playSound(): AudioSource {
-        return this.gameManager.playSound;
+        return this._gameManager.playSound;
     }
 
     public get eggCatchSound(): AudioClip[] {
-        return this.gameManager.eggCatchSound;
+        return this._gameManager.eggCatchSound;
     }
 
     public async initialize(gameManager: gameManager) {
-        this.gameManager = gameManager;
+        this._gameManager = gameManager;
     }
 
     public async loadSprite(egg: EggType): Promise<SpriteFrame> {
@@ -40,7 +43,7 @@ export class gameManagerExtensions extends Component {
     }
 
     public async spawnEggScore(position: Vec3, score: number): Promise<eggScore> {
-        const newEggScore = await ResourceManager.I.spawnPrefab<eggScore>("prefab/EggScore", this.gameManager.eggScoreParent);
+        const newEggScore = await ResourceManager.I.spawnPrefab<eggScore>("prefab/EggScore", this._gameManager.eggScoreParent);
         newEggScore.node.setPosition(position);
         newEggScore.setScore(score);
         return newEggScore;
@@ -52,7 +55,7 @@ export class gameManagerExtensions extends Component {
         const hitEffectPosition = new Vec3(eggPosition.x, eggPosition.y - 100, eggPosition.z);
         hitEffectNode.setPosition(hitEffectPosition);
         hitEffectNode.setScale(100, 100, 100);
-        this.gameManager.playingNode.addChild(hitEffectNode);
+        this._gameManager.playingNode.addChild(hitEffectNode);
     }
 
     private prevRandomX: number = -1;
@@ -116,6 +119,6 @@ export class gameManagerExtensions extends Component {
     }
 
     public resetComboScore() {
-        this.gameManager.resetComboScore();
+        this._gameManager.resetComboScore();
     }
 }

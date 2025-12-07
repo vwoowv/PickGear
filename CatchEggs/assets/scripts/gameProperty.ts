@@ -22,51 +22,87 @@ export class gameProperty extends Component {
         }
     }
 
-    @property({ type: CCInteger })
-    public DoArin_Score: number = 100;
-    @property({ type: CCInteger })
-    public EmmaMoon_Score: number = 100;
-    @property({ type: CCInteger })
-    public Happy_Score: number = 100;
-    @property({ type: CCInteger })
-    public Howsam_Score: number = 100;
-    @property({ type: CCInteger })
-    public Hoyang_Score: number = 100;
-    @property({ type: CCInteger })
-    public SongUnbee_Score: number = 100;
-    @property({ type: CCInteger })
-    public SooHana_Score: number = 100;
-
-    @property({ type: CCFloat, group: "Level 1" })
+    // FallDownSpeed
+    @property({ type: CCFloat, group: "Level 1", displayName: "FallDownSpeed - Normal" })
     public level1FallDownSpeedRate_Normal: number = 1.2;
-    @property({ type: CCFloat, group: "Level 1" })
+    @property({ type: CCFloat, group: "Level 1", displayName: "FallDownSpeed - High" })
     public level1FallDownSpeedRate_High: number = 1.4;
-    @property({ type: CCFloat, group: "Level 1" })
+    // SpawnTime
+    @property({ type: CCFloat, group: "Level 1", displayName: "SpawnTime - Normal" })
     public level1SpawnTime_Normal: number = 1;
-    @property({ type: CCFloat, group: "Level 1" })
+    @property({ type: CCFloat, group: "Level 1", displayName: "SpawnTime - Middle" })
     public level1SpawnTime_Middle: number = 0.5;
-    @property({ type: CCFloat, group: "Level 1" })
+    @property({ type: CCFloat, group: "Level 1", displayName: "SpawnTime - High" })
     public level1SpawnTime_High: number = 0.7;
+    // Score
+    @property({ type: CCInteger, group: "Level 1", displayName: "Score - DoArin" })
+    public level1DoArin_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 1", displayName: "Score - EmmaMoon" })
+    public level1EmmaMoon_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 1", displayName: "Score - Happy" })
+    public level1Happy_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 1", displayName: "Score - Howsam" })
+    public level1Howsam_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 1", displayName: "Score - Hoyang" })
+    public level1Hoyang_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 1", displayName: "Score - SongUnbee" })
+    public level1SongUnbee_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 1", displayName: "Score - SooHana" })
+    public level1SooHana_Score: number = 1;
 
-    @property({ type: CCFloat, group: "Level 2" })
+    // FallDownSpeed
+    @property({ type: CCFloat, group: "Level 2", displayName: "FallDownSpeed - Normal" })
     public level2FallDownSpeedRate_Normal: number = 1.3;
-    @property({ type: CCFloat, group: "Level 2" })
+    @property({ type: CCFloat, group: "Level 2", displayName: "FallDownSpeed - High" })
     public level2FallDownSpeedRate_High: number = 1.5;
-    @property({ type: CCFloat, group: "Level 2" })
+    // SpawnTime
+    @property({ type: CCFloat, group: "Level 2", displayName: "SpawnTime - Normal" })
     public level2SpawnTime_Normal: number = 0.9;
-    @property({ type: CCFloat, group: "Level 2" })
+    @property({ type: CCFloat, group: "Level 2", displayName: "SpawnTime - Middle" })
     public level2SpawnTime_Middle: number = 0.55;
-    @property({ type: CCFloat, group: "Level 2" })
+    @property({ type: CCFloat, group: "Level 2", displayName: "SpawnTime - High" })
     public level2SpawnTime_High: number = 0.4;
+    // Score
+    @property({ type: CCInteger, group: "Level 2", displayName: "Score - DoArin" })
+    public level2DoArin_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 2", displayName: "Score - EmmaMoon" })
+    public level2EmmaMoon_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 2", displayName: "Score - Happy" })
+    public level2Happy_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 2", displayName: "Score - Howsam" })
+    public level2Howsam_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 2", displayName: "Score - Hoyang" })
+    public level2Hoyang_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 2", displayName: "Score - SongUnbee" })
+    public level2SongUnbee_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 2", displayName: "Score - SooHana" })
+    public level2SooHana_Score: number = 1;
 
-    @property({ type: CCFloat, group: "Level 3" })
+    // FallDownSpeed
+    @property({ type: CCFloat, group: "Level 3", displayName: "FallDownSpeed - Normal" })
     public level3FallDownSpeedRate_Normal: number = 1.4;
-    @property({ type: CCFloat, group: "Level 3" })
+    @property({ type: CCFloat, group: "Level 3", displayName: "FallDownSpeed - High" })
     public level3FallDownSpeedRate_High: number = 1.6;
-    @property({ type: CCFloat, group: "Level 3" })
+    // SpawnTime
+    @property({ type: CCFloat, group: "Level 3", displayName: "SpawnTime - Normal" })
     public level3SpawnTime_Normal: number = 0.8;
-    @property({ type: CCFloat, group: "Level 3" })
+    @property({ type: CCFloat, group: "Level 3", displayName: "SpawnTime - Middle" })
     public level3SpawnTime_Middle: number = 0.5;
-    @property({ type: CCFloat, group: "Level 3" })
+    @property({ type: CCFloat, group: "Level 3", displayName: "SpawnTime - High" })
     public level3SpawnTime_High: number = 0.3;
+    // Score
+    @property({ type: CCInteger, group: "Level 3", displayName: "Score - DoArin" })
+    public level3DoArin_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 3", displayName: "Score - EmmaMoon" })
+    public level3EmmaMoon_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 3", displayName: "Score - Happy" })
+    public level3Happy_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 3", displayName: "Score - Howsam" })
+    public level3Howsam_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 3", displayName: "Score - Hoyang" })
+    public level3Hoyang_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 3", displayName: "Score - SongUnbee" })
+    public level3SongUnbee_Score: number = 1;
+    @property({ type: CCInteger, group: "Level 3", displayName: "Score - SooHana" })
+    public level3SooHana_Score: number = 1;
 }

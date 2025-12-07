@@ -251,7 +251,8 @@ export class gameManager extends Component {
     }
 
     private processEggCatch(eggNode: Node) {
-        const currentEggScore = eggNode.getComponent(egg).getCurrentScore();
+        const level = this.gameMode.getCurrentLevelFromVersion();
+        const currentEggScore = eggNode.getComponent(egg).getCurrentScore(level);
         if (currentEggScore > 0) {
             this.currentComboScore += currentEggScore;
         }

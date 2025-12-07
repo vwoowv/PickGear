@@ -81,30 +81,62 @@ export class egg extends Component {
             this.node.parent.removeChild(this.node);
             this.node.destroy();
             // 0보다 클 경우에만 콤보가 리셋된다
-            if (this.getCurrentScore() > 0) {
+            const level = this.extensions.gameManager.gameMode.getCurrentLevelFromVersion();
+            if (this.getCurrentScore(level) > 0) {
                 this.extensions.resetComboScore();
             }
         }
     }
 
-    public getCurrentScore() {
-        switch (this.currentType) {
-            case EggType.DoArin:
-                return gameProperty.I.DoArin_Score;
-            case EggType.EmmaMoon:
-                return gameProperty.I.EmmaMoon_Score;
-            case EggType.Happy:
-                return gameProperty.I.Happy_Score;
-            case EggType.Howsam:
-                return gameProperty.I.Howsam_Score;
-            case EggType.Hoyang:
-                return gameProperty.I.Hoyang_Score;
-            case EggType.SongUnbee:
-                return gameProperty.I.SongUnbee_Score;
-            case EggType.SooHana:
-                return gameProperty.I.SooHana_Score;
-            default:
-                return 1;
-        }
+    public getCurrentScore(level: number) {
+        const prop = gameProperty.I;
+        const levelScores = this.getLevelScores(prop);
+        
+        return levelScores[this.currentType]?.[level] ?? 0;
+    }
+
+    private getLevelScores(prop: gameProperty): Record<EggType, Record<number, number>> {
+        return {
+            [EggType.DoArin]: {
+                1: prop.level1DoArin_Score,
+                2: prop.level2DoArin_Score,
+                3: prop.level3DoArin_Score,
+            },
+            [EggType.EmmaMoon]: {
+                1: prop.level1EmmaMoon_Score,
+                2: prop.level2EmmaMoon_Score,
+                3: prop.level3EmmaMoon_Score,
+            },
+            [EggType.Happy]: {
+                1: prop.level1Happy_Score,
+                2: prop.level2Happy_Score,
+                3: prop.level3Happy_Score,
+            },
+            [EggType.Howsam]: {
+                1: prop.level1Howsam_Score,
+                2: prop.level2Howsam_Score,
+                3: prop.level3Howsam_Score,
+            },
+            [EggType.Hoyang]: {
+                1: prop.level1Hoyang_Score,
+                2: prop.level2Hoyang_Score,
+                3: prop.level3Hoyang_Score,
+            },
+            [EggType.SongUnbee]: {
+                1: prop.level1SongUnbee_Score,
+                2: prop.level2SongUnbee_Score,
+                3: prop.level3SongUnbee_Score,
+            },
+            [EggType.SooHana]: {
+                1: prop.level1SooHana_Score,
+                2: prop.level2SooHana_Score,
+                3: prop.level3SooHana_Score,
+            },
+            [EggType.TotalCount]: {
+                1: 0,
+                2: 0,
+                3: 0,
+            },
+        };
     }
 }
