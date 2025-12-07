@@ -80,7 +80,10 @@ export class egg extends Component {
             this.extensions.spawnEggScore(this.node.position.clone(), 0);
             this.node.parent.removeChild(this.node);
             this.node.destroy();
-            this.extensions.resetComboScore();
+            // 0보다 작을 경우에만 콤보가 리셋된다
+            if (this.getCurrentScore() < 0) {
+                this.extensions.resetComboScore();
+            }
         }
     }
 
