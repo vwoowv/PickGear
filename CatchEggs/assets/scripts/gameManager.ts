@@ -149,85 +149,10 @@ export class gameManager extends Component {
         const level = this.gameMode.getCurrentLevelFromVersion();
         const prop = gameProperty.I;
         
-        // 레벨별 스코어와 이미지를 가져오는 헬퍼 함수
-        const getScore = (eggType: EggType): number => {
-            if (level === 1) {
-                switch (eggType) {
-                    case EggType.DoArin: return prop.level1DoArin_Score;
-                    case EggType.EmmaMoon: return prop.level1EmmaMoon_Score;
-                    case EggType.Happy: return prop.level1Happy_Score;
-                    case EggType.Howsam: return prop.level1Howsam_Score;
-                    case EggType.Hoyang: return prop.level1Hoyang_Score;
-                    case EggType.SongUnbee: return prop.level1SongUnbee_Score;
-                    case EggType.SooHana: return prop.level1SooHana_Score;
-                    default: return 0;
-                }
-            } else if (level === 2) {
-                switch (eggType) {
-                    case EggType.DoArin: return prop.level2DoArin_Score;
-                    case EggType.EmmaMoon: return prop.level2EmmaMoon_Score;
-                    case EggType.Happy: return prop.level2Happy_Score;
-                    case EggType.Howsam: return prop.level2Howsam_Score;
-                    case EggType.Hoyang: return prop.level2Hoyang_Score;
-                    case EggType.SongUnbee: return prop.level2SongUnbee_Score;
-                    case EggType.SooHana: return prop.level2SooHana_Score;
-                    default: return 0;
-                }
-            } else {
-                switch (eggType) {
-                    case EggType.DoArin: return prop.level3DoArin_Score;
-                    case EggType.EmmaMoon: return prop.level3EmmaMoon_Score;
-                    case EggType.Happy: return prop.level3Happy_Score;
-                    case EggType.Howsam: return prop.level3Howsam_Score;
-                    case EggType.Hoyang: return prop.level3Hoyang_Score;
-                    case EggType.SongUnbee: return prop.level3SongUnbee_Score;
-                    case EggType.SooHana: return prop.level3SooHana_Score;
-                    default: return 0;
-                }
-            }
-        };
-        
-        const getImage = (eggType: EggType): string => {
-            if (level === 1) {
-                switch (eggType) {
-                    case EggType.DoArin: return prop.level1DoArin_Image;
-                    case EggType.EmmaMoon: return prop.level1EmmaMoon_Image;
-                    case EggType.Happy: return prop.level1Happy_Image;
-                    case EggType.Howsam: return prop.level1Howsam_Image;
-                    case EggType.Hoyang: return prop.level1Hoyang_Image;
-                    case EggType.SongUnbee: return prop.level1SongUnbee_Image;
-                    case EggType.SooHana: return prop.level1SooHana_Image;
-                    default: return "";
-                }
-            } else if (level === 2) {
-                switch (eggType) {
-                    case EggType.DoArin: return prop.level2DoArin_Image;
-                    case EggType.EmmaMoon: return prop.level2EmmaMoon_Image;
-                    case EggType.Happy: return prop.level2Happy_Image;
-                    case EggType.Howsam: return prop.level2Howsam_Image;
-                    case EggType.Hoyang: return prop.level2Hoyang_Image;
-                    case EggType.SongUnbee: return prop.level2SongUnbee_Image;
-                    case EggType.SooHana: return prop.level2SooHana_Image;
-                    default: return "";
-                }
-            } else {
-                switch (eggType) {
-                    case EggType.DoArin: return prop.level3DoArin_Image;
-                    case EggType.EmmaMoon: return prop.level3EmmaMoon_Image;
-                    case EggType.Happy: return prop.level3Happy_Image;
-                    case EggType.Howsam: return prop.level3Howsam_Image;
-                    case EggType.Hoyang: return prop.level3Hoyang_Image;
-                    case EggType.SongUnbee: return prop.level3SongUnbee_Image;
-                    case EggType.SooHana: return prop.level3SooHana_Image;
-                    default: return "";
-                }
-            }
-        };
-        
         // 현재 레벨에서 하나라도 0보다 작은 점수를 가진 캐릭터가 있는지 확인
         let hasNegativeScore = false;
         for (let i = 0; i < EggType.TotalCount; i++) {
-            if (getScore(i) < 0) {
+            if (prop.getScore(level, i) < 0) {
                 hasNegativeScore = true;
                 break;
             }
@@ -241,8 +166,8 @@ export class gameManager extends Component {
         const negativeScores: { eggType: EggType, score: number, image: string }[] = [];
         
         for (let i = 0; i < EggType.TotalCount; i++) {
-            const score = getScore(i);
-            const image = getImage(i);
+            const score = prop.getScore(level, i);
+            const image = prop.getImage(level, i);
             if (score > 0) {
                 positiveScores.push({ eggType: i, score, image });
             } else if (score < 0) {

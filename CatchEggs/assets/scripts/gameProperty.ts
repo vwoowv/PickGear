@@ -1,4 +1,5 @@
 import { _decorator, Component, CCFloat, CCInteger } from 'cc';
+import { EggType } from './gameDefine';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameProperty')
@@ -150,4 +151,80 @@ export class gameProperty extends Component {
     public level3Happy_Image: string = "Happy";
     @property({ group: "Level 3", displayName: "Image - Hoyang" })
     public level3Hoyang_Image: string = "Hoyang";
+
+    // 레벨별 스코어를 가져오는 헬퍼 메서드
+    public getScore(level: number, eggType: EggType): number {
+        if (level === 1) {
+            switch (eggType) {
+                case EggType.DoArin: return this.level1DoArin_Score;
+                case EggType.EmmaMoon: return this.level1EmmaMoon_Score;
+                case EggType.Happy: return this.level1Happy_Score;
+                case EggType.Howsam: return this.level1Howsam_Score;
+                case EggType.Hoyang: return this.level1Hoyang_Score;
+                case EggType.SongUnbee: return this.level1SongUnbee_Score;
+                case EggType.SooHana: return this.level1SooHana_Score;
+                default: return 0;
+            }
+        } else if (level === 2) {
+            switch (eggType) {
+                case EggType.DoArin: return this.level2DoArin_Score;
+                case EggType.EmmaMoon: return this.level2EmmaMoon_Score;
+                case EggType.Happy: return this.level2Happy_Score;
+                case EggType.Howsam: return this.level2Howsam_Score;
+                case EggType.Hoyang: return this.level2Hoyang_Score;
+                case EggType.SongUnbee: return this.level2SongUnbee_Score;
+                case EggType.SooHana: return this.level2SooHana_Score;
+                default: return 0;
+            }
+        } else {
+            switch (eggType) {
+                case EggType.DoArin: return this.level3DoArin_Score;
+                case EggType.EmmaMoon: return this.level3EmmaMoon_Score;
+                case EggType.Happy: return this.level3Happy_Score;
+                case EggType.Howsam: return this.level3Howsam_Score;
+                case EggType.Hoyang: return this.level3Hoyang_Score;
+                case EggType.SongUnbee: return this.level3SongUnbee_Score;
+                case EggType.SooHana: return this.level3SooHana_Score;
+                default: return 0;
+            }
+        }
+    }
+
+    // 레벨별 이미지를 가져오는 헬퍼 메서드
+    public getImage(level: number, eggType: EggType): string {
+        if (level === 1) {
+            switch (eggType) {
+                case EggType.DoArin: return this.level1DoArin_Image;
+                case EggType.EmmaMoon: return this.level1EmmaMoon_Image;
+                case EggType.Happy: return this.level1Happy_Image;
+                case EggType.Howsam: return this.level1Howsam_Image;
+                case EggType.Hoyang: return this.level1Hoyang_Image;
+                case EggType.SongUnbee: return this.level1SongUnbee_Image;
+                case EggType.SooHana: return this.level1SooHana_Image;
+                default: return "";
+            }
+        } else if (level === 2) {
+            switch (eggType) {
+                case EggType.DoArin: return this.level2DoArin_Image;
+                case EggType.EmmaMoon: return this.level2EmmaMoon_Image;
+                case EggType.Happy: return this.level2Happy_Image;
+                case EggType.Howsam: return this.level2Howsam_Image;
+                case EggType.Hoyang: return this.level2Hoyang_Image;
+                case EggType.SongUnbee: return this.level2SongUnbee_Image;
+                case EggType.SooHana: return this.level2SooHana_Image;
+                default: return "";
+            }
+        } else {
+            switch (eggType) {
+                case EggType.DoArin: return this.level3DoArin_Image;
+                case EggType.EmmaMoon: return this.level3EmmaMoon_Image;
+                case EggType.Happy: return this.level3Happy_Image;
+                case EggType.Howsam: return this.level3Howsam_Image;
+                case EggType.Hoyang: return this.level3Hoyang_Image;
+                case EggType.SongUnbee: return this.level3SongUnbee_Image;
+                case EggType.SooHana: return this.level3SooHana_Image;
+                default: return "";
+            }
+        }
+    }
 }
