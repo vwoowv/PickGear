@@ -131,14 +131,26 @@ export class RootUI extends Component {
         }
     }
 
+    private formatTimeTwoDigits(value: number): string {
+        const num = Math.floor(Math.max(0, Math.min(99, value)));
+        if (num < 10) {
+            return '0' + num.toString();
+        }
+        return num.toString();
+    }
+
     public setTimeProgressBar(value: number, currentTimeInSeconds: number, totalTimeInSeconds: number) {
         this.timeProgressBar.progress = value;
         const seconds = Math.floor(currentTimeInSeconds);
         const decimal = Math.floor((currentTimeInSeconds - seconds) * 100);
-        this.currentTimeText.string = `${seconds}:${decimal}`;
+        const secondsStr = this.formatTimeTwoDigits(seconds);
+        const decimalStr = this.formatTimeTwoDigits(decimal);
+        this.currentTimeText.string = secondsStr + ':' + decimalStr;
         const leftSeconds = Math.floor(totalTimeInSeconds - currentTimeInSeconds);
         const leftDecimal = Math.floor((totalTimeInSeconds - currentTimeInSeconds - leftSeconds) * 100);
-        this.leftTimeText.string = `${leftSeconds}:${leftDecimal}`;
+        const leftSecondsStr = this.formatTimeTwoDigits(leftSeconds);
+        const leftDecimalStr = this.formatTimeTwoDigits(leftDecimal);
+        this.leftTimeText.string = leftSecondsStr + ':' + leftDecimalStr;
     }
 
     public setCurrentScoreText(currentPoint: number, acquirePoint: number) {
