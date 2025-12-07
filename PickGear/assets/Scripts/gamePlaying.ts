@@ -46,6 +46,7 @@ export class gamePlaying extends Component {
     }
     private finalRoundSequence: number = 0;
     private perfect: boolean = true;
+    private waitingTimeForNextDancer: number = 0;
 
     update(deltaTime: number) {
         this.pickedSuitList.update(deltaTime);
@@ -169,6 +170,15 @@ export class gamePlaying extends Component {
         const isTimeUp = this.currentTime > this.finalRoundTime[this.finalRoundSequence];
         if (isTimeUp) {
             if (shouldMoveToNextDancer) {
+                // 기다린 시간을 finalRoundTime에 반영
+                if (this.waitingTimeForNextDancer > 0) {
+                    for (let i = this.finalRoundSequence + 1; i < 4; i++) {
+                        this.finalRoundTime[i] += this.waitingTimeForNextDancer;
+                    }
+                    this.currentGameRoundTime += this.waitingTimeForNextDancer;
+                    this.waitingTimeForNextDancer = 0;
+                }
+
                 this.finalRoundSequence++;
                 if (this.finalRoundSequence >= 4) {
                     // 게임 종료. 결과 보여준다
@@ -178,6 +188,10 @@ export class gamePlaying extends Component {
                 }
 
                 this.setupFinalRound();
+            }
+            else {
+                // 다음 캐릭터로 바뀌는 것을 기다리는 시간 기록
+                this.waitingTimeForNextDancer += deltaTime;
             }
         }
         else if (!isTimeUp) {
@@ -335,6 +349,7 @@ export class gamePlaying extends Component {
             }
 
             this.finalRoundSequence = 0;
+            this.waitingTimeForNextDancer = 0;
             this.setupFinalRound();
         }
         else {
