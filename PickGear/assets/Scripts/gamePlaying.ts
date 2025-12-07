@@ -134,26 +134,59 @@ export class gamePlaying extends Component {
         }
     }
 
-    private async updateGameRoundOverLevel5(deltaTime: number) {
-        if (this.currentTime > this.finalRoundTime[this.finalRoundSequence]) {
-            this.finalRoundSequence++;
-            if (this.finalRoundSequence >= 4) {
-                // 게임 종료. 결과 보여준다
-                gameModeManager.I.playingToLevel5Result();
-                this.garbageRollingSuit();
-                return;
+    private getLastRollingSuit(): RollingSuit | null {
+        if (this.rollingSuitList.length === 0) {
+            return null;
+        }
+
+        let lastRollingSuit: RollingSuit = null;
+        let maxX = -Infinity;
+        for (const rollingSuit of this.rollingSuitList) {
+            if (rollingSuit.node.position.x > maxX) {
+                maxX = rollingSuit.node.position.x;
+                lastRollingSuit = rollingSuit;
             }
+        }
+        return lastRollingSuit;
+    }
 
-            this.setupFinalRound();
+    private hasLastRollingSuitPassedMiddlePoint(): boolean {
+        const lastRollingSuit = this.getLastRollingSuit();
+        if (lastRollingSuit == null) {
+            return false;
         }
 
-        this.nextRollingSuitTime -= deltaTime;
-        if (this.nextRollingSuitTime <= 0 && this.currentGameRoundTime - this.currentTime > 0.5) {
-            this.nextRollingSuitTime = 1;
-            await this.newRandomRollingSuit();
-        }
+        const currentX = lastRollingSuit.currentPosition.x;
+        // 중간 지점(x=0)을 지났는지 확인하고, 지난 후 100만큼 이동했는지 확인
+        return currentX <= -300;
+    }
 
+    private async updateGameRoundOverLevel5(deltaTime: number) {
         this.updateRollingSuitList(deltaTime);
+
+        // 마지막 롤링 수트가 중간 지점을 지나 100 만큼 이동했다면 다음 댄서로 넘어간다
+        const shouldMoveToNextDancer = this.hasLastRollingSuitPassedMiddlePoint();
+        const isTimeUp = this.currentTime > this.finalRoundTime[this.finalRoundSequence];
+        if (isTimeUp) {
+            if (shouldMoveToNextDancer) {
+                this.finalRoundSequence++;
+                if (this.finalRoundSequence >= 4) {
+                    // 게임 종료. 결과 보여준다
+                    gameModeManager.I.playingToLevel5Result();
+                    this.garbageRollingSuit();
+                    return;
+                }
+
+                this.setupFinalRound();
+            }
+        }
+        else if (!isTimeUp) {
+            this.nextRollingSuitTime -= deltaTime;
+            if (this.nextRollingSuitTime <= 0 && this.currentGameRoundTime - this.currentTime > 0.5) {
+                this.nextRollingSuitTime = 1;
+                await this.newRandomRollingSuit();
+            }
+        }
     }
 
     private showPickSuitTime: number = 0.5;
