@@ -32,6 +32,8 @@ export class gamePlaying extends Component {
     public currentSuitType: ECharacterSuitType = ECharacterSuitType.YG;
     private currentLevel: number = 1;
     private currentPoint: number = 0;
+    private currentComboScore: number = 0;
+    private currentComboCount: number = 0;
     private currentTime: number = 0;
     private showSuitTime: number = 2;
     private currentGameRoundTime: number = 0;
@@ -203,6 +205,25 @@ export class gamePlaying extends Component {
         }
     }
 
+    private updateScore(acquirePoint: number) {
+        if (acquirePoint > 0) {
+            if (this.currentComboScore < 0) {
+                this.currentComboScore = 0;
+            }
+            this.currentComboScore += acquirePoint;
+            this.currentComboCount++;
+        }
+        else {
+            this.currentComboScore = acquirePoint;
+            this.currentComboCount = 0;
+        }
+        this.currentPoint += this.currentComboScore;
+        if (this.currentPoint < 0) {
+            this.currentPoint = 0;
+        }
+        RootUI.I.setCurrentScoreText(this.currentPoint, this.currentComboScore);
+    }
+
     private showPickSuitTime: number = 0.5;
     private updateRollingSuitList(deltaTime: number) {
         if (this.showPickSuit) {
@@ -220,11 +241,7 @@ export class gamePlaying extends Component {
                 this.perfect = false;
 
                 const acquirePoint = this.gameProperty.getScore(this.currentLevel, true);
-                this.currentPoint += acquirePoint;
-                if (this.currentPoint < 0) {
-                    this.currentPoint = 0;
-                }
-                RootUI.I.setCurrentScoreText(this.currentPoint, acquirePoint);
+                this.updateScore(acquirePoint);
                 RootUI.I.setFaceSpriteAndBackToNormal(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Fail);
                 gameInstance.I.playAudioClip('sound/Kiss and cry_Game_No', 0.5);
                 this.wrongSuitList.push(rollingSuit);
@@ -276,6 +293,8 @@ export class gamePlaying extends Component {
     private async onPrepare() {
         console.log('onPrepare');
         this.currentPoint = 0;
+        this.currentComboScore = 0;
+        this.currentComboCount = 0;
         this.perfect = true;
         await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
         gameModeManager.I.playingToShowSuit(1);
@@ -417,8 +436,7 @@ export class gamePlaying extends Component {
             this.pickedSuitList.addPickedSuit(nearestSuit);
             nearestSuit.node.setPosition(0, nearestSuit.node.position.y, nearestSuit.node.position.z);
             const acquirePoint = this.gameProperty.getScore(this.currentLevel, false);
-            this.currentPoint += acquirePoint;
-            RootUI.I.setCurrentScoreText(this.currentPoint, acquirePoint);
+            this.updateScore(acquirePoint);
             RootUI.I.setFaceSpriteAndBackToNormal(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Success);
             this.showPickSuit = true;
             gameInstance.I.playAudioClip('sound/Kiss and cry_Game_Yes', 0.5);
@@ -426,11 +444,7 @@ export class gamePlaying extends Component {
         else {
             this.perfect = false;
             const acquirePoint = this.gameProperty.getScore(this.currentLevel, true);
-            this.currentPoint += acquirePoint;
-            if (this.currentPoint < 0) {
-                this.currentPoint = 0;
-            }
-            RootUI.I.setCurrentScoreText(this.currentPoint, acquirePoint);
+            this.updateScore(acquirePoint);
             RootUI.I.setFaceSpriteAndBackToNormal(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Fail);
             gameInstance.I.playAudioClip('sound/Kiss and cry_Game_No', 0.5);
         }
