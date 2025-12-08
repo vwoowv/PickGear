@@ -120,7 +120,7 @@ export class gamePlaying extends Component {
     private randomCharacterTypeList: ECharacterType[] = [ECharacterType.DoArin, ECharacterType.SooHana, ECharacterType.SongUnbee, ECharacterType.EmmaMoon];
     private currentCharacterTypeIndex: number = 0;
     
-    private shuffleCharacterTypeList() {
+    private shuffleCharacterTypeList(forceFrontType: ECharacterType | null = null) {
         // 마지막에 사용한 캐릭터가 새 셔플의 첫 번째로 나오지 않도록 보정
         const prevLast = this.randomCharacterTypeList[this.randomCharacterTypeList.length - 1];
 
@@ -130,11 +130,42 @@ export class gamePlaying extends Component {
             [this.randomCharacterTypeList[i], this.randomCharacterTypeList[j]] = [this.randomCharacterTypeList[j], this.randomCharacterTypeList[i]];
         }
 
+        // forceFrontType이 지정된 경우, 해당 타입을 첫 번째나 두 번째에 배치
+        if (forceFrontType !== null) {
+            this.moveForceFrontTypeToFront(forceFrontType, prevLast);
+        }
+
         // 이전 마지막 요소가 첫 번째로 올라오면 두 번째 요소와 교환
+        this.preventPrevLastAtFirst(prevLast);
+        this.currentCharacterTypeIndex = 0;
+    }
+
+    private moveForceFrontTypeToFront(forceFrontType: ECharacterType, prevLast: ECharacterType) {
+        const forceIndex = this.randomCharacterTypeList.indexOf(forceFrontType);
+        if (forceIndex === -1 || forceIndex < 2) {
+            return;
+        }
+
+        const targetIndex = this.selectTargetIndexForForceType(forceFrontType, prevLast);
+        [this.randomCharacterTypeList[forceIndex], this.randomCharacterTypeList[targetIndex]] = 
+            [this.randomCharacterTypeList[targetIndex], this.randomCharacterTypeList[forceIndex]];
+    }
+
+    private selectTargetIndexForForceType(forceFrontType: ECharacterType, prevLast: ECharacterType): number {
+        if (this.randomCharacterTypeList[0] === prevLast) {
+            return 1; // 첫 번째가 prevLast면 두 번째로
+        }
+        if (forceFrontType === prevLast) {
+            return 1; // forceFrontType이 prevLast면 두 번째로
+        }
+        // 랜덤하게 첫 번째나 두 번째 선택
+        return Math.random() < 0.5 ? 0 : 1;
+    }
+
+    private preventPrevLastAtFirst(prevLast: ECharacterType) {
         if (this.randomCharacterTypeList.length > 1 && this.randomCharacterTypeList[0] === prevLast) {
             [this.randomCharacterTypeList[0], this.randomCharacterTypeList[1]] = [this.randomCharacterTypeList[1], this.randomCharacterTypeList[0]];
         }
-        this.currentCharacterTypeIndex = 0;
     }
 
     private async newRandomRollingSuit() {
@@ -211,6 +242,7 @@ export class gamePlaying extends Component {
                 }
 
                 this.setupFinalRound();
+                this.shuffleCharacterTypeList(this.currentDancer.dancerType);
             }
             else {
                 // 다음 캐릭터로 바뀌는 것을 기다리는 시간 기록
