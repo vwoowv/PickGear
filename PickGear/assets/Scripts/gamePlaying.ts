@@ -95,7 +95,7 @@ export class gamePlaying extends Component {
     private nextRollingSuitTime: number = 0;
     private rollingSuitList: RollingSuit[] = [];
     private wrongSuitList: RollingSuit[] = [];
-    private pickedSuitList: PickedSuitManager = new PickedSuitManager();
+    private readonly pickedSuitList: PickedSuitManager = new PickedSuitManager();
     private async updateGameRoundUnderLevel5(deltaTime: number) {
         if (this.currentTime > this.currentGameRoundTime) {
             // 이번 라운드 종료. 게임 결과로 넘어간다
@@ -119,6 +119,24 @@ export class gamePlaying extends Component {
 
     private randomCharacterTypeList: ECharacterType[] = [ECharacterType.DoArin, ECharacterType.SooHana, ECharacterType.SongUnbee, ECharacterType.EmmaMoon];
     private currentCharacterTypeIndex: number = 0;
+    
+    private shuffleCharacterTypeList() {
+        // 마지막에 사용한 캐릭터가 새 셔플의 첫 번째로 나오지 않도록 보정
+        const prevLast = this.randomCharacterTypeList[this.randomCharacterTypeList.length - 1];
+
+        // 배열을 셔플하는 함수가 없으므로 직접 구현
+        for (let i = this.randomCharacterTypeList.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [this.randomCharacterTypeList[i], this.randomCharacterTypeList[j]] = [this.randomCharacterTypeList[j], this.randomCharacterTypeList[i]];
+        }
+
+        // 이전 마지막 요소가 첫 번째로 올라오면 두 번째 요소와 교환
+        if (this.randomCharacterTypeList.length > 1 && this.randomCharacterTypeList[0] === prevLast) {
+            [this.randomCharacterTypeList[0], this.randomCharacterTypeList[1]] = [this.randomCharacterTypeList[1], this.randomCharacterTypeList[0]];
+        }
+        this.currentCharacterTypeIndex = 0;
+    }
+
     private async newRandomRollingSuit() {
         const newRollingSuit = await ResourceManager.I.spawnPrefab<RollingSuit>("prefab/suit/RollingSuit", this.rollingSuitPos);
         const startPosition: Vec3 = new Vec3(this.characterRollingPosStart.position.x, 0, this.characterRollingPosStart.position.z);
@@ -128,21 +146,7 @@ export class gamePlaying extends Component {
         this.rollingSuitList.push(newRollingSuit);
         this.currentCharacterTypeIndex++;
         if (this.currentCharacterTypeIndex >= this.randomCharacterTypeList.length) {
-            // 마지막에 사용한 캐릭터가 새 셔플의 첫 번째로 나오지 않도록 보정
-            const prevLast = this.randomCharacterTypeList[this.randomCharacterTypeList.length - 1];
-
-            // 배열을 셔플하는 함수가 없으므로 직접 구현
-            for (let i = this.randomCharacterTypeList.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [this.randomCharacterTypeList[i], this.randomCharacterTypeList[j]] = [this.randomCharacterTypeList[j], this.randomCharacterTypeList[i]];
-            }
-
-            // 이전 마지막 요소가 첫 번째로 올라오면 두 번째 요소와 교환
-            if (this.randomCharacterTypeList.length > 1 && this.randomCharacterTypeList[0] === prevLast) {
-                [this.randomCharacterTypeList[0], this.randomCharacterTypeList[1]] = [this.randomCharacterTypeList[1], this.randomCharacterTypeList[0]];
-            }
-
-            this.currentCharacterTypeIndex = 0;
+            this.shuffleCharacterTypeList();
         }
     }
 
