@@ -189,6 +189,14 @@ export class gamePlaying extends Component {
                     return;
                 }
 
+                // 바뀌면서 지나간 옷들은 점수에 영향을 주지 못한다
+                for (const rollingSuit of this.rollingSuitList) {
+                    if (rollingSuit.node.position.x > 0) {
+                        continue;
+                    }
+                    rollingSuit.isScoreEnabled = false;
+                }
+
                 this.setupFinalRound();
             }
             else {
@@ -240,10 +248,12 @@ export class gamePlaying extends Component {
             if (isPass === false && this.wrongSuitList.indexOf(rollingSuit) === -1) {
                 this.perfect = false;
 
-                const acquirePoint = this.gameProperty.getScore(this.currentLevel, true);
-                this.updateScore(acquirePoint);
-                RootUI.I.setFaceSpriteAndBackToNormal(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Fail);
-                gameInstance.I.playAudioClip('sound/Kiss and cry_Game_No', 0.5);
+                if (rollingSuit.isScoreEnabled) {
+                    const acquirePoint = this.gameProperty.getScore(this.currentLevel, true);
+                    this.updateScore(acquirePoint);
+                    RootUI.I.setFaceSpriteAndBackToNormal(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Fail);
+                    gameInstance.I.playAudioClip('sound/Kiss and cry_Game_No', 0.5);
+                }
                 this.wrongSuitList.push(rollingSuit);
             }
         }
