@@ -32,6 +32,8 @@ export class gamePlaying extends Component {
     public currentSuitType: ECharacterSuitType = ECharacterSuitType.YG;
     private currentLevel: number = 1;
     private currentPoint: number = 0;
+    private currentComboScore: number = 0;
+    private currentComboCount: number = 0;
     private currentTime: number = 0;
     private showSuitTime: number = 2;
     private currentGameRoundTime: number = 0;
@@ -93,7 +95,7 @@ export class gamePlaying extends Component {
     private nextRollingSuitTime: number = 0;
     private rollingSuitList: RollingSuit[] = [];
     private wrongSuitList: RollingSuit[] = [];
-    private pickedSuitList: PickedSuitManager = new PickedSuitManager();
+    private readonly pickedSuitList: PickedSuitManager = new PickedSuitManager();
     private async updateGameRoundUnderLevel5(deltaTime: number) {
         if (this.currentTime > this.currentGameRoundTime) {
             // 이번 라운드 종료. 게임 결과로 넘어간다
@@ -117,6 +119,55 @@ export class gamePlaying extends Component {
 
     private randomCharacterTypeList: ECharacterType[] = [ECharacterType.DoArin, ECharacterType.SooHana, ECharacterType.SongUnbee, ECharacterType.EmmaMoon];
     private currentCharacterTypeIndex: number = 0;
+    
+    private shuffleCharacterTypeList(forceFrontType: ECharacterType | null = null) {
+        // 마지막에 사용한 캐릭터가 새 셔플의 첫 번째로 나오지 않도록 보정
+        const prevLast = this.randomCharacterTypeList[this.randomCharacterTypeList.length - 1];
+
+        // 배열을 셔플하는 함수가 없으므로 직접 구현
+        for (let i = this.randomCharacterTypeList.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [this.randomCharacterTypeList[i], this.randomCharacterTypeList[j]] = [this.randomCharacterTypeList[j], this.randomCharacterTypeList[i]];
+        }
+
+        // forceFrontType이 지정된 경우, 해당 타입을 첫 번째나 두 번째에 배치
+        if (forceFrontType !== null) {
+            this.moveForceFrontTypeToFront(forceFrontType, prevLast);
+        }
+
+        // 이전 마지막 요소가 첫 번째로 올라오면 두 번째 요소와 교환
+        this.preventPrevLastAtFirst(prevLast);
+        this.currentCharacterTypeIndex = 0;
+    }
+
+    private moveForceFrontTypeToFront(forceFrontType: ECharacterType, prevLast: ECharacterType) {
+        const forceIndex = this.randomCharacterTypeList.indexOf(forceFrontType);
+        if (forceIndex === -1 || forceIndex < 2) {
+            return;
+        }
+
+        const targetIndex = this.selectTargetIndexForForceType(forceFrontType, prevLast);
+        [this.randomCharacterTypeList[forceIndex], this.randomCharacterTypeList[targetIndex]] = 
+            [this.randomCharacterTypeList[targetIndex], this.randomCharacterTypeList[forceIndex]];
+    }
+
+    private selectTargetIndexForForceType(forceFrontType: ECharacterType, prevLast: ECharacterType): number {
+        if (this.randomCharacterTypeList[0] === prevLast) {
+            return 1; // 첫 번째가 prevLast면 두 번째로
+        }
+        if (forceFrontType === prevLast) {
+            return 1; // forceFrontType이 prevLast면 두 번째로
+        }
+        // 랜덤하게 첫 번째나 두 번째 선택
+        return Math.random() < 0.5 ? 0 : 1;
+    }
+
+    private preventPrevLastAtFirst(prevLast: ECharacterType) {
+        if (this.randomCharacterTypeList.length > 1 && this.randomCharacterTypeList[0] === prevLast) {
+            [this.randomCharacterTypeList[0], this.randomCharacterTypeList[1]] = [this.randomCharacterTypeList[1], this.randomCharacterTypeList[0]];
+        }
+    }
+
     private async newRandomRollingSuit() {
         const newRollingSuit = await ResourceManager.I.spawnPrefab<RollingSuit>("prefab/suit/RollingSuit", this.rollingSuitPos);
         const startPosition: Vec3 = new Vec3(this.characterRollingPosStart.position.x, 0, this.characterRollingPosStart.position.z);
@@ -126,12 +177,7 @@ export class gamePlaying extends Component {
         this.rollingSuitList.push(newRollingSuit);
         this.currentCharacterTypeIndex++;
         if (this.currentCharacterTypeIndex >= this.randomCharacterTypeList.length) {
-            // 배열을 셔플하는 함수가 없으므로 직접 구현
-            for (let i = this.randomCharacterTypeList.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [this.randomCharacterTypeList[i], this.randomCharacterTypeList[j]] = [this.randomCharacterTypeList[j], this.randomCharacterTypeList[i]];
-            }
-            this.currentCharacterTypeIndex = 0;
+            this.shuffleCharacterTypeList();
         }
     }
 
@@ -187,7 +233,16 @@ export class gamePlaying extends Component {
                     return;
                 }
 
+                // 바뀌면서 지나간 옷들은 점수에 영향을 주지 못한다
+                for (const rollingSuit of this.rollingSuitList) {
+                    if (rollingSuit.node.position.x > 0) {
+                        continue;
+                    }
+                    rollingSuit.isScoreEnabled = false;
+                }
+
                 this.setupFinalRound();
+                this.shuffleCharacterTypeList(this.currentDancer.dancerType);
             }
             else {
                 // 다음 캐릭터로 바뀌는 것을 기다리는 시간 기록
@@ -201,6 +256,25 @@ export class gamePlaying extends Component {
                 await this.newRandomRollingSuit();
             }
         }
+    }
+
+    private updateScore(acquirePoint: number) {
+        if (acquirePoint > 0) {
+            if (this.currentComboScore < 0) {
+                this.currentComboScore = 0;
+            }
+            this.currentComboScore += acquirePoint;
+            this.currentComboCount++;
+        }
+        else {
+            this.currentComboScore = acquirePoint;
+            this.currentComboCount = 0;
+        }
+        this.currentPoint += this.currentComboScore;
+        if (this.currentPoint < 0) {
+            this.currentPoint = 0;
+        }
+        RootUI.I.setCurrentScoreText(this.currentPoint, this.currentComboScore);
     }
 
     private showPickSuitTime: number = 0.5;
@@ -219,14 +293,12 @@ export class gamePlaying extends Component {
             if (isPass === false && this.wrongSuitList.indexOf(rollingSuit) === -1) {
                 this.perfect = false;
 
-                const acquirePoint = this.gameProperty.getScore(this.currentLevel, true);
-                this.currentPoint += acquirePoint;
-                if (this.currentPoint < 0) {
-                    this.currentPoint = 0;
+                if (rollingSuit.isScoreEnabled) {
+                    const acquirePoint = this.gameProperty.getScore(this.currentLevel, true);
+                    this.updateScore(acquirePoint);
+                    RootUI.I.setFaceSpriteAndBackToNormal(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Fail);
+                    gameInstance.I.playAudioClip('sound/Kiss and cry_Game_No', 0.5);
                 }
-                RootUI.I.setCurrentScoreText(this.currentPoint, acquirePoint);
-                RootUI.I.setFaceSpriteAndBackToNormal(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Fail);
-                gameInstance.I.playAudioClip('sound/Kiss and cry_Game_No', 0.5);
                 this.wrongSuitList.push(rollingSuit);
             }
         }
@@ -276,6 +348,8 @@ export class gamePlaying extends Component {
     private async onPrepare() {
         console.log('onPrepare');
         this.currentPoint = 0;
+        this.currentComboScore = 0;
+        this.currentComboCount = 0;
         this.perfect = true;
         await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
         gameModeManager.I.playingToShowSuit(1);
@@ -417,8 +491,7 @@ export class gamePlaying extends Component {
             this.pickedSuitList.addPickedSuit(nearestSuit);
             nearestSuit.node.setPosition(0, nearestSuit.node.position.y, nearestSuit.node.position.z);
             const acquirePoint = this.gameProperty.getScore(this.currentLevel, false);
-            this.currentPoint += acquirePoint;
-            RootUI.I.setCurrentScoreText(this.currentPoint, acquirePoint);
+            this.updateScore(acquirePoint);
             RootUI.I.setFaceSpriteAndBackToNormal(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Success);
             this.showPickSuit = true;
             gameInstance.I.playAudioClip('sound/Kiss and cry_Game_Yes', 0.5);
@@ -426,11 +499,7 @@ export class gamePlaying extends Component {
         else {
             this.perfect = false;
             const acquirePoint = this.gameProperty.getScore(this.currentLevel, true);
-            this.currentPoint += acquirePoint;
-            if (this.currentPoint < 0) {
-                this.currentPoint = 0;
-            }
-            RootUI.I.setCurrentScoreText(this.currentPoint, acquirePoint);
+            this.updateScore(acquirePoint);
             RootUI.I.setFaceSpriteAndBackToNormal(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Fail);
             gameInstance.I.playAudioClip('sound/Kiss and cry_Game_No', 0.5);
         }

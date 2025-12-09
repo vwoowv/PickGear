@@ -1,7 +1,6 @@
-import { _decorator, Component, Sprite, SpriteAtlas, SpriteFrame, tween, Vec3 } from 'cc';
+import { _decorator, Component, Sprite, tween, Vec3 } from 'cc';
 import { ECharacterSuitType, ECharacterType } from '../GameDefine';
 import { getDancerSuitSpriteFrame } from '../Utility/getDancerSuitSpriteFrame';
-import { ResourceManager } from '../ResourceManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('RollingSuit')
@@ -11,18 +10,14 @@ export class RollingSuit extends Component {
     public suitType: ECharacterSuitType = ECharacterSuitType.HYBE;
     public dancerType: ECharacterType = ECharacterType.DoArin;
     private moveSpeed: number = 0;
+    public isScoreEnabled: boolean = true;
 
     public async Initialize(dancerType: ECharacterType, suitType: ECharacterSuitType, correctDancerType: ECharacterType, moveSpeed: number) {
         this.suitType = suitType;
         this.dancerType = dancerType;
-        // 맞는 옷은 여기서는 사용하지 않는다
-        // if (suitType == ECharacterSuitType.YG) {
-        //     this.suitSprite.spriteFrame = await new getDancerSuitSpriteFrame().getAsync(dancerType, suitType, dancerType == correctDancerType);
-        // } else {
-        //     this.suitSprite.spriteFrame = await new getDancerSuitSpriteFrame().getAsync(dancerType, suitType, false);
-        // }
         this.suitSprite.spriteFrame = await new getDancerSuitSpriteFrame().getAsync(dancerType, suitType, false);
         this.moveSpeed = moveSpeed;
+        this.isScoreEnabled = true;
     }
 
     public prevPosition: Vec3 = new Vec3(0, 0, 0);
