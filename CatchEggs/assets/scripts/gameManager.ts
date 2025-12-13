@@ -178,6 +178,10 @@ export class gameManager extends Component {
                 negativeScores.push({ eggType: i, score, image });
             }
         }
+
+        // 점수 큰 순(내림차순)으로 정렬해서 높은 점수가 앞에 오도록 한다.
+        // (동점일 때는 eggType 오름차순으로 고정 정렬)
+        positiveScores.sort((a, b) => (b.score - a.score) || (a.eggType - b.eggType));
         
         // openingEggNormalList에 세팅
         let normalIndex = 0;
