@@ -87,11 +87,15 @@ export class gameManager extends Component {
     private openingEggNormalList: openingEgg[] = [];
     @property(openingEgg)
     private openingEggNegativeList: openingEgg[] = [];
+    @property(Node)
+    private loadingNode: Node = null;
     private gameState: EGameState = EGameState.None;
     private timeLeft: number = 0;
     private currentScore: number = 0;
     private extensions: gameManagerExtensions = null;
     async start() {
+        this.loadingNode.active = true;
+
         this.extensions = this.node.addComponent(gameManagerExtensions);
         await this.extensions.initialize(this);
         this.selectGameMode();
