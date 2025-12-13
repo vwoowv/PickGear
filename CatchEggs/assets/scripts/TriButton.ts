@@ -55,7 +55,7 @@ export class TriButton extends Component {
         // 이 노드의 콜라이더가 포함되어 있는지 확인합니다.
         if (hitColliders.some(c => c.uuid === this.collider.uuid)) {
             this.isPressed = true;
-            this.node.setScale(this.originalScale.x * 0.9, this.originalScale.y * 0.9, this.originalScale.z);
+            this.node.setScale(this.originalScale.x * 0.98, this.originalScale.y * 0.98, this.originalScale.z);
 
             console.log("삼각형 버튼이 클릭되었습니다!");
             this.node.emit('TriButton_clicked');
