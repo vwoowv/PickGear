@@ -182,6 +182,15 @@ export class gameManager extends Component {
         // 점수 큰 순(내림차순)으로 정렬해서 높은 점수가 앞에 오도록 한다.
         // (동점일 때는 eggType 오름차순으로 고정 정렬)
         positiveScores.sort((a, b) => (b.score - a.score) || (a.eggType - b.eggType));
+
+        // Howsam은 무조건 3번째(인덱스 2)에 오도록 고정한다.
+        // (단, 아이템이 3개 미만이면 3번째가 불가능하므로 가능한 가장 가까운 위치로 배치)
+        const howsamIndex = positiveScores.findIndex(x => x.eggType === EggType.Howsam);
+        if (howsamIndex >= 0) {
+            const [howsam] = positiveScores.splice(howsamIndex, 1);
+            const targetIndex = Math.min(2, positiveScores.length); // 제거 후 길이 기준
+            positiveScores.splice(targetIndex, 0, howsam);
+        }
         
         // openingEggNormalList에 세팅
         let normalIndex = 0;
