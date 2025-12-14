@@ -1103,6 +1103,10 @@
         "__expectedType__": "cc.AudioClip"
       }
     ],
+    "penaltySound": {
+      "__uuid__": "9c61daa8-605b-4e9a-b2de-93442e62bcbe",
+      "__expectedType__": "cc.AudioClip"
+    },
     "background": {
       "__id__": 423
     },

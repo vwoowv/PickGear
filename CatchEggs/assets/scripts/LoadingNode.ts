@@ -82,6 +82,9 @@ export class LoadingNode extends Component {
             ["sound/Sanrio1_Full_Version", AudioClip],
             ["sound/Sanrio2_Full_Version", AudioClip],
             ["sound/Sanrio3_Full_Version", AudioClip],
+            ["sound/Penalty sound", AudioClip],
+            ["sound/Sanrio FX1", AudioClip],
+            ["sound/Sanrio FX2", AudioClip],
 
             // Midi JSON
             ["midi/version1", JsonAsset],
