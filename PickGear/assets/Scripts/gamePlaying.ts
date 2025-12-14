@@ -290,9 +290,8 @@ export class gamePlaying extends Component {
         for (const rollingSuit of this.rollingSuitList) {
             const isPass = rollingSuit.roll(deltaTime, this.gameProperty.getPickDistanceThreshold(this.currentSuitType, this.currentLevel), this.currentDancer.dancerType);
             if (isPass === false && this.wrongSuitList.indexOf(rollingSuit) === -1) {
-                this.perfect = false;
-
                 if (rollingSuit.isScoreEnabled) {
+                    this.perfect = false;
                     const acquirePoint = this.gameProperty.getScore(this.currentSuitType, this.currentLevel, true);
                     this.updateScore(acquirePoint);
                     RootUI.I.setFaceSpriteAndBackToNormal(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Fail);
