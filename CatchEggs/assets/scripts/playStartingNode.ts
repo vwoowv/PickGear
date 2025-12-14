@@ -4,6 +4,7 @@ import { ResourceManager } from './ResourceManager';
 import { openingEgg } from './openingEgg';
 import { EggType } from './gameDefine';
 import { gameProperty } from './gameProperty';
+import { sortOpeningPositiveScores } from './openingCharacterOrder';
 const { ccclass, property } = _decorator;
 
 @ccclass('playStartingNode')
@@ -65,6 +66,9 @@ export class playStartingNode extends Component {
                 negativeScores.push({ eggType: i, score, image });
             }
         }
+
+        // gameManager.ts 와 동일한 배치 규칙 적용
+        sortOpeningPositiveScores(level, positiveScores);
         
         // openingEggNormalList에 세팅
         let normalIndex = 0;
