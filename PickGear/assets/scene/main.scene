@@ -7410,28 +7410,6 @@
     },
     "_enabled": true,
     "__prefab": null,
-<<<<<<< HEAD
-    "Level1Speed": 100,
-    "Level2Speed": 129,
-    "Level3Speed": 150,
-    "Level4Speed": 160,
-    "Level5Speed": 70,
-    "level1PickDistance": 300,
-    "level2PickDistance": 300,
-    "level3PickDistance": 300,
-    "level4PickDistance": 300,
-    "level5PickDistance": 200,
-    "level1Score": 1,
-    "level1Score_Wrong": 0,
-    "level2Score": 1,
-    "level2Score_Wrong": -1,
-    "level3Score": 1,
-    "level3Score_Wrong": -1,
-    "level4Score": 1,
-    "level4Score_Wrong": -1,
-    "level5Score": 1,
-    "level5Score_Wrong": -1,
-=======
     "ygLevel1Speed": 120,
     "ygLevel2Speed": 240,
     "ygLevel3Speed": 360,
@@ -7512,7 +7490,6 @@
     "hybeLevel3ScoreWrong": -1,
     "hybeLevel4ScoreWrong": -1,
     "hybeLevel5ScoreWrong": -1,
->>>>>>> aba6790577c655d2f36322668830a8d907933500
     "_id": "21vdRH0hdGsL3031vZvhTM"
   },
   {
