@@ -1107,6 +1107,10 @@
       "__uuid__": "9c61daa8-605b-4e9a-b2de-93442e62bcbe",
       "__expectedType__": "cc.AudioClip"
     },
+    "missSound": {
+      "__uuid__": "422aa283-8d33-4880-a9b9-8492f412bee9",
+      "__expectedType__": "cc.AudioClip"
+    },
     "background": {
       "__id__": 423
     },

@@ -38,6 +38,10 @@ export class gameManagerExtensions extends Component {
         return this._gameManager.penaltySound;
     }
 
+    public get missSound(): AudioClip {
+        return this._gameManager.missSound;
+    }
+
     public async initialize(gameManager: gameManager) {
         this._gameManager = gameManager;
     }

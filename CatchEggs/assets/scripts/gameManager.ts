@@ -83,6 +83,8 @@ export class gameManager extends Component {
     public eggCatchSound: AudioClip[] = [];
     @property(AudioClip)
     public penaltySound: AudioClip = null;
+    @property(AudioClip)
+    public missSound: AudioClip = null;
     @property(Sprite)
     private background: Sprite = null;
     @property(Node)

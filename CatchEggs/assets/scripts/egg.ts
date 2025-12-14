@@ -87,6 +87,7 @@ export class egg extends Component {
             const level = this.extensions.gameManager.gameMode.getCurrentLevelFromVersion();
             if (this.getCurrentScore(level) > 0) {
                 this.extensions.resetComboScore();
+                this.extensions.playSound.playOneShot(this.extensions.missSound);
             }
         }
     }
