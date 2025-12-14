@@ -12,6 +12,7 @@ export class gameModeData extends Component {
     @property(Font)
     private versionFont: Font[] = [null, null, null];
     private backgroundName: string[] = ["background", "backgroundLake", "backgroundCity"];
+    // private gameDurationInSeconds: number[] = [5, 5, 5,];
     private gameDurationInSeconds: number[] = [44, 49, 74];
     private gameBgName: string[] = ["sound/Sanrio1_Full_Version", "sound/Sanrio2_Full_Version", "sound/Sanrio3_Full_Version"];
 
@@ -44,9 +45,7 @@ export class gameModeData extends Component {
     }
 
     private completeSelectGameMode() {
-        if (this.gameManagerInstance == null) {
-            this.gameManagerInstance = this.node.getComponent(gameManager)
-        }
+        this.gameManagerInstance ??= this.node.getComponent(gameManager);
         this.gameManagerInstance.completeSelectGameMode();
     }
 

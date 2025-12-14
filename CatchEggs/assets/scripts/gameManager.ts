@@ -11,6 +11,7 @@ import { gameProperty } from './gameProperty';
 import { midiJsonData } from './midi/midiJsonData';
 import { openingEgg } from './openingEgg';
 import { sortOpeningPositiveScores } from './openingCharacterOrder';
+import { ResultNode } from './ResultNode';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameManager')
@@ -294,6 +295,7 @@ export class gameManager extends Component {
         this.playingNode.active = false;
         this.prepareNode.active = false;
         this.retryNode.active = true;
+        this.retryNode.getComponent(ResultNode).initialize(this);
         this.scoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
         this.coinText.string = new richTextMaker("0000", "#020202", 3, "").resultText;
         this.gameMode.resultGame();
