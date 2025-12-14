@@ -113,8 +113,7 @@ export class gamePlaying extends Component {
     }
 
     private getMoveSpeed(): number {
-        // return this.currentLevel * 120;
-        return this.gameProperty.getSpeed(this.currentLevel);
+        return this.gameProperty.getSpeed(this.currentSuitType, this.currentLevel);
     }
 
     private randomCharacterTypeList: ECharacterType[] = [ECharacterType.DoArin, ECharacterType.SooHana, ECharacterType.SongUnbee, ECharacterType.EmmaMoon];
@@ -289,12 +288,12 @@ export class gamePlaying extends Component {
         }
 
         for (const rollingSuit of this.rollingSuitList) {
-            const isPass = rollingSuit.roll(deltaTime, this.gameProperty.getPickDistanceThreshold(this.currentLevel), this.currentDancer.dancerType);
+            const isPass = rollingSuit.roll(deltaTime, this.gameProperty.getPickDistanceThreshold(this.currentSuitType, this.currentLevel), this.currentDancer.dancerType);
             if (isPass === false && this.wrongSuitList.indexOf(rollingSuit) === -1) {
                 this.perfect = false;
 
                 if (rollingSuit.isScoreEnabled) {
-                    const acquirePoint = this.gameProperty.getScore(this.currentLevel, true);
+                    const acquirePoint = this.gameProperty.getScore(this.currentSuitType, this.currentLevel, true);
                     this.updateScore(acquirePoint);
                     RootUI.I.setFaceSpriteAndBackToNormal(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Fail);
                     gameInstance.I.playAudioClip('sound/Kiss and cry_Game_No', 0.5);
@@ -490,7 +489,7 @@ export class gamePlaying extends Component {
             this.rollingSuitList.splice(this.rollingSuitList.indexOf(nearestSuit), 1);
             this.pickedSuitList.addPickedSuit(nearestSuit);
             nearestSuit.node.setPosition(0, nearestSuit.node.position.y, nearestSuit.node.position.z);
-            const acquirePoint = this.gameProperty.getScore(this.currentLevel, false);
+            const acquirePoint = this.gameProperty.getScore(this.currentSuitType, this.currentLevel, false);
             this.updateScore(acquirePoint);
             RootUI.I.setFaceSpriteAndBackToNormal(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Success);
             this.showPickSuit = true;
@@ -498,7 +497,7 @@ export class gamePlaying extends Component {
         }
         else {
             this.perfect = false;
-            const acquirePoint = this.gameProperty.getScore(this.currentLevel, true);
+            const acquirePoint = this.gameProperty.getScore(this.currentSuitType, this.currentLevel, true);
             this.updateScore(acquirePoint);
             RootUI.I.setFaceSpriteAndBackToNormal(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Fail);
             gameInstance.I.playAudioClip('sound/Kiss and cry_Game_No', 0.5);
@@ -515,7 +514,7 @@ export class gamePlaying extends Component {
             const currentPosition = this.rollingSuitList[i].node.position.x;
             const prevPosition = this.rollingSuitList[i].prevPosition.x;
             const distance = Math.abs(currentPosition);
-            if (distance < this.gameProperty.getPickDistanceThreshold(this.currentLevel) || (prevPosition < 0 && currentPosition > 0)) {
+            if (distance < this.gameProperty.getPickDistanceThreshold(this.currentSuitType, this.currentLevel) || (prevPosition < 0 && currentPosition > 0)) {
                 nearestSuit = this.rollingSuitList[i];
             }
         }
