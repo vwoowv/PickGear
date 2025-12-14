@@ -34,6 +34,10 @@ export class gameManagerExtensions extends Component {
         return this._gameManager.eggCatchSound;
     }
 
+    public get penaltySound(): AudioClip {
+        return this._gameManager.penaltySound;
+    }
+
     public async initialize(gameManager: gameManager) {
         this._gameManager = gameManager;
     }

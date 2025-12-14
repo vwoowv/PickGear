@@ -61,7 +61,10 @@ export class egg extends Component {
     }
 
     public onEggCatch(currentScore: number) {
-        if (this.currentType == EggType.Happy) {
+        if (currentScore < 0) {
+            this.extensions.playSound.playOneShot(this.extensions.penaltySound);
+        }
+        else if (this.currentType == EggType.Happy) {
             this.extensions.playSound.playOneShot(this.extensions.eggCatchSound[1]);
         }
         else {
@@ -91,7 +94,7 @@ export class egg extends Component {
     public getCurrentScore(level: number) {
         const prop = gameProperty.I;
         const levelScores = this.getLevelScores(prop);
-        
+
         return levelScores[this.currentType]?.[level] ?? 0;
     }
 
