@@ -263,7 +263,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 45.079986572265625,
+      "width": 67.6199951171875,
       "height": 75.6
     },
     "_anchorPoint": {
@@ -293,7 +293,7 @@
     "_string": "<color=#00ff00>+2</color>",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_fontSize": 40,
+    "_fontSize": 60,
     "_fontColor": {
       "__type__": "cc.Color",
       "r": 255,
