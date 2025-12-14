@@ -13,12 +13,13 @@ export function sortOpeningPositiveScores(level: number, positiveScores: Opening
     const fixedOrder =
         level === 1
             ? [
-                  EggType.SongUnbee,
+                  EggType.SooHana,
                   EggType.EmmaMoon,
                   EggType.Howsam,
                   EggType.Happy,
                   EggType.Hoyang,
                   EggType.DoArin,
+                  EggType.SongUnbee,
               ]
             : level === 2 || level === 3
               ? [EggType.SooHana, EggType.EmmaMoon, EggType.Howsam, EggType.DoArin, EggType.SongUnbee]
