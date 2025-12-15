@@ -7,10 +7,22 @@ export interface IAssetLists {
     spriteFrames?: string[];
 }
 
+export interface IPreloadOptions {
+    /**
+     * 동시에 로드할 최대 개수 (너무 크면 프레임 드랍/스파이크 유발 가능)
+     */
+    concurrency?: number;
+    /**
+     * 일부 리소스 로드 실패 시에도 나머지를 계속 로드할지 여부
+     */
+    continueOnError?: boolean;
+}
+
 @ccclass('ResourceManager')
 export class ResourceManager extends Component {
     private static _instance: ResourceManager = null;
     private resourceCache: Map<string, any> = new Map();
+    private inFlightLoads: Map<string, Promise<any>> = new Map();
 
     // Singleton 인스턴스에 접근하는 getter
     public static get I(): ResourceManager {
@@ -53,16 +65,28 @@ export class ResourceManager extends Component {
             return Promise.resolve(this.resourceCache.get(path) as T);
         }
 
+        const inFlight = this.inFlightLoads.get(path);
+        if (inFlight) {
+            return inFlight as Promise<T>;
+        }
+
         return new Promise((resolve, reject) => {
-            resources.load(path, type, (err, asset) => {
-                if (err) {
-                    error(`리소스 로드 실패: ${path}`, err);
-                    reject(err);
-                    return;
-                }
-                this.resourceCache.set(path, asset);
-                resolve(asset as T);
+            const promise = new Promise<T>((innerResolve, innerReject) => {
+                resources.load(path, type, (err, asset) => {
+                    if (err) {
+                        error(`리소스 로드 실패: ${path}`, err);
+                        this.inFlightLoads.delete(path);
+                        innerReject(err);
+                        return;
+                    }
+                    this.resourceCache.set(path, asset);
+                    this.inFlightLoads.delete(path);
+                    innerResolve(asset as T);
+                });
             });
+
+            this.inFlightLoads.set(path, promise);
+            promise.then(resolve).catch(reject);
         });
     }
 
@@ -77,34 +101,72 @@ export class ResourceManager extends Component {
         return newNode.getComponent(Component) as T;
     }
 
-    public async preloadGameAssets(assetLists: IAssetLists, onProgress?: (progress: number) => void) {
-        const assetGroups = [];
-        if (assetLists.prefabs?.length > 0) {
-            assetGroups.push({ paths: assetLists.prefabs, type: Prefab });
-        }
-        if (assetLists.audioClips?.length > 0) {
-            assetGroups.push({ paths: assetLists.audioClips, type: AudioClip });
-        }
-        if (assetLists.spriteFrames?.length > 0) {
-            assetGroups.push({ paths: assetLists.spriteFrames, type: SpriteFrame });
-        }
+    public async preloadGameAssets(
+        assetLists: IAssetLists,
+        onProgress?: (progress: number) => void,
+        options?: IPreloadOptions
+    ) {
+        const concurrency = Math.max(1, options?.concurrency ?? 6);
+        const continueOnError = options?.continueOnError ?? false;
 
-        let totalAssets = 0;
-        assetGroups.forEach(group => totalAssets += group.paths.length);
-        if (totalAssets === 0) {
+        // 1) 입력 정리 + 중복 제거 + null/빈 문자열 제거
+        const toLoad: Array<{ path: string; type: any }> = [];
+        const seen = new Set<string>();
+        const pushUnique = (paths: string[] | undefined, type: any) => {
+            if (!paths || paths.length === 0) return;
+            for (const p of paths) {
+                const path = (p ?? '').trim();
+                if (!path) continue;
+                if (this.resourceCache.has(path)) continue;
+                const key = `${path}`; // 현재 캐시 키가 path 기반이므로 동일 기준으로 dedupe
+                if (seen.has(key)) continue;
+                seen.add(key);
+                toLoad.push({ path, type });
+            }
+        };
+
+        pushUnique(assetLists.prefabs, Prefab);
+        pushUnique(assetLists.audioClips, AudioClip);
+        pushUnique(assetLists.spriteFrames, SpriteFrame);
+
+        const total = toLoad.length;
+        if (total === 0) {
             onProgress?.(1);
             return;
         }
 
-        let loadedAssets = 0;
-        for (const group of assetGroups) {
-            for (const path of group.paths) {
-                if (!this.resourceCache.has(path)) {
-                    await this.loadResource(path, group.type);
+        // 2) 동시성 제한 로딩 + 진행률
+        let completed = 0;
+        const report = () => onProgress?.(completed / total);
+
+        let firstError: unknown = null;
+        let idx = 0;
+
+        const worker = async () => {
+            while (true) {
+                const current = idx < total ? toLoad[idx++] : null;
+                if (!current) return;
+                try {
+                    await this.loadResource(current.path, current.type);
+                } catch (e) {
+                    if (!continueOnError) throw e;
+                    if (firstError === null) firstError = e;
+                } finally {
+                    completed++;
+                    report();
                 }
-                loadedAssets++;
-                onProgress?.(loadedAssets / totalAssets);
             }
+        };
+
+        const workerCount = Math.min(concurrency, total);
+        const workers = Array.from({ length: workerCount }, () => worker());
+        await Promise.all(workers);
+        onProgress?.(1);
+
+        // continueOnError 모드에서는 프리로드가 "완료"되더라도,
+        // 내부적으로 일부 실패가 있었음을 로그로 남길 수 있게 해둔다.
+        if (continueOnError && firstError) {
+            error('preloadGameAssets: 일부 리소스 로드에 실패했지만 계속 진행했습니다.', firstError);
         }
     }
 }

@@ -61,6 +61,10 @@ export class RootUI extends Component {
     private currentShowScoreText: Label = null;
     @property(Node)
     private loadingGroup: Node = null;
+    @property(ProgressBar)
+    private loadingProgressBar: ProgressBar = null;
+    @property(Label)
+    private loadingProgressText: Label = null;
     @property(Node)
     public selectGameTypeNode: Node = null;
     @property(Node)
@@ -166,10 +170,22 @@ export class RootUI extends Component {
 
     public showLoadingGroup() {
         this.loadingGroup.active = true;
+        this.setLoadingProgress(0);
     }
 
     public hideLoadingGroup() {
         this.loadingGroup.active = false;
+        this.setLoadingProgress(0);
+    }
+
+    public setLoadingProgress(progress: number) {
+        const p = Math.max(0, Math.min(1, progress));
+        if (this.loadingProgressBar) {
+            this.loadingProgressBar.progress = p;
+        }
+        if (this.loadingProgressText) {
+            this.loadingProgressText.string = `${Math.floor(p * 100)}%`;
+        }
     }
 
     public async setFaceSprite(dancerType: ECharacterType, characterSuitType: ECharacterSuitType, faceType: EFaceType) {
