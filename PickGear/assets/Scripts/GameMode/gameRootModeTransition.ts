@@ -78,6 +78,10 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
                 backgroundSprite.spriteFrame = await ResourceManager.I.loadResource(gameBackgroundPath, SpriteFrame);
             }
         } finally {
+            // 마지막 프레임에 100%가 보이도록 보정
+            RootUI.I.setLoadingProgress(1);
+            // UI 렌더링이 한 프레임 반영될 시간을 줌 (같은 프레임에 비활성화하면 100%가 안 보일 수 있음)
+            await new Promise<void>((resolve) => setTimeout(resolve, 0));
             RootUI.I.hideLoadingGroup();
         }
         RootUI.I.showGameNode();

@@ -175,7 +175,6 @@ export class RootUI extends Component {
 
     public hideLoadingGroup() {
         this.loadingGroup.active = false;
-        this.setLoadingProgress(0);
     }
 
     public setLoadingProgress(progress: number) {
