@@ -124,15 +124,33 @@ export class gameManagerExtensions extends Component {
         const randomEgg = Math.floor(Math.random() * EggType.TotalCount);
         const level = this._gameManager.gameMode.getCurrentLevelFromVersion();
         newEgg.initialize(randomEgg, this.eggEndLine, currentTime, totalDuration, gameMode, this, level);
-        let xPosition = Math.random() * (this.eggSpawnPoint_Right.position.x - this.eggSpawnPoint_Left.position.x) + this.eggSpawnPoint_Left.position.x;
+        const leftX = this.eggSpawnPoint_Left.position.x;
+        const rightX = this.eggSpawnPoint_Right.position.x;
+        const minX = Math.min(leftX, rightX);
+        const maxX = Math.max(leftX, rightX);
+        const rangeX = maxX - minX;
+
+        // 스폰 범위가 잘못 세팅되면(0 또는 매우 작음) 무한 루프/프리즈를 방지
+        let xPosition = rangeX <= 0 ? minX : (Math.random() * rangeX + minX);
         if (this.prevRandomX == -1) {
             this.prevRandomX = xPosition;
         }
         else {
+            // 해상도/씬에 따라 스폰 범위가 300보다 좁을 수 있음 → 최소 간격을 범위에 맞게 완화하고, 시도 횟수를 제한
+            const desiredMinGap = 300;
+            const minGap = rangeX <= 0 ? 0 : Math.min(desiredMinGap, rangeX * 0.8);
+
             let xLength = Math.abs(this.prevRandomX - xPosition);
-            while (xLength < 300) {
-                xPosition = Math.random() * (this.eggSpawnPoint_Right.position.x - this.eggSpawnPoint_Left.position.x) + this.eggSpawnPoint_Left.position.x;
+            let attempts = 0;
+            const maxAttempts = 25;
+            while (xLength < minGap && attempts < maxAttempts) {
+                xPosition = Math.random() * rangeX + minX;
                 xLength = Math.abs(this.prevRandomX - xPosition);
+                attempts += 1;
+            }
+            if (attempts >= maxAttempts && minGap > 0) {
+                // 개발 중 원인 파악용(프리즈 방지 우선)
+                console.warn(`[spawnRandomEgg] x 재시도 초과: rangeX=${rangeX.toFixed(2)}, minGap=${minGap.toFixed(2)}. 현재 값으로 진행합니다.`);
             }
             this.prevRandomX = xPosition;
         }

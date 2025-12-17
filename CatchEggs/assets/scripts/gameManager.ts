@@ -119,7 +119,10 @@ export class gameManager extends Component {
             this.updatePlayStarting(deltaTime);
         }
         else if (this.gameState == EGameState.Playing) {
-            this.updatePlaying(deltaTime);
+            // async 함수의 예외가 unhandledrejection으로 튀면 "멈춘 것처럼" 보일 수 있어 여기서 흡수/로그
+            this.updatePlaying(deltaTime).catch((err) => {
+                console.error("[gameManager] updatePlaying error:", err);
+            });
         }
         else if (this.gameState == EGameState.GameOver) {
             this.updateGameOver(deltaTime);
@@ -270,9 +273,13 @@ export class gameManager extends Component {
         // 끝나기 1초전까지 스폰시킨다
         if (this.leftTimeToSpawnEgg <= 0 && this.timeLeft - 2 > 0 && this.isSpawningEgg == false) {
             this.isSpawningEgg = true;
-            const spawnTime = await this.extensions.spawnRandomEgg(this.timeLeft, totalDuration, this.gameMode.currentGameMode);
-            this.leftTimeToSpawnEgg = spawnTime;
-            this.isSpawningEgg = false;
+            try {
+                const spawnTime = await this.extensions.spawnRandomEgg(this.timeLeft, totalDuration, this.gameMode.currentGameMode);
+                this.leftTimeToSpawnEgg = spawnTime;
+            }
+            finally {
+                this.isSpawningEgg = false;
+            }
         }
         this.timeLeft -= deltaTime;
         this.timeProgressBar.progress = this.timeLeft / totalDuration;
