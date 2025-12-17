@@ -8,6 +8,8 @@ import { getGameBackground } from "../Utility/getGameBackground";
 import { SpriteFrame } from "cc";
 import { ECharacterType, ECharacterSuitType } from "../GameDefine";
 import { getDancerSuit } from "../Character/getDancerSuit";
+import { dancerSprite, nameTagSprite } from "../Character/dancerResource";
+import { getDancerFace } from "../Character/getDancerFace";
 
 export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGameRootModeEvent> {
     constructor() {
@@ -57,7 +59,20 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
                     if (resourcePath) {
                         assetLists.spriteFrames.push(resourcePath);
                     }
+
+                    // 캐릭터 페이스(표정) 리소스 프리로드
+                    const faceNormal = new getDancerFace().getFaceResourcePath(characterType, suitType, 0);
+                    const faceSuccess = new getDancerFace().getFaceResourcePath(characterType, suitType, 1);
+                    const faceFail = new getDancerFace().getFaceResourcePath(characterType, suitType, 2);
+                    assetLists.spriteFrames.push(faceNormal, faceSuccess, faceFail);
                 }
+            }
+
+            // 기본 캐릭터 스프라이트 및 네임태그 프리로드
+            assetLists.spriteFrames.push(...dancerSprite.getAllResourcePath());
+            for (let i = 0; i < ECharacterType.TotalCount; i++) {
+                const characterType = i as ECharacterType;
+                assetLists.spriteFrames.push(new nameTagSprite(characterType).resourcePath);
             }
 
             await ResourceManager.I.preloadGameAssets(
