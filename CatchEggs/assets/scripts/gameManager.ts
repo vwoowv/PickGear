@@ -100,6 +100,15 @@ export class gameManager extends Component {
     private timeLeft: number = 0;
     private currentScore: number = 0;
     private extensions: gameManagerExtensions = null;
+    public perfect: boolean = false;
+
+    public markNotPerfect(reason: string) {
+        // 한 번이라도 실패 조건이 발생하면 false로 고정
+        if (this.perfect) {
+            console.log(`[perfect] broken: ${reason}`);
+        }
+        this.perfect = false;
+    }
     async start() {
         this.loadingNode.active = true;
 
@@ -151,6 +160,7 @@ export class gameManager extends Component {
         this.prepareNode.active = true;
         this.retryNode.active = false;
         this.basket.getComponent(basket).initialize();
+        this.perfect = true;
         this.currentScore = 0;
         this.currentComboScore = 0;
         this.scoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
@@ -252,6 +262,7 @@ export class gameManager extends Component {
         this.playStartingNode.active = false;
         this.playingNode.active = true;
         this.prepareNode.active = false;
+        this.perfect = true;
         this.timeLeft = this.gameMode.getCurrentGameDuration();
         this.retryNode.active = false;
         this.currentScore = 0;
@@ -340,6 +351,7 @@ export class gameManager extends Component {
         this.isSpawningEgg = false;
         this.leftTimeToSpawnEgg = 1;
         this.timeLeft = this.gameMode.getCurrentGameDuration();
+        this.perfect = true;
         this.currentScore = 0;
         this.currentComboScore = 0;
         this.timeProgressBar.progress = 1;
@@ -397,6 +409,7 @@ export class gameManager extends Component {
         const currentEggScore = eggNode.getComponent(egg).getCurrentScore(level);
         // 잘못 받은(패널티) 경우 바구니를 빨갛게 1초 표시
         if (currentEggScore < 0 && isValid(this.basket, true)) {
+            this.markNotPerfect("caught_negative_egg");
             const basketComp = this.basket.getComponent(basket);
             if (basketComp) {
                 basketComp.flashRed(1);

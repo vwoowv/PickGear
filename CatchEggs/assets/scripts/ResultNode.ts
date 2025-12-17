@@ -14,69 +14,80 @@ export class ResultNode extends Component {
     private readonly openingEggNormalList: openingEgg[] = [];
     @property(openingEgg)
     private readonly openingEggNegativeList: openingEgg[] = [];
+    @property(Node)
+    private readonly perfectNode: Node = null;
+    @property(Node)
+    private readonly notPerfectNode: Node = null;
 
     public async initialize(gameManager: gameManager) {
         const level = gameManager.gameMode.getCurrentLevelFromVersion();
         const prop = gameProperty.I;
 
-        // 현재 레벨에서 하나라도 0보다 작은 점수를 가진 캐릭터가 있는지 확인
-        let hasNegativeScore = false;
-        for (let i = 0; i < EggType.TotalCount; i++) {
-            if (prop.getScore(level, i) < 0) {
-                hasNegativeScore = true;
-                break;
-            }
-        }
+        this.perfectNode.active = gameManager.perfect;
+        this.notPerfectNode.active = !gameManager.perfect;
 
-        this.OpeningNerdsGroup.active = hasNegativeScore;
+        this.OpeningNerdsGroup.active = this.hasNegativeScore(prop, level);
 
-        // 스코어가 0보다 큰 캐릭터들을 정리
-        const positiveScores: { eggType: EggType; score: number; image: string }[] = [];
-        // 스코어가 0보다 작은 캐릭터들을 정리
-        const negativeScores: { eggType: EggType; score: number; image: string }[] = [];
-
-        for (let i = 0; i < EggType.TotalCount; i++) {
-            const score = prop.getScore(level, i);
-            const image = prop.getImage(level, i);
-            if (score > 0) {
-                positiveScores.push({ eggType: i, score, image });
-            } else if (score < 0) {
-                negativeScores.push({ eggType: i, score, image });
-            }
-        }
+        const { positiveScores, negativeScores } = this.buildScoreLists(prop, level);
 
         // gameManager/playStartingNode와 동일한 배치 규칙 적용
         sortOpeningPositiveScores(level, positiveScores);
 
-        // openingEggNormalList에 세팅
-        let normalIndex = 0;
-        for (const item of positiveScores) {
-            if (normalIndex < this.openingEggNormalList.length && this.openingEggNormalList[normalIndex] != null) {
-                await this.openingEggNormalList[normalIndex].initialize(item.image, item.score);
-                this.openingEggNormalList[normalIndex].node.active = true;
-                normalIndex++;
+        await this.applyScoresToOpeningEggs(this.openingEggNormalList, positiveScores);
+        await this.applyScoresToOpeningEggs(this.openingEggNegativeList, negativeScores);
+    }
+
+    private hasNegativeScore(prop: gameProperty, level: number): boolean {
+        for (let i = 0; i < EggType.TotalCount; i++) {
+            if (prop.getScore(level, i) < 0) {
+                return true;
             }
         }
-        // 나머지는 안 보이게 처리
-        for (let i = normalIndex; i < this.openingEggNormalList.length; i++) {
-            if (this.openingEggNormalList[i] != null) {
-                this.openingEggNormalList[i].node.active = false;
+        return false;
+    }
+
+    private buildScoreLists(prop: gameProperty, level: number): {
+        positiveScores: { eggType: EggType; score: number; image: string }[];
+        negativeScores: { eggType: EggType; score: number; image: string }[];
+    } {
+        const positiveScores: { eggType: EggType; score: number; image: string }[] = [];
+        const negativeScores: { eggType: EggType; score: number; image: string }[] = [];
+
+        for (let i = 0; i < EggType.TotalCount; i++) {
+            const score = prop.getScore(level, i);
+            if (score === 0) {
+                continue;
+            }
+            const image = prop.getImage(level, i);
+            if (score > 0) {
+                positiveScores.push({ eggType: i, score, image });
+            } else {
+                negativeScores.push({ eggType: i, score, image });
             }
         }
 
-        // openingEggNegativeList에 세팅
-        let negativeIndex = 0;
-        for (const item of negativeScores) {
-            if (negativeIndex < this.openingEggNegativeList.length && this.openingEggNegativeList[negativeIndex] != null) {
-                await this.openingEggNegativeList[negativeIndex].initialize(item.image, item.score);
-                this.openingEggNegativeList[negativeIndex].node.active = true;
-                negativeIndex++;
+        return { positiveScores, negativeScores };
+    }
+
+    private async applyScoresToOpeningEggs(
+        targetList: openingEgg[],
+        scores: { eggType: EggType; score: number; image: string }[]
+    ) {
+        let index = 0;
+        for (const item of scores) {
+            if (index >= targetList.length) {
+                break;
+            }
+            const slot = targetList[index];
+            if (slot != null) {
+                await slot.initialize(item.image, item.score);
+                slot.node.active = true;
+                index++;
             }
         }
-        // 나머지는 안 보이게 처리
-        for (let i = negativeIndex; i < this.openingEggNegativeList.length; i++) {
-            if (this.openingEggNegativeList[i] != null) {
-                this.openingEggNegativeList[i].node.active = false;
+        for (let i = index; i < targetList.length; i++) {
+            if (targetList[i] != null) {
+                targetList[i].node.active = false;
             }
         }
     }

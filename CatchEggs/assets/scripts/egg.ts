@@ -86,6 +86,8 @@ export class egg extends Component {
             // 0보다 클 경우에만 콤보가 리셋된다
             const level = this.extensions.gameManager.gameMode.getCurrentLevelFromVersion();
             if (this.getCurrentScore(level) > 0) {
+                // 잡아야 할(양수 점수) 달걀을 놓치면 perfect 실패
+                this.extensions.gameManager.markNotPerfect("missed_positive_egg");
                 this.extensions.resetComboScore();
                 this.extensions.playSound.playOneShot(this.extensions.missSound);
             }
