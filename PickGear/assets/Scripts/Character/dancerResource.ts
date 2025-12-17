@@ -16,3 +16,10 @@ export class dancerSprite {
         this.resourcePath = `textures/Character/${ECharacterType[dancerType]}/spriteFrame`;
     }
 }
+
+export class nameTagSprite {
+    public resourcePath: string;
+    constructor(dancerType: ECharacterType) {
+        this.resourcePath = `textures/Character/NameTag/${ECharacterType[dancerType]}/spriteFrame`;
+    }
+}

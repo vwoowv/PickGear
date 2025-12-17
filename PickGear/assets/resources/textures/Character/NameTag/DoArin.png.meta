@@ -11,7 +11,7 @@
     "6c48a": {
       "importer": "texture",
       "uuid": "a509fe4d-51fa-4021-a3cc-ddd1691dd7f1@6c48a",
-      "displayName": "DoArinName",
+      "displayName": "DoArin",
       "id": "6c48a",
       "name": "texture",
       "userData": {
@@ -35,7 +35,7 @@
     "f9941": {
       "importer": "sprite-frame",
       "uuid": "a509fe4d-51fa-4021-a3cc-ddd1691dd7f1@f9941",
-      "displayName": "DoArinName",
+      "displayName": "DoArin",
       "id": "f9941",
       "name": "spriteFrame",
       "userData": {

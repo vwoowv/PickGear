@@ -2,7 +2,7 @@
   "ver": "1.0.27",
   "importer": "image",
   "imported": true,
-  "uuid": "508d8a81-0f4b-4b77-9819-2c18172c0bd7",
+  "uuid": "15c672b4-ba7b-4b9a-ad7b-a5b6528a05de",
   "files": [
     ".json",
     ".png"
@@ -10,14 +10,14 @@
   "subMetas": {
     "6c48a": {
       "importer": "texture",
-      "uuid": "508d8a81-0f4b-4b77-9819-2c18172c0bd7@6c48a",
-      "displayName": "SooHanaName",
+      "uuid": "15c672b4-ba7b-4b9a-ad7b-a5b6528a05de@6c48a",
+      "displayName": "SongUnbee",
       "id": "6c48a",
       "name": "texture",
       "userData": {
         "wrapModeS": "clamp-to-edge",
         "wrapModeT": "clamp-to-edge",
-        "imageUuidOrDatabaseUri": "508d8a81-0f4b-4b77-9819-2c18172c0bd7",
+        "imageUuidOrDatabaseUri": "15c672b4-ba7b-4b9a-ad7b-a5b6528a05de",
         "isUuid": true,
         "visible": false,
         "minfilter": "linear",
@@ -34,8 +34,8 @@
     },
     "f9941": {
       "importer": "sprite-frame",
-      "uuid": "508d8a81-0f4b-4b77-9819-2c18172c0bd7@f9941",
-      "displayName": "SooHanaName",
+      "uuid": "15c672b4-ba7b-4b9a-ad7b-a5b6528a05de@f9941",
+      "displayName": "SongUnbee",
       "id": "f9941",
       "name": "spriteFrame",
       "userData": {
@@ -113,7 +113,7 @@
           ]
         },
         "isUuid": true,
-        "imageUuidOrDatabaseUri": "508d8a81-0f4b-4b77-9819-2c18172c0bd7@6c48a",
+        "imageUuidOrDatabaseUri": "15c672b4-ba7b-4b9a-ad7b-a5b6528a05de@6c48a",
         "atlasUuid": "",
         "trimType": "auto"
       },
@@ -129,7 +129,7 @@
     "type": "sprite-frame",
     "hasAlpha": true,
     "fixAlphaTransparencyArtifacts": false,
-    "redirect": "508d8a81-0f4b-4b77-9819-2c18172c0bd7@6c48a",
+    "redirect": "15c672b4-ba7b-4b9a-ad7b-a5b6528a05de@6c48a",
     "compressSettings": {
       "useCompressTexture": true,
       "presetId": "a8asHtczdNIpAogUguAvqg"

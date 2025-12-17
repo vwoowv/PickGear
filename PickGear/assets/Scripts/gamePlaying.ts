@@ -37,8 +37,8 @@ export class gamePlaying extends Component {
     private currentTime: number = 0;
     private showSuitTime: number = 2;
     private currentGameRoundTime: number = 0;
-    private readonly gameRoundTime: number = 13;
-    // private readonly gameRoundTime: number = 1;
+    // private readonly gameRoundTime: number = 13;
+    private readonly gameRoundTime: number = 1;
     private readonly resultTime: number = 3;
     private get gameRoundTimeRate(): number {
         return this.currentTime / this.currentGameRoundTime;
@@ -396,6 +396,7 @@ export class gamePlaying extends Component {
     private async newDancer(level: number, dancerPos: Node) {
         const newDancer = await ResourceManager.I.spawnPrefab<dancer>("prefab/character/Dancer", dancerPos);
         newDancer.initialize(new getCharacterTypeFromLevel(level).characterType);
+        newDancer.showNameTag(true);
         return newDancer;
     }
 
@@ -423,9 +424,13 @@ export class gamePlaying extends Component {
             this.finalRoundSequence = 0;
             this.waitingTimeForNextDancer = 0;
             this.setupFinalRound();
+            if (this.currentDancer) {
+                this.currentDancer.showNameTag(false);
+            }
         }
         else {
             this.currentDancer.takeOffSuit();
+            this.currentDancer.showNameTag(false);
         }
 
         this.currentGameRoundTime = this.gameRoundTime;
