@@ -1,4 +1,4 @@
-import { _decorator, Component, ProgressBar, RichText, Node, Label, AnimationComponent, Sprite, SpriteFrame } from 'cc';
+import { _decorator, Component, ProgressBar, RichText, Node, Label, AnimationComponent, Sprite, SpriteFrame, BlockInputEvents } from 'cc';
 import { richTextMaker } from './Utility/richTextMaker';
 import { ECharacterSuitType, ECharacterType, EFaceType } from './GameDefine';
 import { getDancerFace } from './Character/getDancerFace';
@@ -171,10 +171,12 @@ export class RootUI extends Component {
     public showLoadingGroup() {
         this.loadingGroup.active = true;
         this.setLoadingProgress(0);
+        this.setLoadingBlockInput(true);
     }
 
     public hideLoadingGroup() {
         this.loadingGroup.active = false;
+        this.setLoadingBlockInput(false);
     }
 
     public setLoadingProgress(progress: number) {
@@ -184,6 +186,16 @@ export class RootUI extends Component {
         }
         if (this.loadingProgressText) {
             this.loadingProgressText.string = `${Math.floor(p * 100)}%`;
+        }
+    }
+
+    private setLoadingBlockInput(enabled: boolean) {
+        if (!this.loadingGroup) {
+            return;
+        }
+        const blocker = this.loadingGroup.getComponent(BlockInputEvents);
+        if (blocker) {
+            blocker.enabled = enabled;
         }
     }
 
