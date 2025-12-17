@@ -40,4 +40,3 @@ export class dragArea extends Component {
         console.log("onTouchCancel");
     }
 }
-

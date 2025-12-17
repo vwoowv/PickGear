@@ -1,4 +1,4 @@
-import { _decorator, AudioClip, AudioSource, Component, instantiate, Label, Node, ParticleSystem, Prefab, ProgressBar, RichText, Sprite, Vec3 } from 'cc';
+import { _decorator, AudioClip, AudioSource, Component, instantiate, isValid, Label, Node, ParticleSystem, Prefab, ProgressBar, RichText, Sprite, Vec3 } from 'cc';
 import { ResourceManager } from './ResourceManager';
 import { egg } from './egg';
 import { EggType, EGameState, EGameMode } from './gameDefine';
@@ -12,6 +12,7 @@ import { midiJsonData } from './midi/midiJsonData';
 import { openingEgg } from './openingEgg';
 import { sortOpeningPositiveScores } from './openingCharacterOrder';
 import { ResultNode } from './ResultNode';
+import { basket } from './basket';
 const { ccclass, property } = _decorator;
 
 @ccclass('gameManager')
@@ -146,6 +147,7 @@ export class gameManager extends Component {
         this.playingNode.active = false;
         this.prepareNode.active = true;
         this.retryNode.active = false;
+        this.basket.getComponent(basket).initialize();
         this.currentScore = 0;
         this.currentComboScore = 0;
         this.scoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
@@ -317,9 +319,18 @@ export class gameManager extends Component {
 
     private currentComboScore: number = 0;
     private checkEggsInBasket() {
+        // 안전 가드: 씬 세팅/파괴 타이밍 이슈로 null/invalid가 될 수 있음
+        if (!isValid(this.eggParent, true) || !isValid(this.basket, true)) {
+            return;
+        }
+
         const eggInBasket: Node[] = [];
         for (const eggNode of this.eggParent.children) {
-            const distance: number = eggNode.position.clone().subtract(this.basket.position).length();
+            if (!isValid(eggNode, true)) {
+                continue;
+            }
+            // 서로 다른 부모를 가질 수 있으니 월드 좌표 기준으로 계산
+            const distance: number = Vec3.distance(eggNode.worldPosition, this.basket.worldPosition);
             if (distance < 100) {
                 console.log("egg in basket : " + eggNode.name);
                 this.processEggCatch(eggNode);
@@ -338,6 +349,13 @@ export class gameManager extends Component {
     private processEggCatch(eggNode: Node) {
         const level = this.gameMode.getCurrentLevelFromVersion();
         const currentEggScore = eggNode.getComponent(egg).getCurrentScore(level);
+        // 잘못 받은(패널티) 경우 바구니를 빨갛게 1초 표시
+        if (currentEggScore < 0 && isValid(this.basket, true)) {
+            const basketComp = this.basket.getComponent(basket);
+            if (basketComp) {
+                basketComp.flashRed(1);
+            }
+        }
         if (currentEggScore > 0) {
             this.currentComboScore += currentEggScore;
         }
@@ -374,6 +392,8 @@ export class gameManager extends Component {
         else if (x < -300) {
             x = -300;
         }
-        this.basket.setPosition(x, y, 0);
+        if (isValid(this.basket, true)) {
+            this.basket.setPosition(x, y, 0);
+        }
     }
 }
