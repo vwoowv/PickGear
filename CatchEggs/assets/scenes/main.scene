@@ -1425,7 +1425,7 @@
         "__id__": 47
       }
     ],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 51
@@ -1978,7 +1978,9 @@
     "basketSprite": {
       "__id__": 41
     },
-    "redBasketSprite": null,
+    "redBasketSprite": {
+      "__id__": 44
+    },
     "_id": "6e19RkV5xFZZoonl0LwVgO"
   },
   {
@@ -7500,7 +7502,7 @@
         "__id__": 428
       }
     ],
-    "_active": false,
+    "_active": true,
     "_components": [
       {
         "__id__": 433
@@ -10571,7 +10573,7 @@
     },
     "component": "",
     "_componentId": "e7fd8iK+L1OarW3F/vQlUHs",
-    "handler": "onRetryButtonClick",
+    "handler": "onHomeButtonClick",
     "customEventData": ""
   },
   {

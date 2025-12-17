@@ -119,6 +119,9 @@ export class gameManagerExtensions extends Component {
     }
 
     private prevRandomX: number = -1;
+    public resetSpawnState() {
+        this.prevRandomX = -1;
+    }
     public async spawnRandomEgg(currentTime: number, totalDuration: number, gameMode: EGameMode): Promise<number> {
         const newEgg = await ResourceManager.I.spawnPrefab<egg>("prefab/Egg", this.eggParent);
         const randomEgg = Math.floor(Math.random() * EggType.TotalCount);

@@ -154,7 +154,7 @@ export class gameManager extends Component {
         this.currentScore = 0;
         this.currentComboScore = 0;
         this.scoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
-        this.coinText.string = new richTextMaker("0000", "#020202", 3, "").resultText;
+        this.coinText.string = new richTextMaker("00", "#020202", 3, "").resultText;
         this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
         this.currentLevelText.string = new richTextMaker("LV." + this.gameMode.getCurrentLevelFromVersion().toString(), "#020202", 3, "").resultText;
         await this.setOpeningCharacter();
@@ -256,7 +256,7 @@ export class gameManager extends Component {
         this.retryNode.active = false;
         this.currentScore = 0;
         this.scoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
-        this.coinText.string = new richTextMaker("0000", "#020202", 3, "").resultText;
+        this.coinText.string = new richTextMaker("00", "#020202", 3, "").resultText;
         this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
         this.currentLevelText.string = new richTextMaker("LV." + this.gameMode.getCurrentLevelFromVersion().toString(), "#020202", 3, "").resultText;
     }
@@ -310,7 +310,7 @@ export class gameManager extends Component {
         this.retryNode.active = true;
         this.retryNode.getComponent(ResultNode).initialize(this);
         this.scoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
-        this.coinText.string = new richTextMaker("0000", "#020202", 3, "").resultText;
+        this.coinText.string = new richTextMaker("00", "#020202", 3, "").resultText;
         this.gameMode.resultGame();
     }
 
@@ -320,8 +320,47 @@ export class gameManager extends Component {
         }
     }
 
-    private onRetryButtonClick() {
+    public onHomeButtonClick() {
         this.selectGameMode();
+    }
+
+    public onRetryButtonClick() {
+        this.restartCurrentStage();
+    }
+
+    private restartCurrentStage() {
+        // 현재 선택된 스테이지(= gameModeData.currentGameMode / 버전 레벨)를 유지한 채 라운드만 재시작
+        // 1) 남아있는 달걀 정리
+        if (this.eggParent) {
+            this.eggParent.children.forEach((child) => child.destroy());
+            this.eggParent.removeAllChildren();
+        }
+
+        // 2) 스폰/타이머/점수 리셋
+        this.isSpawningEgg = false;
+        this.leftTimeToSpawnEgg = 1;
+        this.timeLeft = this.gameMode.getCurrentGameDuration();
+        this.currentScore = 0;
+        this.currentComboScore = 0;
+        this.timeProgressBar.progress = 1;
+
+        // 3) UI 리셋
+        this.scoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
+        this.coinText.string = new richTextMaker("00", "#020202", 3, "").resultText;
+        this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
+        this.currentLevelText.string = new richTextMaker("LV." + this.gameMode.getCurrentLevelFromVersion().toString(), "#020202", 3, "").resultText;
+
+        // 4) 바구니 상태 초기화(색/스케일 등)
+        const basketComp = this.basket?.getComponent(basket);
+        basketComp?.initialize();
+
+        // 5) 스폰 위치 상태 리셋
+        this.extensions?.resetSpawnState();
+
+        // 6) 화면 전환: 스테이지 선택으로 가지 않고 바로 시작 연출로
+        this.selectGameModeNode.active = false;
+        this.retryNode.active = false;
+        this.startPlayStarting();
     }
 
     private currentComboScore: number = 0;
