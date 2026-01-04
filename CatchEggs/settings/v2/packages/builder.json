@@ -1,0 +1,22 @@
+{
+  "__version__": "1.3.9",
+  "splash-setting": {
+    "logo": {
+      "type": "none"
+    }
+  },
+  "textureCompressConfig": {
+    "userPreset": {
+      "4ewlGpyIJCi4sLhFC+9evD": {
+        "name": "ExportWeb",
+        "options": {
+          "web": {
+            "png": {
+              "quality": 80
+            }
+          }
+        }
+      }
+    }
+  }
+}
