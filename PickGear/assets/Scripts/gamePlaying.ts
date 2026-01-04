@@ -12,7 +12,7 @@ import { RollingSuit } from './Character/RollingSuit';
 import { gameInstance } from './gameInstance';
 import { PickedSuitManager } from './PickedSuitManager';
 import { gamePlayProperty } from './gamePlayProperty';
-import { AppleMusicManager } from './AppleMusicManager'; // [추가됨]
+import { AppleMusicManager } from './AppleMusicManager';
 
 const { ccclass, property } = _decorator;
 
