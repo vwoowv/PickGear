@@ -10,8 +10,8 @@ import { AppleMusicManager } from './AppleMusicManager';
 const { ccclass, property } = _decorator;
 
 /**
- * 게임 시작 전(Start) 오프닝 연출을 담당하는 컴포넌트입니다.
- * 등장 캐릭터(알) 배치, 배경음악 재생, 대기 애니메이션 후 게임 시작 트리거 역할을 합니다.
+ * 게임 시작 전(Start) 오프닝 연출을 담당하는 컴포넌트
+ * 등장 캐릭터(알) 배치, 배경음악 재생, 대기 애니메이션 후 게임 시작 트리거 역할
  */
 @ccclass('playStartingNode')
 export class playStartingNode extends Component {
@@ -37,10 +37,10 @@ export class playStartingNode extends Component {
     private isReadyToPlay: boolean = false;
 
     /**
-     * 오프닝 노드를 초기화합니다.
-     * 1. 캐릭터 데이터를 설정하고 배치합니다.
-     * 2. Apple Music 배경음악 재생을 시도합니다.
-     * 3. 음악 재생 성공/실패 여부와 관계없이 애니메이션을 재생하고 대기 상태로 진입합니다.
+     * 오프닝 노드를 초기화
+     * 1. 캐릭터 데이터를 설정하고 배치
+     * 2. Apple Music 배경음악 재생을 시도
+     * 3. 음악 재생 성공/실패 여부와 관계없이 애니메이션을 재생하고 대기 상태로 진입
      * @param gameManager 게임 매니저 인스턴스
      */
     public async initialize(gameManager: gameManager) {
@@ -69,8 +69,8 @@ export class playStartingNode extends Component {
     }
 
     /**
-     * 현재 레벨 데이터(gameProperty)를 기반으로 등장할 알(캐릭터)들을 설정합니다.
-     * 점수에 따라 긍정적(Normal) 그룹과 부정적(Negative) 그룹으로 분류하여 배치합니다.
+     * 현재 레벨 데이터(gameProperty)를 기반으로 등장할 알(캐릭터)들을 설정
+     * 점수에 따라 긍정적(Normal) 그룹과 부정적(Negative) 그룹으로 분류하여 배치합
      */
     private async setOpeningCharacter() {
         try {
@@ -124,7 +124,7 @@ export class playStartingNode extends Component {
     }
 
     /**
-     * 매 프레임 호출되는 업데이트 함수입니다.
+     * 매 프레임 호출되는 업데이트 함수
      * 1. 알들을 좌우로 흔드는(Wiggle) 애니메이션 처리
      * 2. 4초 대기 후 실제 게임(startNewGame)으로 전환
      * @param deltaTime 이전 프레임과의 시간 차
