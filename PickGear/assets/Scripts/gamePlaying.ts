@@ -12,7 +12,7 @@ import { RollingSuit } from './Character/RollingSuit';
 import { gameInstance } from './gameInstance';
 import { PickedSuitManager } from './PickedSuitManager';
 import { gamePlayProperty } from './gamePlayProperty';
-import { Spotify } from './Utility/spotify';
+import { AppleMusicManager } from './Utility/AppleMusicManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('gamePlaying')
@@ -350,11 +350,22 @@ export class gamePlaying extends Component {
         this.currentComboScore = 0;
         this.currentComboCount = 0;
         this.perfect = true;
-        // Spotify 재생 시도(Into you). 실패(활성 디바이스 없음/권한 부족 등) 시 로컬 사운드 폴백.
+        /* eslint-disable */
+        // (기존) Spotify 재생 (주석 처리 유지)
+        // try {
+        //     await Spotify.I.playLevelMusic(0);
+        // } catch (e) {
+        //     console.warn('Spotify play failed, fallback to local audio', e);
+        //     await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
+        // }
+        /* eslint-enable */
+
+        // Apple Music 재생 시도(Into you). 실패 시 로컬 사운드 폴백.
         try {
-            await Spotify.I.playLevelMusic(0);
+            const appleMusic = new AppleMusicManager();
+            await appleMusic.playMyMusic();
         } catch (e) {
-            console.warn('Spotify play failed, fallback to local audio', e);
+            console.warn('Apple Music play failed, fallback to local audio', e);
             await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
         }
         gameModeManager.I.playingToShowSuit(1);
