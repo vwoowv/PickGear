@@ -13,6 +13,7 @@ import { gameInstance } from './gameInstance';
 import { PickedSuitManager } from './PickedSuitManager';
 import { gamePlayProperty } from './gamePlayProperty';
 import { AppleMusicManager } from './Utility/AppleMusicManager';
+import { Spotify } from './Utility/spotify';
 const { ccclass, property } = _decorator;
 
 @ccclass('gamePlaying')
@@ -29,6 +30,10 @@ export class gamePlaying extends Component {
     private characterRollingPosEnd: Node = null;
     @property(gamePlayProperty)
     private gameProperty: gamePlayProperty = null;
+    @property({ tooltip: 'Spotify Client ID (PKCE 로그인용, 시크릿 아님)' })
+    private spotifyClientId: string = '';
+    @property({ tooltip: 'Spotify Redirect URI (Spotify Dashboard에도 등록 필요)' })
+    private spotifyRedirectUri: string = '';
     private currentSequence: EPlayingSequence = EPlayingSequence.ShowSuit;
     public currentSuitType: ECharacterSuitType = ECharacterSuitType.YG;
     private currentLevel: number = 1;
@@ -425,14 +430,11 @@ export class gamePlaying extends Component {
             } else if (provider === 'spotify') {
                 // Spotify 로직
                 console.log('Spotify Playback Requested');
-                
-                // (수정된 코드) Spotify 로그인 테스트를 위해 실제 Spotify 로그인 페이지를 새 창으로 띄움
-                if (typeof window !== 'undefined') {
-                    window.open('https://accounts.spotify.com/login', 'SpotifyLogin', 'width=500,height=600');
+                if (!this.spotifyClientId || !this.spotifyRedirectUri) {
+                    throw new Error('Spotify Client ID / Redirect URI가 비어있습니다.');
                 }
-
-                // 구현 전까지는 안전하게 로컬 오디오 폴백
-                await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
+                Spotify.I.setAuthConfig(this.spotifyClientId, this.spotifyRedirectUri);
+                await Spotify.I.playLevelMusic(0);
             } else {
                 throw new Error('Unknown provider');
             }

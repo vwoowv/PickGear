@@ -3,7 +3,14 @@ const { ccclass, property } = _decorator;
 
 @ccclass('AppleMusicManager')
 export class AppleMusicManager {
-    private readonly developerToken = "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ikw3M1haN1g0QzcifQ.eyJpYXQiOjE3Njc4ODc3NTIsImV4cCI6MTc4MzQzOTc1MiwiaXNzIjoiVk40M1JEODY2SiJ9.eFP5xgnVEMTiRpNg46cZPJJPiTdxsA4aGLTPL2fkR8fecalad6aX4aBp8dGijNG66ljR7aFZi5tlf08Yk6wFzw";
+    private developerToken: string | null = null;
+    private developerTokenEndpoint: string | null = null;
+
+    constructor(opts?: { developerToken?: string; developerTokenEndpoint?: string }) {
+        if (opts?.developerToken) this.developerToken = opts.developerToken;
+        if (opts?.developerTokenEndpoint) this.developerTokenEndpoint = opts.developerTokenEndpoint;
+        this.hydrateFromWeb();
+    }
 
     private async ensureMusicKitLoaded(): Promise<void> {
         if (!sys.isBrowser) {
@@ -52,10 +59,44 @@ export class AppleMusicManager {
         });
     }
 
+    private hydrateFromWeb() {
+        if (!sys.isBrowser) return;
+        try {
+            const url = new URL(globalThis.location.href);
+            const tokenFromQuery = url.searchParams.get('appleToken');
+            const endpointFromQuery = url.searchParams.get('appleTokenEndpoint');
+
+            const tokenFromStorage = sys.localStorage.getItem('pickgear_apple_developer_token');
+            const endpointFromStorage = sys.localStorage.getItem('pickgear_apple_token_endpoint');
+
+            if (!this.developerToken && tokenFromQuery) this.developerToken = tokenFromQuery;
+            if (!this.developerToken && tokenFromStorage) this.developerToken = tokenFromStorage;
+            if (!this.developerTokenEndpoint && endpointFromQuery) this.developerTokenEndpoint = endpointFromQuery;
+            if (!this.developerTokenEndpoint && endpointFromStorage) this.developerTokenEndpoint = endpointFromStorage;
+        } catch {
+            // ignore
+        }
+    }
+
+    private async resolveDeveloperToken(): Promise<string> {
+        if (this.developerToken) return this.developerToken;
+        if (!this.developerTokenEndpoint) {
+            throw new Error('AppleMusicManager: developerToken 또는 developerTokenEndpoint가 필요합니다.');
+        }
+        const res = await fetch(this.developerTokenEndpoint, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`AppleMusicManager: developerToken 요청 실패: ${await res.text()}`);
+        const json = await res.json().catch(() => ({}));
+        const token = json?.developerToken;
+        if (!token) throw new Error('AppleMusicManager: developerToken 응답이 비어있습니다.');
+        this.developerToken = token;
+        return token;
+    }
+
     async searchMusic(query: string) {
+        const developerToken = await this.resolveDeveloperToken();
         const res = await fetch(`https://api.music.apple.com/v1/catalog/kr/search?term=${encodeURIComponent(query)}&types=songs`, {
             headers: {
-                Authorization: `Bearer ${this.developerToken}`,
+                Authorization: `Bearer ${developerToken}`,
             }
         });
 
@@ -64,9 +105,10 @@ export class AppleMusicManager {
 
     async playMyMusic() {
         await this.ensureMusicKitLoaded();
+        const developerToken = await this.resolveDeveloperToken();
         // 2. 뮤직킷 설정
         await (globalThis as any).MusicKit.configure({
-            developerToken: this.developerToken,
+            developerToken,
             app: { name: 'MySite', build: '1.0' }
         });
 

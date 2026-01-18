@@ -1,4 +1,3 @@
-
 export class Spotify {
     private static _instance: Spotify | null = null;
 
@@ -7,32 +6,218 @@ export class Spotify {
         return Spotify._instance;
     }
 
-    private readonly client_id: string = '254d6b7f190543e78da436cd3287a60e';
-    private readonly client_secret: string = 'b7e0e2391c7b4c93b99d6959086dd60c';
-    private readonly refresh_token: string = 'AQCsREHflrwilt4ccdU_RChHyYDVlpdQ49r6KkEDrciMc0iU-ZLhdG9wKOOn0e2F-s0yZSHTcYuba2Os4-BuoOgZgZzd5wVq76vqGu7p647szlYmoTrMcoaycyqHjba3bJI';
-    private readonly tokenEndpoint: string = 'https://accounts.spotify.com/api/token';
-    private readonly basic: string;
+    private authClientId: string = '';
+    private authRedirectUri: string = '';
+    private authScopes: string[] = [
+        'streaming',
+        'user-read-email',
+        'user-read-private',
+        'user-read-playback-state',
+        'user-modify-playback-state',
+    ];
+
+    private readonly tokenEndpoint = 'https://accounts.spotify.com/api/token';
+    private readonly tokenStorageKey = 'pickgear_spotify_token';
+    private readonly verifierStorageKey = 'pickgear_spotify_pkce_verifier';
+    private readonly forceAttemptKey = 'pickgear_spotify_force_attempted';
+
     private webPlayer: { addListener: (...args: any[]) => void; connect: () => Promise<boolean> } | null = null;
     private webDeviceId: string | null = null;
     private previewAudio: HTMLAudioElement | null = null;
     private webPlayerError: string | null = null;
 
-    private base64Encode(value: string): string {
-        // Spotify client_id / client_secret는 ASCII라서 btoa로 충분합니다.
-        const g = globalThis as any;
-        if (typeof g.btoa === 'function') {
-            return g.btoa(value);
+    private constructor() {}
+
+    public setAuthConfig(clientId: string, redirectUri: string, scopes?: string[]) {
+        this.authClientId = clientId;
+        this.authRedirectUri = redirectUri.trim();
+        if (scopes?.length) {
+            this.authScopes = scopes;
         }
-        // btoa가 없는 런타임(일부 네이티브) 대비: 최소 폴백
-        throw new Error('Base64 encoder is not available in this runtime.');
     }
 
-    private constructor() {
-        this.basic = this.base64Encode(`${this.client_id}:${this.client_secret}`);
+    private base64UrlEncode(bytes: Uint8Array): string {
+        let b64 = '';
+        for (const byte of bytes) {
+            b64 += String.fromCodePoint(byte);
+        }
+        const g = globalThis as any;
+        if (typeof g?.btoa !== 'function') {
+            throw new TypeError('Base64 encoder is not available in this runtime.');
+        }
+        const raw = g.btoa(b64);
+        return raw.replaceAll('+', '-').replaceAll('/', '_').replaceAll(/=+$/g, '');
+    }
+
+    private async sha256Base64Url(input: string): Promise<string> {
+        const data = new TextEncoder().encode(input);
+        const digest = await globalThis.crypto.subtle.digest('SHA-256', data);
+        return this.base64UrlEncode(new Uint8Array(digest));
+    }
+
+    private randomString(len: number): string {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+        const bytes = new Uint8Array(len);
+        globalThis.crypto.getRandomValues(bytes);
+        let s = '';
+        for (const b of bytes) s += chars[b % chars.length];
+        return s;
+    }
+
+    private loadToken(): { access_token: string; refresh_token?: string; expires_at_ms: number } | null {
+        try {
+            const raw = globalThis.localStorage.getItem(this.tokenStorageKey);
+            if (!raw) return null;
+            return JSON.parse(raw);
+        } catch {
+            return null;
+        }
+    }
+
+    private saveToken(token: { access_token: string; refresh_token?: string; expires_at_ms: number }) {
+        globalThis.localStorage.setItem(this.tokenStorageKey, JSON.stringify(token));
+    }
+
+    private isTokenValid(token: { access_token: string; expires_at_ms: number } | null): boolean {
+        if (!token?.access_token || !token.expires_at_ms) return false;
+        return token.expires_at_ms - Date.now() > 30_000;
+    }
+
+    private ensureAuthConfig() {
+        if (!this.authClientId || !this.authRedirectUri) {
+            throw new Error('Spotify: clientId/redirectUri 설정이 필요합니다.');
+        }
+        const g = globalThis as any;
+        if (g?.location?.origin && g?.location?.pathname) {
+            const current = g.location.origin + g.location.pathname;
+            if (current !== this.authRedirectUri) {
+                console.warn('[Spotify] redirectUri 불일치', {
+                    configured: this.authRedirectUri,
+                    current,
+                });
+            }
+        }
+    }
+
+    private async exchangeCodeForToken(code: string, verifier: string) {
+        const body = new URLSearchParams({
+            client_id: this.authClientId,
+            grant_type: 'authorization_code',
+            code,
+            redirect_uri: this.authRedirectUri,
+            code_verifier: verifier,
+        });
+        const res = await fetch(this.tokenEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body,
+        });
+        if (!res.ok) {
+            throw new Error(`Spotify PKCE token 교환 실패: ${await res.text()}`);
+        }
+        const json = await res.json();
+        const token = {
+            access_token: json.access_token,
+            refresh_token: json.refresh_token,
+            expires_at_ms: Date.now() + (json.expires_in * 1000),
+        };
+        this.saveToken(token);
+        return token;
+    }
+
+    private async refreshAccessToken(refreshToken: string) {
+        const body = new URLSearchParams({
+            client_id: this.authClientId,
+            grant_type: 'refresh_token',
+            refresh_token: refreshToken,
+        });
+        const res = await fetch(this.tokenEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body,
+        });
+        if (!res.ok) {
+            throw new Error(`Spotify refresh token 실패: ${await res.text()}`);
+        }
+        const json = await res.json();
+        const prev = this.loadToken() || { refresh_token: undefined };
+        const token = {
+            access_token: json.access_token,
+            refresh_token: json.refresh_token || prev.refresh_token,
+            expires_at_ms: Date.now() + (json.expires_in * 1000),
+        };
+        this.saveToken(token);
+        return token;
+    }
+
+    private clearStoredToken() {
+        try {
+            globalThis.localStorage.removeItem(this.tokenStorageKey);
+        } catch {
+            // ignore
+        }
+    }
+
+    private async ensureAccessToken(forceReauth = false): Promise<string> {
+        this.ensureAuthConfig();
+
+        const params = new URLSearchParams(globalThis.location.search);
+        const code = params.get('code');
+        if (code) {
+            const verifier = globalThis.sessionStorage.getItem(this.verifierStorageKey);
+            if (!verifier) {
+                const url = new URL(globalThis.location.href);
+                url.searchParams.delete('code');
+                url.searchParams.delete('state');
+                globalThis.history.replaceState({}, globalThis.document.title, url.toString());
+                return await this.ensureAccessToken(true);
+            }
+            const token = await this.exchangeCodeForToken(code, verifier);
+            const url = new URL(globalThis.location.href);
+            url.searchParams.delete('code');
+            url.searchParams.delete('state');
+            globalThis.history.replaceState({}, globalThis.document.title, url.toString());
+            try {
+                globalThis.sessionStorage.removeItem(this.forceAttemptKey);
+            } catch {
+                // ignore
+            }
+            return token.access_token;
+        }
+
+        if (forceReauth) {
+            this.clearStoredToken();
+        }
+
+        const stored = this.loadToken();
+        if (this.isTokenValid(stored) && stored) return stored.access_token;
+
+        if (stored?.refresh_token) {
+            const token = await this.refreshAccessToken(stored.refresh_token);
+            return token.access_token;
+        }
+
+        const verifier = this.randomString(64);
+        globalThis.sessionStorage.setItem(this.verifierStorageKey, verifier);
+        const challenge = await this.sha256Base64Url(verifier);
+
+        const state = this.randomString(16);
+        const authUrl = new URL('https://accounts.spotify.com/authorize');
+        authUrl.searchParams.set('client_id', this.authClientId);
+        authUrl.searchParams.set('response_type', 'code');
+        authUrl.searchParams.set('redirect_uri', this.authRedirectUri);
+        authUrl.searchParams.set('code_challenge_method', 'S256');
+        authUrl.searchParams.set('code_challenge', challenge);
+        authUrl.searchParams.set('state', state);
+        authUrl.searchParams.set('scope', this.authScopes.join(' '));
+        if (forceReauth) {
+            authUrl.searchParams.set('show_dialog', 'true');
+        }
+        globalThis.location.assign(authUrl.toString());
+        return await new Promise<string>(() => {});
     }
 
     private extractTrackId(trackUri: string): string {
-        // spotify:track:ID or https://open.spotify.com/track/ID
         if (trackUri.startsWith('spotify:track:')) {
             return trackUri.split(':')[2] || trackUri;
         }
@@ -47,9 +232,13 @@ export class Spotify {
             headers: { Authorization: `Bearer ${accessToken}` }
         });
         if (!res.ok) {
+            console.warn('[Spotify] preview_url 조회 실패:', res.status, trackId);
             return null;
         }
         const json = await res.json().catch(() => ({}));
+        if (!json?.preview_url) {
+            console.warn('[Spotify] preview_url 없음:', trackId, trackUri);
+        }
         return json?.preview_url || null;
     }
 
@@ -72,6 +261,9 @@ export class Spotify {
     private async loadSpotifyWebPlaybackSdk(): Promise<void> {
         const g = globalThis as any;
         if (g.Spotify?.Player) return;
+        if (this.webPlayerError === 'sdk_script_error' || this.webPlayerError === 'sdk_not_ready') {
+            throw new Error('Spotify Web Playback SDK가 이전에 실패했습니다.');
+        }
 
         await new Promise<void>((resolve, reject) => {
             const doc = g.document as Document | undefined;
@@ -79,6 +271,18 @@ export class Spotify {
                 reject(new Error('Spotify Web Playback SDK를 로드할 document가 없습니다.'));
                 return;
             }
+
+            fetch('https://sdk.scdn.co/spotify-player.js', { method: 'GET', mode: 'cors' })
+                .then((res) => {
+                    if (!res.ok) {
+                        this.webPlayerError = 'sdk_fetch_failed';
+                        console.warn('[Spotify] SDK fetch failed:', res.status);
+                    }
+                })
+                .catch((e) => {
+                    this.webPlayerError = 'sdk_fetch_failed';
+                    console.warn('[Spotify] SDK fetch blocked:', e);
+                });
 
             const existing = doc.querySelector('script[src="https://sdk.scdn.co/spotify-player.js"]');
             if (existing) {
@@ -94,17 +298,55 @@ export class Spotify {
             const script = doc.createElement('script');
             script.src = 'https://sdk.scdn.co/spotify-player.js';
             script.async = true;
-            script.onload = () => resolve();
-            script.onerror = () => reject(new Error('Spotify Web Playback SDK 로드 실패'));
+            script.crossOrigin = 'anonymous';
+            const onWindowError = (event: ErrorEvent) => {
+                const isSdkError = event?.filename?.includes('spotify-player.js')
+                    || (event?.message === 'Script error.' && !event?.filename);
+                if (isSdkError) {
+                    this.webPlayerError = 'sdk_script_error';
+                    globalThis.removeEventListener('error', onWindowError);
+                    event.preventDefault?.();
+                    reject(new Error('Spotify Web Playback SDK 스크립트 오류(상세 미확인)'));
+                }
+            };
+            globalThis.addEventListener('error', onWindowError);
+            script.onload = () => {
+                globalThis.removeEventListener('error', onWindowError);
+                if (!g.Spotify?.Player) {
+                    this.webPlayerError = 'sdk_not_ready';
+                    reject(new Error('Spotify Web Playback SDK 로드 후 Player가 없습니다.'));
+                    return;
+                }
+                resolve();
+            };
+            script.onerror = () => {
+                globalThis.removeEventListener('error', onWindowError);
+                reject(new Error('Spotify Web Playback SDK 로드 실패'));
+            };
             doc.head.appendChild(script);
         });
+    }
+
+    private async withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+        return await Promise.race([
+            promise,
+            new Promise<T>((_resolve, reject) => {
+                setTimeout(() => reject(new Error(label)), ms);
+            }),
+        ]);
     }
 
     private async ensureWebPlaybackDevice(accessToken: string): Promise<string | null> {
         const g = globalThis as any;
         if (!g.document) return null;
 
-        await this.loadSpotifyWebPlaybackSdk();
+        try {
+            await this.loadSpotifyWebPlaybackSdk();
+        } catch (e) {
+            this.webPlayerError = (e as Error)?.message || 'sdk_load_error';
+            console.warn('[Spotify] SDK load failed:', this.webPlayerError);
+            return null;
+        }
 
         if (!g.Spotify?.Player) {
             throw new Error('Spotify Web Playback SDK가 준비되지 않았습니다.');
@@ -125,31 +367,49 @@ export class Spotify {
             });
             this.webPlayer.addListener('initialization_error', ({ message }: { message: string }) => {
                 this.webPlayerError = message || 'initialization_error';
+                console.warn('[Spotify] Web Playback init error:', this.webPlayerError);
             });
             this.webPlayer.addListener('authentication_error', ({ message }: { message: string }) => {
                 this.webPlayerError = message || 'authentication_error';
+                console.warn('[Spotify] Web Playback auth error:', this.webPlayerError);
             });
             this.webPlayer.addListener('account_error', ({ message }: { message: string }) => {
                 this.webPlayerError = message || 'account_error';
+                console.warn('[Spotify] Web Playback account error:', this.webPlayerError);
             });
             this.webPlayer.addListener('playback_error', ({ message }: { message: string }) => {
                 this.webPlayerError = message || 'playback_error';
+                console.warn('[Spotify] Web Playback playback error:', this.webPlayerError);
             });
 
-            const connected = await this.webPlayer.connect();
-            if (!connected) {
-                throw new Error('Spotify Web Player 연결 실패');
+            try {
+                const connected = await this.withTimeout(
+                    this.webPlayer.connect(),
+                    10_000,
+                    'Spotify Web Player 연결 타임아웃'
+                );
+                if (!connected) {
+                    throw new Error('Spotify Web Player 연결 실패');
+                }
+            } catch (e) {
+                this.webPlayerError = (e as Error)?.message || 'connect_error';
+                console.warn('[Spotify] Web Playback connect error:', this.webPlayerError);
+                return null;
             }
         }
 
-        // deviceId 대기
-        for (let i = 0; i < 100; i++) {
-            if (this.webDeviceId) break;
+        const start = Date.now();
+        while (!this.webDeviceId && !this.webPlayerError && (Date.now() - start) < 10_000) {
             await new Promise((r) => setTimeout(r, 50));
         }
-        if (!this.webDeviceId || this.webPlayerError) return null;
+        if (!this.webDeviceId || this.webPlayerError) {
+            if (!this.webPlayerError) {
+                this.webPlayerError = 'device_id_timeout';
+                console.warn('[Spotify] Web Playback deviceId timeout');
+            }
+            return null;
+        }
 
-        // 현재 재생 디바이스를 Web Player로 전환
         await fetch('https://api.spotify.com/v1/me/player', {
             method: 'PUT',
             headers: {
@@ -171,100 +431,41 @@ export class Spotify {
         return json?.product || null;
     }
 
-    public async getAccessToken(): Promise<any> {
-        const response = await fetch(this.tokenEndpoint, {
-            method: 'POST',
-            headers: {
-                Authorization: `Basic ${this.basic}`,
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-                grant_type: 'refresh_token',
-                refresh_token: this.refresh_token,
-            }),
-            cache: 'no-store',
-        });
-
-        const json = await response.json().catch(() => ({}));
-        if (!response.ok) {
-            // 예: { error: 'invalid_grant', error_description: '...' }
-            console.error('Spotify token endpoint failed', response.status, json);
-            throw new Error(`Spotify getAccessToken failed: ${response.status} ${JSON.stringify(json)}`);
-        }
-        if (!json?.access_token) {
-            console.error('Spotify token endpoint returned no access_token', json);
-            throw new Error(`Spotify getAccessToken missing access_token: ${JSON.stringify(json)}`);
-        }
-        return json;
-    };
-
-    public async getMyMusic(): Promise<any> {
-        // 1. 저장해둔 리프레시 토큰으로 새 액세스 토큰을 받아옴 (로그인 창 안 뜸)
-        const { access_token } = await this.getAccessToken();
-
-        // 2. 받은 토큰으로 Spotify API 호출
-        const res = await fetch('https://api.spotify.com/v1/me/tracks', {
-            headers: {
-                Authorization: `Bearer ${access_token}`
+    private async handleNonPremium(accessToken: string, trackUri: string): Promise<boolean> {
+        try {
+            const forced = globalThis.sessionStorage.getItem(this.forceAttemptKey);
+            if (!forced) {
+                globalThis.sessionStorage.setItem(this.forceAttemptKey, '1');
+                await this.ensureAccessToken(true);
+                return true;
             }
-        });
+        } catch {
+            // ignore
+        }
+        const previewUrl = await this.fetchTrackPreviewUrl(accessToken, trackUri);
+        if (previewUrl) {
+            await this.playPreviewUrl(previewUrl);
+            return true;
+        }
+        throw new Error('Spotify Premium 계정이 아니어서 전체 재생이 불가합니다.');
+    }
 
-        const data = await res.json();
-        return data;
+    public async getAccessToken(): Promise<any> {
+        const access_token = await this.ensureAccessToken();
+        return { access_token };
     }
 
     private readonly gamePlaylist = {
-        name: "옷 맞추기 게임 음악",
-        description: "Egg Bird 게임의 레벨별 배경 음악",
+        name: '옷 맞추기 게임 음악',
+        description: 'Egg Bird 게임의 레벨별 배경 음악',
         tracks: [
-            "spotify:track:4wgpMVdrWBELff42ZZgJl8", // Into you
-            "spotify:track:7v3bpnW7d5ij0scB8ThIAa", // 마주치는 눈빛 (레벨1)
-            "spotify:track:0u2dt20b1qyfce5j6PnTeZ", // Freeze the fire (레벨2)
-            "spotify:track:0Ccpm5dnPQuR83s2JWPI9P", // Monster (레벨3)
+            'spotify:track:4wgpMVdrWBELff42ZZgJl8', // Into you
+            'spotify:track:7v3bpnW7d5ij0scB8ThIAa', // 마주치는 눈빛 (레벨1)
+            'spotify:track:0u2dt20b1qyfce5j6PnTeZ', // Freeze the fire (레벨2)
+            'spotify:track:0Ccpm5dnPQuR83s2JWPI9P', // Monster (레벨3)
         ]
     };
 
-    // 플레이리스트 생성
-    public async createGamePlaylist(): Promise<any> {
-        const { access_token } = await this.getAccessToken();
-
-        // 1. 현재 사용자 정보 가져오기
-        const userRes = await fetch('https://api.spotify.com/v1/me', {
-            headers: { Authorization: `Bearer ${access_token}` }
-        });
-        const user = await userRes.json();
-
-        // 2. 플레이리스트 생성
-        const playlistRes = await fetch(`https://api.spotify.com/v1/users/${user.id}/playlists`, {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${access_token}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                name: this.gamePlaylist.name,
-                description: this.gamePlaylist.description,
-                public: false, // 비공개 플레이리스트
-            })
-        });
-        const playlist = await playlistRes.json();
-
-        // 3. 플레이리스트에 곡 추가
-        await fetch(`https://api.spotify.com/v1/playlists/${playlist.id}/tracks`, {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${access_token}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                uris: this.gamePlaylist.tracks
-            })
-        });
-
-        return playlist;
-    }
-
-    // 특정 곡 재생하기
     public async playTrack(trackUri: string): Promise<any> {
         const { access_token } = await this.getAccessToken();
         if (!access_token || typeof access_token !== 'string') {
@@ -273,19 +474,20 @@ export class Spotify {
 
         const product = await this.getUserProduct(access_token);
         if (product && product !== 'premium') {
+            await this.handleNonPremium(access_token, trackUri);
+            return;
+        }
+
+        let deviceId = await this.ensureWebPlaybackDevice(access_token);
+        if (!deviceId && this.webPlayerError?.startsWith('sdk_')) {
             const previewUrl = await this.fetchTrackPreviewUrl(access_token, trackUri);
             if (previewUrl) {
                 await this.playPreviewUrl(previewUrl);
                 return;
             }
-            throw new Error('Spotify Premium 계정이 아니어서 전체 재생이 불가합니다.');
         }
 
-        // Web Playback SDK 디바이스 확보 시도
-        let deviceId = await this.ensureWebPlaybackDevice(access_token);
-
         if (!deviceId) {
-            // 활성화된 디바이스 가져오기(외부 Spotify 앱)
             const devicesRes = await fetch('https://api.spotify.com/v1/me/player/devices', {
                 headers: { Authorization: `Bearer ${access_token}` }
             });
@@ -299,7 +501,6 @@ export class Spotify {
             }
             const { devices } = await devicesRes.json();
             if (!devices?.length) {
-                // Premium이 아니면 full playback이 불가하므로 preview로 폴백
                 const previewUrl = await this.fetchTrackPreviewUrl(access_token, trackUri);
                 if (previewUrl) {
                     await this.playPreviewUrl(previewUrl);
@@ -310,7 +511,6 @@ export class Spotify {
             deviceId = devices[0].id;
         }
 
-        // 곡 재생
         await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
             method: 'PUT',
             headers: {
@@ -323,9 +523,8 @@ export class Spotify {
         });
     }
 
-    // 레벨별 음악 재생 예시
     public async playLevelMusic(level: number): Promise<any> {
-        const trackIndex = level; // 0: Into you, 1: 레벨1, 2: 레벨2, 3: 레벨3
+        const trackIndex = level;
         await this.playTrack(this.gamePlaylist.tracks[trackIndex]);
     }
 }
