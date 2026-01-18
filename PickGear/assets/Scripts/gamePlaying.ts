@@ -13,14 +13,8 @@ import { gameInstance } from './gameInstance';
 import { PickedSuitManager } from './PickedSuitManager';
 import { gamePlayProperty } from './gamePlayProperty';
 import { AppleMusicManager } from './Utility/AppleMusicManager';
-import { Spotify } from './Utility/spotify';
 const { ccclass, property } = _decorator;
-/*
 
-p8 : -----BEGIN PRIVATE KEY-----\nMIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgw9xLMO0FenC1tX/1\nQ0lbptAit7lDwHdPFQA8KqrWIz+gCgYIKoZIzj0DAQehRANCAARxWkbLEeMS29IZ\ng0gKfzZ2Z2C+tGn3hPkKTUogJ1beeHTsR+u/LtT9mBK2DIQLL8ac2bYhO07wxDvT\nmDcYQiap\n-----END PRIVATE KEY-----
-
-
-*/
 @ccclass('gamePlaying')
 export class gamePlaying extends Component {
     @property(Node)
@@ -351,10 +345,7 @@ export class gamePlaying extends Component {
     }
 
     // --- 부모 창(Next.js)과 통신하기 위한 메서드 ---
-    // (기존 코드)
-    // private checkParentAuth(): Promise<{ isLoggedIn: boolean, provider: string }> {
-    // (수정 코드) token 필드 추가
-    private checkParentAuth(): Promise<{ isLoggedIn: boolean, provider: string, token: string }> {
+    private checkParentAuth(): Promise<{ isLoggedIn: boolean, provider: string }> {
         return new Promise((resolve) => {
             // 타임아웃 설정 (1초 내 응답 없으면 테스트 모드 진입)
             const timeout = setTimeout(() => {
@@ -364,7 +355,7 @@ export class gamePlaying extends Component {
                 // console.log("Parent not responding. Using MOCK LOGIN for testing.");
                 // resolve({ isLoggedIn: true, provider: 'spotify' });
 
-                // (수정 코드) 사용자에게 어떤 상태로 시작할지 물어봄
+                // (수정된 코드) 사용자에게 어떤 상태로 시작할지 물어봄
                 if (typeof window !== 'undefined' && window.confirm) {
                     const isMockLogin = window.confirm(
                         "[테스트 모드] 부모 창의 응답이 없습니다.\n\n" +
@@ -377,22 +368,21 @@ export class gamePlaying extends Component {
                         // console.log("테스트 모드: 로그인 성공 (Apple) 선택됨");
                         // resolve({ isLoggedIn: true, provider: 'apple' });
 
-                        // (수정 코드) 확인 시 Apple
+                        // (수정된 코드) 확인 시 Apple
                         console.log("테스트 모드: Apple 로그인 시도");
-                        resolve({ isLoggedIn: true, provider: 'apple', token: null });
+                        resolve({ isLoggedIn: true, provider: 'apple' });
                     } else {
                         // (기존 코드) 취소 시 로그인 실패
                         // console.log("테스트 모드: 로그인 실패 선택됨");
                         // resolve({ isLoggedIn: false, provider: null });
 
-                        // (수정 코드) 취소 시 Spotify 로그인 테스트
+                        // (수정된 코드) 취소 시 Spotify 로그인 테스트
                         console.log("테스트 모드: Spotify 로그인 시도");
-                        // 테스트 모드에서는 토큰을 수동으로 넣지 않는 한 null
-                        resolve({ isLoggedIn: true, provider: 'spotify', token: null });
+                        resolve({ isLoggedIn: true, provider: 'spotify' });
                     }
                 } else {
                     // confirm 불가 환경이면 기본값 false
-                    resolve({ isLoggedIn: false, provider: null, token: null });
+                    resolve({ isLoggedIn: false, provider: null });
                 }
 
             }, 1000);
@@ -402,7 +392,7 @@ export class gamePlaying extends Component {
                 if (event.data && event.data.type === 'AUTH_STATUS_RESPONSE') {
                     clearTimeout(timeout);
                     window.removeEventListener('message', listener);
-                    resolve(event.data.payload); // payload에 token이 포함되어 있어야 한다.
+                    resolve(event.data.payload);
                 }
             };
 
@@ -417,23 +407,20 @@ export class gamePlaying extends Component {
             //     resolve({ isLoggedIn: false, provider: null });
             // }
 
-            // (수정 코드) 에디터나 로컬 환경에서도 요청을 보냄
+            // (수정된 코드) 에디터나 로컬 환경에서도 요청을 보냄
             window.parent.postMessage({ type: 'CHECK_AUTH' }, '*');
         });
     }
 
     // --- 음악 제공자에 따른 재생 로직 ---
-    // (기존 코드)
-    // private async playMusicByProvider(provider: string) {
-    // (수정 코드) token 인자 추가
-    private async playMusicByProvider(provider: string, token: string | null) {
+    private async playMusicByProvider(provider: string) {
         try {
             if (provider === 'apple') {
                 const appleMusic = new AppleMusicManager();
                 // (기존 코드) 
                 // await appleMusic.playMyMusic(); 
                 
-                // (참고) AppleMusicManager 내부에서 music.authorize()가 호출되어 팝업이 뜸
+                // (참고) AppleMusicManager 내부에서 music.authorize()가 호출되어 팝업이 뜹니다.
                 await appleMusic.playMyMusic();
             } else if (provider === 'spotify') {
                 // Spotify 로직
@@ -441,24 +428,8 @@ export class gamePlaying extends Component {
                 
                 // (수정된 코드) Spotify 로그인 테스트를 위해 실제 Spotify 로그인 페이지를 새 창으로 띄움
                 if (typeof window !== 'undefined') {
-                    const popup = window.open('https://accounts.spotify.com/login', 'SpotifyLogin', 'width=500,height=600');
-                    // 로그인 창이 닫힐 때까지 대기(최대 2분)
-                    await this.waitForPopupClose(popup, 120_000);
+                    window.open('https://accounts.spotify.com/login', 'SpotifyLogin', 'width=500,height=600');
                 }
-
-                // (수정 코드) 부모로부터 받은 토큰이 있다면 Spotify Manager에 설정
-                // 중요: Spotify.ts 내부에 setAccessToken 같은 메서드가 있어야 한다.
-                if (token) {
-                    console.log('Setting Spotify Access Token from User Session');
-                    // @ts-ignore: Spotify 클래스에 setAccessToken이 있다고 가정합니다. 없을 경우 추가 필요.
-                    if (typeof Spotify.I.setAccessToken === 'function') {
-                         Spotify.I.setAccessToken(token);
-                    } else {
-                        console.warn('Spotify.I.setAccessToken method missing! Using default/refresh token logic.');
-                    }
-                }
-
-                await Spotify.I.playLevelMusic(0);
 
                 // 구현 전까지는 안전하게 로컬 오디오 폴백
                 await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
@@ -469,19 +440,6 @@ export class gamePlaying extends Component {
             console.warn(`${provider} Music play failed, fallback to local audio`, e);
             await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
         }
-    }
-
-    private async waitForPopupClose(popup: Window | null, timeoutMs: number) {
-        if (!popup) return;
-        const start = Date.now();
-        await new Promise<void>((resolve) => {
-            const timer = setInterval(() => {
-                if (popup.closed || (Date.now() - start) > timeoutMs) {
-                    clearInterval(timer);
-                    resolve();
-                }
-            }, 300);
-        });
     }
 
     private async onPrepare() {
@@ -518,10 +476,7 @@ export class gamePlaying extends Component {
         // 2. 로그인 상태 확인 (Spotify 또는 Apple Music인 경우만 인정)
         if (authStatus.isLoggedIn && (authStatus.provider === 'apple' || authStatus.provider === 'spotify')) {
             console.log(`User logged in via ${authStatus.provider}. Playing streaming music.`);
-            // (기존 코드)
-            // await this.playMusicByProvider(authStatus.provider);
-            // (수정 코드) 토큰 전달
-            await this.playMusicByProvider(authStatus.provider, authStatus.token);
+            await this.playMusicByProvider(authStatus.provider);
         } else {
             // 3. 로그인 안되어 있거나, 일반 로그인 상태 -> 로그인 모달 요청
             console.log('User not logged in with Music Provider. Requesting Login Modal.');
@@ -531,7 +486,7 @@ export class gamePlaying extends Component {
             //     window.parent.postMessage({ type: 'REQUEST_LOGIN' }, '*');
             // }
             
-            // (수정 코드) 무조건 메시지 전송 (로그 확인용)
+            // (수정된 코드) 무조건 메시지 전송 (로그 확인용)
             console.log('Sending REQUEST_LOGIN message to parent (or self in editor)...');
             window.parent.postMessage({ type: 'REQUEST_LOGIN' }, '*');
             
