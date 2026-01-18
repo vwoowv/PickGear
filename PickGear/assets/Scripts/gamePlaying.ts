@@ -35,6 +35,10 @@ export class gamePlaying extends Component {
     private characterRollingPosEnd: Node = null;
     @property(gamePlayProperty)
     private gameProperty: gamePlayProperty = null;
+    @property({ tooltip: 'Spotify Client ID (PKCE 로그인용, 시크릿 아님)' })
+    private spotifyClientId: string = '';
+    @property({ tooltip: 'Spotify Redirect URI (Spotify Dashboard에도 등록 필요)' })
+    private spotifyRedirectUri: string = '';
     private currentSequence: EPlayingSequence = EPlayingSequence.ShowSuit;
     public currentSuitType: ECharacterSuitType = ECharacterSuitType.YG;
     private currentLevel: number = 1;
@@ -432,12 +436,10 @@ export class gamePlaying extends Component {
                 // Spotify 로직
                 console.log('Spotify Playback Requested');
                 
-                // (수정된 코드) Spotify 로그인 테스트를 위해 실제 Spotify 로그인 페이지를 새 창으로 띄움
-                if (typeof window !== 'undefined') {
-                    const popup = window.open('https://accounts.spotify.com/login', 'SpotifyLogin', 'width=500,height=600');
-                    // 로그인 창이 닫힐 때까지 대기(최대 2분)
-                    await this.waitForPopupClose(popup, 120_000);
+                if (!this.spotifyClientId || !this.spotifyRedirectUri) {
+                    throw new Error('Spotify Client ID / Redirect URI가 비어있습니다.');
                 }
+                Spotify.I.setAuthConfig(this.spotifyClientId, this.spotifyRedirectUri);
                 await Spotify.I.playLevelMusic(0);
 
                 // 구현 전까지는 안전하게 로컬 오디오 폴백
@@ -451,18 +453,6 @@ export class gamePlaying extends Component {
         }
     }
 
-    private async waitForPopupClose(popup: Window | null, timeoutMs: number) {
-        if (!popup) return;
-        const start = Date.now();
-        await new Promise<void>((resolve) => {
-            const timer = setInterval(() => {
-                if (popup.closed || (Date.now() - start) > timeoutMs) {
-                    clearInterval(timer);
-                    resolve();
-                }
-            }, 300);
-        });
-    }
 
     private async onPrepare() {
         console.log('onPrepare');

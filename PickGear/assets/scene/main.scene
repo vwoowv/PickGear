@@ -7398,6 +7398,8 @@
     "gameProperty": {
       "__id__": 206
     },
+    "spotifyClientId": "254d6b7f190543e78da436cd3287a60e",
+    "spotifyRedirectUri": "http://127.0.0.1:7456/",
     "_id": "e3l6PkPqxN7JuRvEnpLXp9"
   },
   {
