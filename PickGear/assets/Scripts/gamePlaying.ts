@@ -13,6 +13,7 @@ import { gameInstance } from './gameInstance';
 import { PickedSuitManager } from './PickedSuitManager';
 import { gamePlayProperty } from './gamePlayProperty';
 import { AppleMusicManager } from './Utility/AppleMusicManager';
+import { Spotify } from './Utility/spotify';
 const { ccclass, property } = _decorator;
 /*
 
@@ -433,8 +434,11 @@ export class gamePlaying extends Component {
                 
                 // (수정된 코드) Spotify 로그인 테스트를 위해 실제 Spotify 로그인 페이지를 새 창으로 띄움
                 if (typeof window !== 'undefined') {
-                    window.open('https://accounts.spotify.com/login', 'SpotifyLogin', 'width=500,height=600');
+                    const popup = window.open('https://accounts.spotify.com/login', 'SpotifyLogin', 'width=500,height=600');
+                    // 로그인 창이 닫힐 때까지 대기(최대 2분)
+                    await this.waitForPopupClose(popup, 120_000);
                 }
+                await Spotify.I.playLevelMusic(0);
 
                 // 구현 전까지는 안전하게 로컬 오디오 폴백
                 await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
@@ -445,6 +449,19 @@ export class gamePlaying extends Component {
             console.warn(`${provider} Music play failed, fallback to local audio`, e);
             await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
         }
+    }
+
+    private async waitForPopupClose(popup: Window | null, timeoutMs: number) {
+        if (!popup) return;
+        const start = Date.now();
+        await new Promise<void>((resolve) => {
+            const timer = setInterval(() => {
+                if (popup.closed || (Date.now() - start) > timeoutMs) {
+                    clearInterval(timer);
+                    resolve();
+                }
+            }, 300);
+        });
     }
 
     private async onPrepare() {

@@ -12,6 +12,10 @@ export class Spotify {
     private readonly refresh_token: string = 'AQCsREHflrwilt4ccdU_RChHyYDVlpdQ49r6KkEDrciMc0iU-ZLhdG9wKOOn0e2F-s0yZSHTcYuba2Os4-BuoOgZgZzd5wVq76vqGu7p647szlYmoTrMcoaycyqHjba3bJI';
     private readonly tokenEndpoint: string = 'https://accounts.spotify.com/api/token';
     private readonly basic: string;
+    private webPlayer: { addListener: (...args: any[]) => void; connect: () => Promise<boolean> } | null = null;
+    private webDeviceId: string | null = null;
+    private previewAudio: HTMLAudioElement | null = null;
+    private webPlayerError: string | null = null;
 
     private base64Encode(value: string): string {
         // Spotify client_id / client_secret는 ASCII라서 btoa로 충분합니다.
@@ -25,6 +29,146 @@ export class Spotify {
 
     private constructor() {
         this.basic = this.base64Encode(`${this.client_id}:${this.client_secret}`);
+    }
+
+    private extractTrackId(trackUri: string): string {
+        // spotify:track:ID or https://open.spotify.com/track/ID
+        if (trackUri.startsWith('spotify:track:')) {
+            return trackUri.split(':')[2] || trackUri;
+        }
+        const regex = /open\.spotify\.com\/track\/([A-Za-z0-9]+)/;
+        const match = regex.exec(trackUri);
+        return match?.[1] || trackUri;
+    }
+
+    private async fetchTrackPreviewUrl(accessToken: string, trackUri: string): Promise<string | null> {
+        const trackId = this.extractTrackId(trackUri);
+        const res = await fetch(`https://api.spotify.com/v1/tracks/${trackId}`, {
+            headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        if (!res.ok) {
+            return null;
+        }
+        const json = await res.json().catch(() => ({}));
+        return json?.preview_url || null;
+    }
+
+    private async playPreviewUrl(previewUrl: string): Promise<void> {
+        const g = globalThis as any;
+        if (!g?.document) {
+            throw new Error('Spotify preview 재생은 Web에서만 가능합니다.');
+        }
+        if (this.previewAudio) {
+            try {
+                this.previewAudio.pause();
+            } catch {
+                // ignore
+            }
+        }
+        this.previewAudio = new Audio(previewUrl);
+        await this.previewAudio.play();
+    }
+
+    private async loadSpotifyWebPlaybackSdk(): Promise<void> {
+        const g = globalThis as any;
+        if (g.Spotify?.Player) return;
+
+        await new Promise<void>((resolve, reject) => {
+            const doc = g.document as Document | undefined;
+            if (!doc) {
+                reject(new Error('Spotify Web Playback SDK를 로드할 document가 없습니다.'));
+                return;
+            }
+
+            const existing = doc.querySelector('script[src="https://sdk.scdn.co/spotify-player.js"]');
+            if (existing) {
+                if (g.Spotify?.Player) {
+                    resolve();
+                    return;
+                }
+                existing.addEventListener?.('load', () => resolve(), { once: true } as any);
+                existing.addEventListener?.('error', () => reject(new Error('Spotify Web Playback SDK 로드 실패')), { once: true } as any);
+                return;
+            }
+
+            const script = doc.createElement('script');
+            script.src = 'https://sdk.scdn.co/spotify-player.js';
+            script.async = true;
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error('Spotify Web Playback SDK 로드 실패'));
+            doc.head.appendChild(script);
+        });
+    }
+
+    private async ensureWebPlaybackDevice(accessToken: string): Promise<string | null> {
+        const g = globalThis as any;
+        if (!g.document) return null;
+
+        await this.loadSpotifyWebPlaybackSdk();
+
+        if (!g.Spotify?.Player) {
+            throw new Error('Spotify Web Playback SDK가 준비되지 않았습니다.');
+        }
+
+        if (!this.webPlayer) {
+            this.webPlayer = new g.Spotify.Player({
+                name: 'PickGear Web Player',
+                getOAuthToken: (cb: (t: string) => void) => cb(accessToken),
+                volume: 0.8,
+            });
+
+            this.webPlayer.addListener('ready', ({ device_id }: { device_id: string }) => {
+                this.webDeviceId = device_id;
+            });
+            this.webPlayer.addListener('not_ready', ({ device_id }: { device_id: string }) => {
+                if (this.webDeviceId === device_id) this.webDeviceId = null;
+            });
+            this.webPlayer.addListener('initialization_error', ({ message }: { message: string }) => {
+                this.webPlayerError = message || 'initialization_error';
+            });
+            this.webPlayer.addListener('authentication_error', ({ message }: { message: string }) => {
+                this.webPlayerError = message || 'authentication_error';
+            });
+            this.webPlayer.addListener('account_error', ({ message }: { message: string }) => {
+                this.webPlayerError = message || 'account_error';
+            });
+            this.webPlayer.addListener('playback_error', ({ message }: { message: string }) => {
+                this.webPlayerError = message || 'playback_error';
+            });
+
+            const connected = await this.webPlayer.connect();
+            if (!connected) {
+                throw new Error('Spotify Web Player 연결 실패');
+            }
+        }
+
+        // deviceId 대기
+        for (let i = 0; i < 100; i++) {
+            if (this.webDeviceId) break;
+            await new Promise((r) => setTimeout(r, 50));
+        }
+        if (!this.webDeviceId || this.webPlayerError) return null;
+
+        // 현재 재생 디바이스를 Web Player로 전환
+        await fetch('https://api.spotify.com/v1/me/player', {
+            method: 'PUT',
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ device_ids: [this.webDeviceId], play: false }),
+        });
+
+        return this.webDeviceId;
+    }
+
+    private async getUserProduct(accessToken: string): Promise<string | null> {
+        const res = await fetch('https://api.spotify.com/v1/me', {
+            headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        if (!res.ok) return null;
+        const json = await res.json().catch(() => ({}));
+        return json?.product || null;
     }
 
     public async getAccessToken(): Promise<any> {
@@ -127,27 +271,47 @@ export class Spotify {
             throw new Error('Spotify: access_token is missing');
         }
 
-        // 활성화된 디바이스 가져오기
-        const devicesRes = await fetch('https://api.spotify.com/v1/me/player/devices', {
-            headers: { Authorization: `Bearer ${access_token}` }
-        });
-        if (!devicesRes.ok) {
-            const body = await devicesRes.json().catch(() => ({}));
-            console.error('Spotify devices request failed', devicesRes.status, body);
-            throw new Error(
-                `Spotify /me/player/devices failed: ${devicesRes.status}. ` +
-                `보통 토큰 스코프(user-read-playback-state) 부족 또는 토큰 무효/만료입니다.`
-            );
+        const product = await this.getUserProduct(access_token);
+        if (product && product !== 'premium') {
+            const previewUrl = await this.fetchTrackPreviewUrl(access_token, trackUri);
+            if (previewUrl) {
+                await this.playPreviewUrl(previewUrl);
+                return;
+            }
+            throw new Error('Spotify Premium 계정이 아니어서 전체 재생이 불가합니다.');
         }
-        const { devices } = await devicesRes.json();
 
-        if (devices.length === 0) {
-            console.error('재생 가능한 Spotify 디바이스가 없습니다. Spotify 앱을 실행해주세요.');
-            return;
+        // Web Playback SDK 디바이스 확보 시도
+        let deviceId = await this.ensureWebPlaybackDevice(access_token);
+
+        if (!deviceId) {
+            // 활성화된 디바이스 가져오기(외부 Spotify 앱)
+            const devicesRes = await fetch('https://api.spotify.com/v1/me/player/devices', {
+                headers: { Authorization: `Bearer ${access_token}` }
+            });
+            if (!devicesRes.ok) {
+                const body = await devicesRes.json().catch(() => ({}));
+                console.error('Spotify devices request failed', devicesRes.status, body);
+                throw new Error(
+                    `Spotify /me/player/devices failed: ${devicesRes.status}. ` +
+                    `보통 토큰 스코프(user-read-playback-state) 부족 또는 토큰 무효/만료입니다.`
+                );
+            }
+            const { devices } = await devicesRes.json();
+            if (!devices?.length) {
+                // Premium이 아니면 full playback이 불가하므로 preview로 폴백
+                const previewUrl = await this.fetchTrackPreviewUrl(access_token, trackUri);
+                if (previewUrl) {
+                    await this.playPreviewUrl(previewUrl);
+                    return;
+                }
+                throw new Error('재생 가능한 Spotify 디바이스가 없습니다. Spotify 앱 또는 Web Playback SDK 권한이 필요합니다.');
+            }
+            deviceId = devices[0].id;
         }
 
         // 곡 재생
-        await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${devices[0].id}`, {
+        await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
             method: 'PUT',
             headers: {
                 Authorization: `Bearer ${access_token}`,
