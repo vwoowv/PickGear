@@ -344,12 +344,111 @@ export class gamePlaying extends Component {
         }
     }
 
+    // --- 부모 창(Next.js)과 통신하기 위한 메서드 ---
+    private checkParentAuth(): Promise<{ isLoggedIn: boolean, provider: string }> {
+        return new Promise((resolve) => {
+            // 타임아웃 설정 (1초 내 응답 없으면 테스트 모드 진입)
+            const timeout = setTimeout(() => {
+                window.removeEventListener('message', listener);
+                
+                // (기존 코드) 무조건 로그인 성공으로 처리
+                // console.log("Parent not responding. Using MOCK LOGIN for testing.");
+                // resolve({ isLoggedIn: true, provider: 'spotify' });
+
+                // (수정된 코드) 사용자에게 어떤 상태로 시작할지 물어봄
+                if (typeof window !== 'undefined' && window.confirm) {
+                    const isMockLogin = window.confirm(
+                        "[테스트 모드] 부모 창의 응답이 없습니다.\n\n" +
+                        "▶ [확인]: Apple Music 로그인 테스트 (팝업)\n" +
+                        "▶ [취소]: Spotify 로그인 테스트 (페이지 이동)"
+                    );
+
+                    if (isMockLogin) {
+                        // (기존 코드) 확인 시 Apple
+                        // console.log("테스트 모드: 로그인 성공 (Apple) 선택됨");
+                        // resolve({ isLoggedIn: true, provider: 'apple' });
+
+                        // (수정된 코드) 확인 시 Apple
+                        console.log("테스트 모드: Apple 로그인 시도");
+                        resolve({ isLoggedIn: true, provider: 'apple' });
+                    } else {
+                        // (기존 코드) 취소 시 로그인 실패
+                        // console.log("테스트 모드: 로그인 실패 선택됨");
+                        // resolve({ isLoggedIn: false, provider: null });
+
+                        // (수정된 코드) 취소 시 Spotify 로그인 테스트
+                        console.log("테스트 모드: Spotify 로그인 시도");
+                        resolve({ isLoggedIn: true, provider: 'spotify' });
+                    }
+                } else {
+                    // confirm 불가 환경이면 기본값 false
+                    resolve({ isLoggedIn: false, provider: null });
+                }
+
+            }, 1000);
+
+            const listener = (event: MessageEvent) => {
+                // 부모로부터 인증 상태 응답을 받았을 때
+                if (event.data && event.data.type === 'AUTH_STATUS_RESPONSE') {
+                    clearTimeout(timeout);
+                    window.removeEventListener('message', listener);
+                    resolve(event.data.payload);
+                }
+            };
+
+            window.addEventListener('message', listener);
+            
+            // (기존 코드) iframe 내부인 경우 부모에게 요청 전송
+            // if (window.parent && window.parent !== window) {
+            //     window.parent.postMessage({ type: 'CHECK_AUTH' }, '*');
+            // } else {
+            //     // iframe이 아닌 경우 (에디터 테스트 등)
+            //     clearTimeout(timeout);
+            //     resolve({ isLoggedIn: false, provider: null });
+            // }
+
+            // (수정된 코드) 에디터나 로컬 환경에서도 요청을 보냄
+            window.parent.postMessage({ type: 'CHECK_AUTH' }, '*');
+        });
+    }
+
+    // --- 음악 제공자에 따른 재생 로직 ---
+    private async playMusicByProvider(provider: string) {
+        try {
+            if (provider === 'apple') {
+                const appleMusic = new AppleMusicManager();
+                // (기존 코드) 
+                // await appleMusic.playMyMusic(); 
+                
+                // (참고) AppleMusicManager 내부에서 music.authorize()가 호출되어 팝업이 뜹니다.
+                await appleMusic.playMyMusic();
+            } else if (provider === 'spotify') {
+                // Spotify 로직
+                console.log('Spotify Playback Requested');
+                
+                // (수정된 코드) Spotify 로그인 테스트를 위해 실제 Spotify 로그인 페이지를 새 창으로 띄움
+                if (typeof window !== 'undefined') {
+                    window.open('https://accounts.spotify.com/login', 'SpotifyLogin', 'width=500,height=600');
+                }
+
+                // 구현 전까지는 안전하게 로컬 오디오 폴백
+                await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
+            } else {
+                throw new Error('Unknown provider');
+            }
+        } catch (e) {
+            console.warn(`${provider} Music play failed, fallback to local audio`, e);
+            await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
+        }
+    }
+
     private async onPrepare() {
         console.log('onPrepare');
         this.currentPoint = 0;
         this.currentComboScore = 0;
         this.currentComboCount = 0;
         this.perfect = true;
+        
         /* eslint-disable */
         // (기존) Spotify 재생 (주석 처리 유지)
         // try {
@@ -360,7 +459,8 @@ export class gamePlaying extends Component {
         // }
         /* eslint-enable */
 
-        // Apple Music 재생 시도(Into you). 실패 시 로컬 사운드 폴백.
+        // (기존) Apple Music 자동 재생 로직 주석 처리 (부모 인증 확인 후 실행하도록 변경)
+        /*
         try {
             const appleMusic = new AppleMusicManager();
             await appleMusic.playMyMusic();
@@ -368,6 +468,32 @@ export class gamePlaying extends Component {
             console.warn('Apple Music play failed, fallback to local audio', e);
             await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
         }
+        */
+
+        // 1. 부모 창(Next.js)에 인증 상태 확인 요청 (또는 테스트 모드 선택)
+        const authStatus = await this.checkParentAuth();
+
+        // 2. 로그인 상태 확인 (Spotify 또는 Apple Music인 경우만 인정)
+        if (authStatus.isLoggedIn && (authStatus.provider === 'apple' || authStatus.provider === 'spotify')) {
+            console.log(`User logged in via ${authStatus.provider}. Playing streaming music.`);
+            await this.playMusicByProvider(authStatus.provider);
+        } else {
+            // 3. 로그인 안되어 있거나, 일반 로그인 상태 -> 로그인 모달 요청
+            console.log('User not logged in with Music Provider. Requesting Login Modal.');
+            
+            // (기존 코드) 부모 창이 있을 때만 전송
+            // if (window.parent && window.parent !== window) {
+            //     window.parent.postMessage({ type: 'REQUEST_LOGIN' }, '*');
+            // }
+            
+            // (수정된 코드) 무조건 메시지 전송 (로그 확인용)
+            console.log('Sending REQUEST_LOGIN message to parent (or self in editor)...');
+            window.parent.postMessage({ type: 'REQUEST_LOGIN' }, '*');
+            
+            // 모달 요청 후, 게임이 멈추지 않게 로컬 오디오 재생하며 진행
+            await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
+        }
+
         gameModeManager.I.playingToShowSuit(1);
     }
 
