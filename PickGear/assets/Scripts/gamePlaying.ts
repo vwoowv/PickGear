@@ -14,7 +14,12 @@ import { PickedSuitManager } from './PickedSuitManager';
 import { gamePlayProperty } from './gamePlayProperty';
 import { AppleMusicManager } from './Utility/AppleMusicManager';
 const { ccclass, property } = _decorator;
+/*
 
+p8 : -----BEGIN PRIVATE KEY-----\nMIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgw9xLMO0FenC1tX/1\nQ0lbptAit7lDwHdPFQA8KqrWIz+gCgYIKoZIzj0DAQehRANCAARxWkbLEeMS29IZ\ng0gKfzZ2Z2C+tGn3hPkKTUogJ1beeHTsR+u/LtT9mBK2DIQLL8ac2bYhO07wxDvT\nmDcYQiap\n-----END PRIVATE KEY-----
+
+
+*/
 @ccclass('gamePlaying')
 export class gamePlaying extends Component {
     @property(Node)
