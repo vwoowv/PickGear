@@ -13,6 +13,7 @@ import { gameInstance } from './gameInstance';
 import { PickedSuitManager } from './PickedSuitManager';
 import { gamePlayProperty } from './gamePlayProperty';
 import { AppleMusicManager } from './Utility/AppleMusicManager';
+import { Spotify } from './Utility/spotify';
 const { ccclass, property } = _decorator;
 
 @ccclass('gamePlaying')
@@ -425,14 +426,13 @@ export class gamePlaying extends Component {
             } else if (provider === 'spotify') {
                 // Spotify 로직
                 console.log('Spotify Playback Requested');
-                
-                // (수정된 코드) Spotify 로그인 테스트를 위해 실제 Spotify 로그인 페이지를 새 창으로 띄움
-                if (typeof window !== 'undefined') {
-                    window.open('https://accounts.spotify.com/login', 'SpotifyLogin', 'width=500,height=600');
-                }
+                // (테스트 코드) 로그인 페이지 수동 오픈은 주석 처리
+                // if (typeof window !== 'undefined') {
+                //     window.open('https://accounts.spotify.com/login', 'SpotifyLogin', 'width=500,height=600');
+                // }
 
-                // 구현 전까지는 안전하게 로컬 오디오 폴백
-                await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
+                const trackIndex = Math.max(0, Math.min(3, this.currentLevel - 1));
+                await Spotify.I.playLevelMusic(trackIndex);
             } else {
                 throw new Error('Unknown provider');
             }
