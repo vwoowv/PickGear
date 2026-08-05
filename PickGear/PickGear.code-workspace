@@ -1,0 +1,32 @@
+{
+  "folders": [
+    {
+      "name": "PickGear",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/build": true,
+      "**/library": true,
+      "**/local": true,
+      "**/profiles": true,
+      "**/temp": true
+    },
+    "files.watcherExclude": {
+      "**/build/**": true,
+      "**/library/**": true,
+      "**/local/**": true,
+      "**/profiles/**": true,
+      "**/temp/**": true
+    },
+    "search.exclude": {
+      "**/build/**": true,
+      "**/library/**": true,
+      "**/local/**": true,
+      "**/profiles/**": true,
+      "**/temp/**": true
+    },
+    "typescript.preferences.importModuleSpecifier": "relative"
+  }
+}

@@ -12,8 +12,6 @@ import { RollingSuit } from './Character/RollingSuit';
 import { gameInstance } from './gameInstance';
 import { PickedSuitManager } from './PickedSuitManager';
 import { gamePlayProperty } from './gamePlayProperty';
-import { AppleMusicManager } from './Utility/AppleMusicManager';
-import { Spotify } from './Utility/spotify';
 const { ccclass, property } = _decorator;
 
 @ccclass('gamePlaying')
@@ -51,27 +49,6 @@ export class gamePlaying extends Component {
     private finalRoundSequence: number = 0;
     private perfect: boolean = true;
     private waitingTimeForNextDancer: number = 0;
-    private isWaitingForMusic: boolean = false;
-    private musicMessageListener: ((event: MessageEvent) => void) | null = null;
-
-    onEnable() {
-        const w = globalThis.window;
-        if (!w) {
-            return;
-        }
-        if (!this.musicMessageListener) {
-            this.musicMessageListener = (event: MessageEvent) => this.handleMusicMessage(event);
-        }
-        w.addEventListener('message', this.musicMessageListener);
-    }
-
-    onDisable() {
-        const w = globalThis.window;
-        if (!w || !this.musicMessageListener) {
-            return;
-        }
-        w.removeEventListener('message', this.musicMessageListener);
-    }
 
     update(deltaTime: number) {
         this.pickedSuitList.update(deltaTime);
@@ -366,134 +343,14 @@ export class gamePlaying extends Component {
         }
     }
 
-    // --- 부모 창(Next.js)과 통신하기 위한 메서드 ---
-    private checkParentAuth(): Promise<{ isLoggedIn: boolean, provider: string | null }> {
-        const w = globalThis.window;
-        if (!w) {
-            return Promise.resolve({ isLoggedIn: false, provider: null });
-        }
-        return new Promise((resolve) => {
-            // 타임아웃 설정 (1초 내 응답 없으면 테스트 모드 진입)
-            const timeout = setTimeout(() => {
-                w.removeEventListener('message', listener);
-                this.resolveMockAuth(w, resolve);
-            }, 1000);
-
-            const listener = (event: MessageEvent) => {
-                // 부모로부터 인증 상태 응답을 받았을 때
-                if (event.data?.type === 'AUTH_STATUS_RESPONSE') {
-                    clearTimeout(timeout);
-                    w.removeEventListener('message', listener);
-                    resolve(event.data.payload);
-                }
-            };
-
-            w.addEventListener('message', listener);
-            w.parent?.postMessage({ type: 'CHECK_AUTH' }, w.location.origin);
-        });
-    }
-
-    private resolveMockAuth(
-        w: Window,
-        resolve: (value: { isLoggedIn: boolean; provider: string | null }) => void
-    ): void {
-        // (수정된 코드) 사용자에게 어떤 상태로 시작할지 물어봄
-        if (w.confirm) {
-            const isMockLogin = w.confirm(
-                "[테스트 모드] 부모 창의 응답이 없습니다.\n\n" +
-                "▶ [확인]: Apple Music 로그인 테스트 (팝업)\n" +
-                "▶ [취소]: Spotify 로그인 테스트 (페이지 이동)"
-            );
-
-            if (isMockLogin) {
-                console.log("테스트 모드: Apple 로그인 시도");
-                resolve({ isLoggedIn: true, provider: 'apple' });
-            } else {
-                console.log("테스트 모드: Spotify 로그인 시도");
-                resolve({ isLoggedIn: true, provider: 'spotify' });
-            }
-        } else {
-            // confirm 불가 환경이면 기본값 false
-            resolve({ isLoggedIn: false, provider: null });
-        }
-    }
-
-    // --- 음악 제공자에 따른 재생 로직 ---
-    private async playMusicByProvider(provider: string) {
-        try {
-            if (provider === 'apple') {
-                const appleMusic = new AppleMusicManager();
-                // (기존 코드) 
-                // await appleMusic.playMyMusic(); 
-
-                // (참고) AppleMusicManager 내부에서 music.authorize()가 호출되어 팝업이 뜹니다.
-                await appleMusic.playMyMusic();
-            } else if (provider === 'spotify') {
-                // Spotify 로직
-                console.log('Spotify Playback Requested');
-                // (테스트 코드) 로그인 페이지 수동 오픈은 주석 처리
-                // if (typeof window !== 'undefined') {
-                //     window.open('https://accounts.spotify.com/login', 'SpotifyLogin', 'width=500,height=600');
-                // }
-
-                const trackIndex = Math.max(0, Math.min(3, this.currentLevel - 1));
-                await Spotify.I.playLevelMusic(trackIndex);
-            } else {
-                throw new Error('Unknown provider');
-            }
-        } catch (e) {
-            console.warn(`${provider} Music play failed, fallback to local audio`, e);
-            await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
-        }
-    }
-
     private async onPrepare() {
         console.log('onPrepare');
         this.currentPoint = 0;
         this.currentComboScore = 0;
         this.currentComboCount = 0;
         this.perfect = true;
-        this.isWaitingForMusic = true;
-        this.requestMusicPlayToParent();
-    }
-
-    private requestMusicPlayToParent() {
-        const w = globalThis.window;
-        if (!w || !w.parent) {
-            return;
-        }
-
-        const appleSongIds = ['1522636431', '1493354242', '1522636440', '1522636433'];
-        const spotifyTrackIds = ['4wgpMVdrWBELff42ZZgJl8', '7v3bpnW7d5ij0scB8ThIAa', '0u2dt20b1qyfce5j6PnTeZ', '0Ccpm5dnPQuR83s2JWPI9P'];
-        const trackIndex = Math.max(0, Math.min(3, (this.currentLevel || 1) - 1));
-
-        w.parent.postMessage(
-            {
-                type: 'PLAY_MUSIC',
-                spotifyTrackId: spotifyTrackIds[trackIndex],
-                appleSongId: appleSongIds[trackIndex],
-            },
-            '*'
-        );
-    }
-
-    private handleMusicMessage(event: MessageEvent): boolean | void {
-        if (!event.data || event.data.type !== 'MUSIC_PLAY_RESULT') {
-            return;
-        }
-
-        console.log('[Game] Received Music Play Result:', event.data.success);
-        if (event.data.success) {
-            console.log('[Game] Music playing successfully. Starting Game!');
-            this.isWaitingForMusic = false;
-            gameModeManager.I.playingToShowSuit(1);
-            return true;
-        }
-
-        console.error('[Game] Failed (Not Premium or Error). Game remains STOPPED.');
-        this.isWaitingForMusic = true;
-        const w = globalThis.window;
-        w?.parent?.postMessage({ type: 'REQUEST_LOGIN' }, '*');
+        await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
+        gameModeManager.I.playingToShowSuit(1);
     }
 
     private currentDancer: dancer = null;
