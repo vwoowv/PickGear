@@ -1,0 +1,49 @@
+{
+  "folders": [
+    {
+      "name": "TapTap",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.DS_Store": true,
+      "**/build": true,
+      "**/library": true,
+      "**/local": true,
+      "**/node_modules": true,
+      "**/profiles": true,
+      "**/temp": true
+    },
+    "files.watcherExclude": {
+      "**/build/**": true,
+      "**/library/**": true,
+      "**/local/**": true,
+      "**/node_modules/**": true,
+      "**/profiles/**": true,
+      "**/temp/**": true
+    },
+    "search.exclude": {
+      "**/build/**": true,
+      "**/library/**": true,
+      "**/local/**": true,
+      "**/node_modules/**": true,
+      "**/profiles/**": true,
+      "**/temp/**": true
+    },
+    "files.associations": {
+      "*.anim": "json",
+      "*.effect": "yaml",
+      "*.meta": "json",
+      "*.mtl": "json",
+      "*.prefab": "json",
+      "*.scene": "json"
+    },
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.expand": false,
+    "explorer.fileNesting.patterns": {
+      "*": "${capture}.meta"
+    },
+    "typescript.preferences.importModuleSpecifier": "relative"
+  }
+}
