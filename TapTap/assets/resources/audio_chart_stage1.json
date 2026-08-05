@@ -1,0 +1,455 @@
+{
+  "version": 1,
+  "sourceAudio": "audio/music_stage1.wav",
+  "duration": 54,
+  "analysis": {
+    "method": "spectral-flux-onset",
+    "sampleRate": 48000,
+    "channels": 2,
+    "bitsPerSample": 24,
+    "windowSize": 2048,
+    "hopSize": 512,
+    "minimumEventSpacing": 0.42,
+    "estimatedBpm": 119.68
+  },
+  "events": [
+    {
+      "time": 1.2693,
+      "strength": 0.9178,
+      "danger": false,
+      "characterIndex": 4
+    },
+    {
+      "time": 2.2613,
+      "strength": 1,
+      "danger": false,
+      "characterIndex": 4
+    },
+    {
+      "time": 2.752,
+      "strength": 0.9772,
+      "danger": false,
+      "characterIndex": 4
+    },
+    {
+      "time": 3.264,
+      "strength": 1,
+      "danger": false,
+      "characterIndex": 4
+    },
+    {
+      "time": 3.9253,
+      "strength": 1,
+      "danger": false,
+      "characterIndex": 4
+    },
+    {
+      "time": 4.7573,
+      "strength": 0.7197,
+      "danger": false,
+      "characterIndex": 1
+    },
+    {
+      "time": 6.272,
+      "strength": 0.9212,
+      "danger": false,
+      "characterIndex": 4
+    },
+    {
+      "time": 6.7627,
+      "strength": 0.8591,
+      "danger": false,
+      "characterIndex": 3
+    },
+    {
+      "time": 7.264,
+      "strength": 0.703,
+      "danger": false,
+      "characterIndex": 0
+    },
+    {
+      "time": 7.7653,
+      "strength": 0.8673,
+      "danger": false,
+      "characterIndex": 3
+    },
+    {
+      "time": 8.2667,
+      "strength": 0.8917,
+      "danger": true,
+      "characterIndex": 3
+    },
+    {
+      "time": 8.768,
+      "strength": 0.6739,
+      "danger": false,
+      "characterIndex": 0
+    },
+    {
+      "time": 9.2693,
+      "strength": 0.6636,
+      "danger": false,
+      "characterIndex": 0
+    },
+    {
+      "time": 10.2613,
+      "strength": 0.8417,
+      "danger": false,
+      "characterIndex": 3
+    },
+    {
+      "time": 10.7627,
+      "strength": 0.6951,
+      "danger": false,
+      "characterIndex": 0
+    },
+    {
+      "time": 11.264,
+      "strength": 0.8368,
+      "danger": false,
+      "characterIndex": 2
+    },
+    {
+      "time": 11.7653,
+      "strength": 0.6753,
+      "danger": false,
+      "characterIndex": 0
+    },
+    {
+      "time": 12.2667,
+      "strength": 0.849,
+      "danger": false,
+      "characterIndex": 3
+    },
+    {
+      "time": 12.768,
+      "strength": 0.7421,
+      "danger": false,
+      "characterIndex": 1
+    },
+    {
+      "time": 13.2693,
+      "strength": 0.7004,
+      "danger": false,
+      "characterIndex": 0
+    },
+    {
+      "time": 13.7707,
+      "strength": 0.697,
+      "danger": false,
+      "characterIndex": 0
+    },
+    {
+      "time": 14.2613,
+      "strength": 0.8157,
+      "danger": false,
+      "characterIndex": 2
+    },
+    {
+      "time": 14.7627,
+      "strength": 0.7307,
+      "danger": false,
+      "characterIndex": 1
+    },
+    {
+      "time": 15.264,
+      "strength": 0.7055,
+      "danger": false,
+      "characterIndex": 0
+    },
+    {
+      "time": 16.2667,
+      "strength": 0.9074,
+      "danger": false,
+      "characterIndex": 4
+    },
+    {
+      "time": 16.7573,
+      "strength": 0.7153,
+      "danger": false,
+      "characterIndex": 1
+    },
+    {
+      "time": 17.2587,
+      "strength": 0.8092,
+      "danger": false,
+      "characterIndex": 2
+    },
+    {
+      "time": 17.7707,
+      "strength": 0.8598,
+      "danger": false,
+      "characterIndex": 3
+    },
+    {
+      "time": 18.7627,
+      "strength": 0.7946,
+      "danger": false,
+      "characterIndex": 2
+    },
+    {
+      "time": 19.264,
+      "strength": 0.8404,
+      "danger": false,
+      "characterIndex": 2
+    },
+    {
+      "time": 19.7547,
+      "strength": 0.6435,
+      "danger": false,
+      "characterIndex": 0
+    },
+    {
+      "time": 20.448,
+      "strength": 0.8963,
+      "danger": false,
+      "characterIndex": 3
+    },
+    {
+      "time": 20.9173,
+      "strength": 1,
+      "danger": true,
+      "characterIndex": 4
+    },
+    {
+      "time": 21.7707,
+      "strength": 0.7187,
+      "danger": false,
+      "characterIndex": 1
+    },
+    {
+      "time": 22.272,
+      "strength": 0.6506,
+      "danger": false,
+      "characterIndex": 0
+    },
+    {
+      "time": 22.7733,
+      "strength": 0.7252,
+      "danger": false,
+      "characterIndex": 1
+    },
+    {
+      "time": 23.264,
+      "strength": 0.6703,
+      "danger": false,
+      "characterIndex": 0
+    },
+    {
+      "time": 24.2667,
+      "strength": 0.9182,
+      "danger": false,
+      "characterIndex": 4
+    },
+    {
+      "time": 24.768,
+      "strength": 0.712,
+      "danger": false,
+      "characterIndex": 1
+    },
+    {
+      "time": 25.2693,
+      "strength": 0.8547,
+      "danger": false,
+      "characterIndex": 3
+    },
+    {
+      "time": 25.7707,
+      "strength": 0.8466,
+      "danger": false,
+      "characterIndex": 3
+    },
+    {
+      "time": 26.2613,
+      "strength": 0.6581,
+      "danger": false,
+      "characterIndex": 0
+    },
+    {
+      "time": 26.7733,
+      "strength": 0.6633,
+      "danger": false,
+      "characterIndex": 0
+    },
+    {
+      "time": 27.264,
+      "strength": 0.8606,
+      "danger": false,
+      "characterIndex": 3
+    },
+    {
+      "time": 27.7653,
+      "strength": 0.9794,
+      "danger": true,
+      "characterIndex": 4
+    },
+    {
+      "time": 28.2667,
+      "strength": 0.8466,
+      "danger": false,
+      "characterIndex": 3
+    },
+    {
+      "time": 29.2693,
+      "strength": 0.7267,
+      "danger": false,
+      "characterIndex": 1
+    },
+    {
+      "time": 29.7707,
+      "strength": 0.6905,
+      "danger": false,
+      "characterIndex": 0
+    },
+    {
+      "time": 30.656,
+      "strength": 0.7596,
+      "danger": false,
+      "characterIndex": 1
+    },
+    {
+      "time": 31.264,
+      "strength": 0.8495,
+      "danger": false,
+      "characterIndex": 3
+    },
+    {
+      "time": 32.768,
+      "strength": 0.83,
+      "danger": false,
+      "characterIndex": 2
+    },
+    {
+      "time": 33.2587,
+      "strength": 0.7595,
+      "danger": false,
+      "characterIndex": 1
+    },
+    {
+      "time": 35.264,
+      "strength": 1,
+      "danger": true,
+      "characterIndex": 4
+    },
+    {
+      "time": 35.7653,
+      "strength": 0.8357,
+      "danger": false,
+      "characterIndex": 2
+    },
+    {
+      "time": 36.4267,
+      "strength": 0.816,
+      "danger": false,
+      "characterIndex": 2
+    },
+    {
+      "time": 37.28,
+      "strength": 0.665,
+      "danger": false,
+      "characterIndex": 0
+    },
+    {
+      "time": 37.76,
+      "strength": 0.7369,
+      "danger": false,
+      "characterIndex": 1
+    },
+    {
+      "time": 38.7627,
+      "strength": 0.8148,
+      "danger": false,
+      "characterIndex": 2
+    },
+    {
+      "time": 39.2747,
+      "strength": 0.8521,
+      "danger": false,
+      "characterIndex": 3
+    },
+    {
+      "time": 39.7653,
+      "strength": 0.7894,
+      "danger": false,
+      "characterIndex": 2
+    },
+    {
+      "time": 40.768,
+      "strength": 0.8365,
+      "danger": false,
+      "characterIndex": 2
+    },
+    {
+      "time": 41.2693,
+      "strength": 0.7469,
+      "danger": false,
+      "characterIndex": 1
+    },
+    {
+      "time": 41.76,
+      "strength": 1,
+      "danger": true,
+      "characterIndex": 4
+    },
+    {
+      "time": 42.752,
+      "strength": 0.8604,
+      "danger": false,
+      "characterIndex": 3
+    },
+    {
+      "time": 43.264,
+      "strength": 0.7089,
+      "danger": false,
+      "characterIndex": 1
+    },
+    {
+      "time": 43.7547,
+      "strength": 1,
+      "danger": false,
+      "characterIndex": 4
+    },
+    {
+      "time": 44.256,
+      "strength": 0.7495,
+      "danger": false,
+      "characterIndex": 1
+    },
+    {
+      "time": 44.7573,
+      "strength": 0.8008,
+      "danger": false,
+      "characterIndex": 2
+    },
+    {
+      "time": 46.0267,
+      "strength": 0.7296,
+      "danger": false,
+      "characterIndex": 1
+    },
+    {
+      "time": 46.7627,
+      "strength": 1,
+      "danger": false,
+      "characterIndex": 4
+    },
+    {
+      "time": 47.264,
+      "strength": 0.7765,
+      "danger": false,
+      "characterIndex": 2
+    },
+    {
+      "time": 47.7547,
+      "strength": 0.8569,
+      "danger": false,
+      "characterIndex": 3
+    },
+    {
+      "time": 48.7573,
+      "strength": 0.8065,
+      "danger": false,
+      "characterIndex": 2
+    }
+  ]
+}

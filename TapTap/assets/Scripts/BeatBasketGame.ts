@@ -26,7 +26,7 @@ import {
     Vec3,
     view,
 } from 'cc';
-import { BeatEvent, buildPrototypeChart, MidiChart } from './RhythmChart';
+import { AudioAnalysisChart, BeatEvent, buildAudioEvents } from './RhythmChart';
 
 const { ccclass } = _decorator;
 
@@ -64,7 +64,7 @@ interface LoadedAssets {
     miss: AudioClip;
     danger: AudioClip;
     font: Font;
-    chart: MidiChart;
+    chart: AudioAnalysisChart;
 }
 
 @ccclass('BeatBasketGame')
@@ -243,7 +243,7 @@ export class BeatBasketGame extends Component {
             this.loadAudio('audio/miss'),
             this.loadAudio('audio/danger'),
             this.loadFont('fonts/LilitaOne-Regular'),
-            this.loadJson('chart_stage1'),
+            this.loadJson('audio_chart_stage1'),
             this.loadSprite('images/characters/doarin/spriteFrame'),
             this.loadSprite('images/characters/emma/spriteFrame'),
             this.loadSprite('images/characters/happy/spriteFrame'),
@@ -265,7 +265,7 @@ export class BeatBasketGame extends Component {
             miss: miss as AudioClip,
             danger: danger as AudioClip,
             font: font as Font,
-            chart: chartAsset.json as unknown as MidiChart,
+            chart: chartAsset.json as unknown as AudioAnalysisChart,
         };
     }
 
@@ -294,7 +294,7 @@ export class BeatBasketGame extends Component {
         this.clearLayer(this.effectLayer);
         this.clearLayer(this.overlayLayer);
 
-        this.runtimeEvents = buildPrototypeChart(this.loaded.chart).map((beat) => ({
+        this.runtimeEvents = buildAudioEvents(this.loaded.chart).map((beat) => ({
             beat,
             state: EventState.Pending,
             node: null,
