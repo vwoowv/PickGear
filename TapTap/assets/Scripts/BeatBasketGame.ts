@@ -26,7 +26,13 @@ import {
     Vec3,
     view,
 } from 'cc';
-import { AudioAnalysisChart, BeatEvent, buildAudioEvents } from './RhythmChart';
+import {
+    AudioAnalysisChart,
+    BeatEvent,
+    buildAudioEvents,
+    buildGuideCues,
+    GuideCue,
+} from './RhythmChart';
 
 const { ccclass } = _decorator;
 
@@ -63,6 +69,8 @@ interface LoadedAssets {
     hit: AudioClip;
     miss: AudioClip;
     danger: AudioClip;
+    guideTick: AudioClip;
+    guideReady: AudioClip;
     font: Font;
     chart: AudioAnalysisChart;
 }
@@ -81,11 +89,14 @@ export class BeatBasketGame extends Component {
     private state = GameState.Loading;
     private loaded: LoadedAssets | null = null;
     private runtimeEvents: RuntimeEvent[] = [];
+    private guideCues: GuideCue[] = [];
     private nextSpawnIndex = 0;
+    private nextGuideCueIndex = 0;
     private completedEvents = 0;
 
     private musicSource: AudioSource = null;
     private effectSource: AudioSource = null;
+    private guideSource: AudioSource = null;
     private gameLayer: Node = null;
     private effectLayer: Node = null;
     private overlayLayer: Node = null;
@@ -112,6 +123,7 @@ export class BeatBasketGame extends Component {
         this.setupCanvas();
         this.musicSource = this.node.addComponent(AudioSource);
         this.effectSource = this.node.addComponent(AudioSource);
+        this.guideSource = this.node.addComponent(AudioSource);
         this.buildStaticUi();
 
         input.on(Input.EventType.TOUCH_END, this.onTap, this);
@@ -136,6 +148,7 @@ export class BeatBasketGame extends Component {
         }
 
         const songTime = this.musicSource.currentTime;
+        this.playDueGuideCues(songTime);
         this.spawnDueEvents(songTime);
         this.updateActiveEvents(songTime);
         this.updateProgress(songTime);
@@ -227,6 +240,8 @@ export class BeatBasketGame extends Component {
             hit,
             miss,
             danger,
+            guideTick,
+            guideReady,
             font,
             chartAsset,
             ...characters
@@ -242,6 +257,8 @@ export class BeatBasketGame extends Component {
             this.loadAudio('audio/hit'),
             this.loadAudio('audio/miss'),
             this.loadAudio('audio/danger'),
+            this.loadAudio('guide_audio/guide_tick'),
+            this.loadAudio('guide_audio/guide_ready'),
             this.loadFont('fonts/LilitaOne-Regular'),
             this.loadJson('audio_chart_stage1'),
             this.loadSprite('images/characters/doarin/spriteFrame'),
@@ -264,6 +281,8 @@ export class BeatBasketGame extends Component {
             hit: hit as AudioClip,
             miss: miss as AudioClip,
             danger: danger as AudioClip,
+            guideTick: guideTick as AudioClip,
+            guideReady: guideReady as AudioClip,
             font: font as Font,
             chart: chartAsset.json as unknown as AudioAnalysisChart,
         };
@@ -294,12 +313,15 @@ export class BeatBasketGame extends Component {
         this.clearLayer(this.effectLayer);
         this.clearLayer(this.overlayLayer);
 
-        this.runtimeEvents = buildAudioEvents(this.loaded.chart).map((beat) => ({
+        const beatEvents = buildAudioEvents(this.loaded.chart);
+        this.runtimeEvents = beatEvents.map((beat) => ({
             beat,
             state: EventState.Pending,
             node: null,
         }));
+        this.guideCues = buildGuideCues(this.loaded.chart, beatEvents);
         this.nextSpawnIndex = 0;
+        this.nextGuideCueIndex = 0;
         this.completedEvents = 0;
         this.score = 0;
         this.combo = 0;
@@ -317,7 +339,24 @@ export class BeatBasketGame extends Component {
         this.musicSource.stop();
         this.musicSource.currentTime = 0;
         this.musicSource.play();
-        this.showJudgement('LISTEN!', new Color(255, 237, 133));
+        this.showJudgement('LISTEN, THEN TAP!', new Color(255, 237, 133));
+    }
+
+    private playDueGuideCues(songTime: number): void {
+        while (this.nextGuideCueIndex < this.guideCues.length) {
+            const cue = this.guideCues[this.nextGuideCueIndex];
+            if (cue.time > songTime) {
+                break;
+            }
+
+            if (songTime - cue.time <= 0.12) {
+                this.guideSource.playOneShot(
+                    cue.accent ? this.loaded.guideReady : this.loaded.guideTick,
+                    cue.accent ? 0.82 : 0.58,
+                );
+            }
+            this.nextGuideCueIndex++;
+        }
     }
 
     private spawnDueEvents(songTime: number): void {
@@ -514,7 +553,16 @@ export class BeatBasketGame extends Component {
         this.clearLayer(this.overlayLayer);
         this.createOverlayShade();
         this.createLabelNode('ReadyTitle', this.overlayLayer, 'GROOVE BASKET', 72, new Vec3(0, 250), new Color(255, 237, 133));
-        this.createLabelNode('ReadyBody', this.overlayLayer, 'TAP ON THE BEAT\nAVOID THE RED FACE', 42, new Vec3(0, 80), Color.WHITE, 560, 150);
+        this.createLabelNode(
+            'ReadyBody',
+            this.overlayLayer,
+            'LISTEN: TA TA TA TICK\nTAP ON THE NEXT BEAT\nAVOID THE RED FACE',
+            34,
+            new Vec3(0, 80),
+            Color.WHITE,
+            600,
+            180,
+        );
         this.createLabelNode('ReadyTap', this.overlayLayer, 'TAP TO START', 48, new Vec3(0, -180), new Color(127, 240, 255));
 
         const tapLabel = this.overlayLayer.getChildByName('ReadyTap');

@@ -33,8 +33,34 @@ export class gameManager extends Component {
         }
         else {
             this.node.destroy();
+            return;
+        }
+
+        if (typeof window !== 'undefined') {
+            window.addEventListener('message', this.onParentMessage);
         }
     }
+
+    onDestroy(): void {
+        if (typeof window !== 'undefined') {
+            window.removeEventListener('message', this.onParentMessage);
+        }
+        if (gameManager._instance === this) {
+            gameManager._instance = null;
+        }
+    }
+
+    private readonly onParentMessage = (event: MessageEvent): void => {
+        if (event.source !== window.parent || window.parent === window) {
+            return;
+        }
+        if (event.data?.type !== 'RESTART_GAME' || this.gameState !== EGameState.GameOver) {
+            return;
+        }
+
+        // 기존 재시작 흐름을 사용하고, 실제 플레이 시작 시 GAME_START를 보낸다.
+        this.restartCurrentStage();
+    };
 
     @property(gameModeData)
     public gameMode: gameModeData = null;
@@ -257,7 +283,11 @@ export class gameManager extends Component {
         this.retryNode.active = false;
     }
 
-    public startNewGame() {
+    public startNewGame(): void {
+        if (this.gameState !== EGameState.PlayStarting) {
+            return;
+        }
+
         this.gameState = EGameState.Playing;
         this.playStartingNode.active = false;
         this.playingNode.active = true;
@@ -270,6 +300,10 @@ export class gameManager extends Component {
         this.coinText.string = new richTextMaker("00", "#020202", 3, "").resultText;
         this.currentScoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
         this.currentLevelText.string = new richTextMaker("LV." + this.gameMode.getCurrentLevelFromVersion().toString(), "#020202", 3, "").resultText;
+
+        if (typeof window !== 'undefined' && window.parent !== window) {
+            window.parent.postMessage({ type: 'GAME_START' }, '*');
+        }
     }
 
     private isSpawningEgg: boolean = false;
@@ -309,7 +343,11 @@ export class gameManager extends Component {
         this.leftTimeText.string = formatTime(this.timeLeft);
     }
 
-    private gameOver() {
+    private gameOver(): void {
+        if (this.gameState === EGameState.GameOver) {
+            return;
+        }
+
         this.gameState = EGameState.GameOver;
         this.eggParent.children.forEach(child => {
             child.destroy();
@@ -323,6 +361,10 @@ export class gameManager extends Component {
         this.scoreText.string = new richTextMaker(this.currentScore.toString(), "#020202", 3, "").resultText;
         this.coinText.string = new richTextMaker("00", "#020202", 3, "").resultText;
         this.gameMode.resultGame();
+
+        if (typeof window !== 'undefined' && window.parent !== window) {
+            window.parent.postMessage({ type: 'GAME_OVER', score: this.currentScore }, '*');
+        }
     }
 
     private updateGameOver(deltaTime: number) {

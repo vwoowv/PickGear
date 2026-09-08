@@ -4,6 +4,6 @@ import { delaySeconds } from "../Utility/delay";
 export class playNewGame {
     async initialize() {
         await new delaySeconds().delay(0.5);
-        gameModeManager.I.playingToPrepare();
+        await gameModeManager.I.playingToPrepare();
     }
 }

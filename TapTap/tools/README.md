@@ -14,3 +14,13 @@ The extractor reads PCM WAV data directly, calculates a spectral-flux onset
 envelope, estimates tempo, removes events that are too close for a one-button
 mobile game, and writes deterministic event times and strengths to
 `assets/resources/audio_chart_stage1.json`.
+
+The short guide sounds are also generated offline:
+
+```sh
+node tools/generate-guide-sounds.mjs
+```
+
+This writes a quiet wooden tick and a brighter ready accent to
+`assets/resources/guide_audio/`. They are intentionally separate from hit and miss
+feedback so the player can distinguish prediction from judgement.

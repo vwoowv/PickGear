@@ -49,6 +49,37 @@ export class gamePlaying extends Component {
     private finalRoundSequence: number = 0;
     private perfect: boolean = true;
     private waitingTimeForNextDancer: number = 0;
+    private restartPending: boolean = false;
+    private parentMessageOrigin: string = '*';
+
+    protected onLoad(): void {
+        if (typeof window !== 'undefined') {
+            window.addEventListener('message', this.onParentMessage);
+        }
+    }
+
+    protected onDestroy(): void {
+        if (typeof window !== 'undefined') {
+            window.removeEventListener('message', this.onParentMessage);
+        }
+    }
+
+    private readonly onParentMessage = (event: MessageEvent): void => {
+        if (event.source !== window.parent || event.data?.type !== 'RESTART_GAME') {
+            return;
+        }
+        if (this.currentSequence !== EPlayingSequence.EndGame || this.restartPending) {
+            return;
+        }
+        this.parentMessageOrigin = event.origin === 'null' ? '*' : event.origin;
+        void this.onTouchRetryButton();
+    };
+
+    private postParentMessage(message: { type: string; score?: number }): void {
+        if (typeof window !== 'undefined') {
+            window.parent.postMessage(message, this.parentMessageOrigin);
+        }
+    }
 
     update(deltaTime: number) {
         this.pickedSuitList.update(deltaTime);
@@ -327,10 +358,10 @@ export class gamePlaying extends Component {
         console.log('onTransitionChanged. Level : ', this.currentLevel);
         console.log('onTransitionChanged. Sequence : ', EPlayingSequence[this.currentSequence], this.currentSequence);
         if (this.currentSequence === EPlayingSequence.Prepare) {
-            this.onPrepare();
+            return this.onPrepare();
         }
         else if (this.currentSequence === EPlayingSequence.ShowSuit) {
-            this.onShowSuit();
+            return this.onShowSuit();
         }
         else if (this.currentSequence === EPlayingSequence.GameRound) {
             this.onGameRound();
@@ -349,8 +380,14 @@ export class gamePlaying extends Component {
         this.currentComboScore = 0;
         this.currentComboCount = 0;
         this.perfect = true;
+        this.currentTime = 0;
+        this.nextRollingSuitTime = 0;
+        this.showPickSuit = false;
+        this.showPickSuitTime = 0.5;
+        this.shuffleCharacterTypeList();
         await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
-        gameModeManager.I.playingToShowSuit(1);
+        await gameModeManager.I.playingToLevel1ShowSuit();
+        this.postParentMessage({ type: 'GAME_START' });
     }
 
     private currentDancer: dancer = null;
@@ -375,21 +412,21 @@ export class gamePlaying extends Component {
     }
 
     private garbageDancer() {
+        // 마지막 라운드의 currentDancer는 allDancer의 한 항목이다.
+        if (this.currentDancer && this.allDancer.indexOf(this.currentDancer) === -1) {
+            this.currentDancer.node.removeFromParent();
+            this.currentDancer.node.destroy();
+        }
+        this.currentDancer = null;
         if (this.allDancer.length > 0) {
             for (let i = 0; i < 4; i++) {
                 if (this.allDancer[i] === null) {
                     continue;
                 }
-                this.dancerResultPos[i].removeChild(this.allDancer[i].node);
-                this.allDancer[i].destroy();
+                this.allDancer[i].node.removeFromParent();
+                this.allDancer[i].node.destroy();
                 this.allDancer[i] = null;
             }
-        }
-
-        if (this.currentDancer != null) {
-            this.dancerPos.removeChild(this.currentDancer.node);
-            this.currentDancer.destroy();
-            this.currentDancer = null;
         }
     }
 
@@ -461,14 +498,28 @@ export class gamePlaying extends Component {
         for (let i = 0; i < 4; i++) {
             this.dancerResultPos[i].addChild(this.allDancer[i].node);
         }
+        this.postParentMessage({ type: 'GAME_OVER', score: this.currentPoint });
     }
 
-    public onTouchRetryButton() {
-        this.garbageDancer();
-        gameModeManager.I.rootPlayGame();
+    public async onTouchRetryButton() {
+        if (this.currentSequence !== EPlayingSequence.EndGame || this.restartPending) {
+            return;
+        }
+        this.restartPending = true;
+        try {
+            this.garbageDancer();
+            await gameModeManager.I.rootPlayGame();
+        } catch (error) {
+            console.error('Failed to restart game', error);
+        } finally {
+            this.restartPending = false;
+        }
     }
 
     public onTouchHomeButton() {
+        if (this.restartPending) {
+            return;
+        }
         this.garbageDancer();
         gameModeManager.I.rootSelectGameType();
     }
