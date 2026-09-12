@@ -50,7 +50,12 @@ export class gamePlaying extends Component {
     private perfect: boolean = true;
     private waitingTimeForNextDancer: number = 0;
     private restartPending: boolean = false;
-    private parentMessageOrigin: string = '*';
+    private parentMessageOrigin: string = null;
+    private externallyExited = false;
+    private readyNotified = false;
+    private webControlConnected = false;
+    private completedRequests: string[] = [];
+    private commandRequests = new Map<string, { command: string; result: Promise<Record<string, unknown>> }>();
 
     private sessionVersion = 0;
     private sessionActive = false;
@@ -81,6 +86,7 @@ export class gamePlaying extends Component {
     public beginSession(): number {
         this.endSession();
         this.sessionActive = true;
+        this.externallyExited = false;
         this.currentSequence = EPlayingSequence.Prepare;
         return this.sessionVersion;
     }
@@ -109,12 +115,102 @@ export class gamePlaying extends Component {
         this.showPickSuit = false;
     }
 
+    public getGameState() {
+        return {
+            status: this.externallyExited ? 'exited' : !this.sessionActive ? 'title' :
+                this.paused ? 'paused' : this.currentSequence === EPlayingSequence.EndGame ? 'ended' : 'playing',
+            score: this.currentPoint,
+            audio: gameInstance.I.getAudioState(),
+            level: this.currentLevel,
+            gameType: this.currentSuitType,
+            sequence: EPlayingSequence[this.currentSequence],
+            elapsedSeconds: this.currentTime,
+            sessionId: this.sessionId,
+            busy: this.restartPending || gameModeManager.I.isRootBusy,
+        };
+    }
+
+    public notifyGameReady() {
+        if (this.readyNotified) return;
+        this.readyNotified = true;
+        this.postParentMessage({ type: 'GAME_READY' });
+    }
+
+    private requireControl(allowed: boolean) {
+        if (this.restartPending) throw new Error('BUSY');
+        if (!allowed) throw new Error('INVALID_STATE');
+    }
+
+    public pauseGame() {
+        this.requireControl(this.sessionActive && this.currentSequence !== EPlayingSequence.EndGame);
+        if (!this.paused) {
+            this.paused = true;
+            gameInstance.I.pauseGameAudio();
+            RootUI.I.setGamePaused(true);
+            this.postParentMessage({ type: 'GAME_PAUSED' });
+        }
+        return this.getGameState();
+    }
+
+    public resumeGame() {
+        this.requireControl(this.sessionActive && this.currentSequence !== EPlayingSequence.EndGame);
+        if (this.paused) {
+            RootUI.I.hideExitConfirmation();
+            this.paused = false;
+            RootUI.I.setGamePaused(false);
+            gameInstance.I.resumeGameAudio();
+            this.releaseResumeWaiters();
+            this.postParentMessage({ type: 'GAME_RESUMED' });
+        }
+        return this.getGameState();
+    }
+
+    public async restartGame() {
+        this.requireControl(this.sessionActive && (this.paused || this.currentSequence === EPlayingSequence.EndGame));
+        this.restartPending = true;
+        try {
+            // 준비 도중 일시정지한 경우에도 이전 시작 작업을 기다리지 않는다.
+            gameModeManager.I.cancelGameSession();
+            await gameModeManager.I.rootPlayGame();
+        } catch (error) {
+            await gameModeManager.I.exitGame();
+            throw error;
+        } finally {
+            this.restartPending = false;
+        }
+        this.postParentMessage({ type: 'GAME_RESTARTED' });
+        return this.getGameState();
+    }
+
+    public async returnToTitle() {
+        this.requireControl(true);
+        this.restartPending = true;
+        try {
+            if (this.sessionActive || this.externallyExited) await gameModeManager.I.exitGame();
+            this.externallyExited = false;
+        } finally {
+            this.restartPending = false;
+        }
+        this.postParentMessage({ type: 'GAME_TITLE' });
+        return this.getGameState();
+    }
+
+    public exitGame() {
+        this.requireControl(true);
+        gameModeManager.I.cancelGameSession();
+        this.externallyExited = true;
+        RootUI.I.hideAllGroup();
+        RootUI.I.hideAllNodeOff();
+        RootUI.I.hideLoadingGroup();
+        // iframe 제거/웹 화면 이동은 부모 웹이 GAME_EXITED를 받은 뒤 처리한다.
+        this.postParentMessage({ type: 'GAME_EXITED' });
+        return this.getGameState();
+    }
+
     public onTouchExitButton() {
         if (!this.sessionActive || this.paused || this.restartPending ||
             this.currentSequence === EPlayingSequence.EndGame) return;
-        this.paused = true;
-        gameInstance.I.pauseGameAudio();
-        RootUI.I.setGamePaused(true);
+        this.pauseGame();
         RootUI.I.showExitConfirmation(
             () => this.onTouchContinueButton(),
             () => { void this.confirmExit(); }
@@ -123,23 +219,12 @@ export class gamePlaying extends Component {
 
     public onTouchContinueButton() {
         if (!this.sessionActive || !this.paused || this.restartPending) return;
-        RootUI.I.hideExitConfirmation();
-        this.paused = false;
-        RootUI.I.setGamePaused(false);
-        gameInstance.I.resumeGameAudio();
-        this.releaseResumeWaiters();
+        this.resumeGame();
     }
 
     private async confirmExit() {
-        if (!this.sessionActive || this.restartPending) return;
-        this.restartPending = true;
-        try {
-            await gameModeManager.I.exitGame();
-        } catch (error) {
-            console.error('Failed to exit game', error);
-        } finally {
-            this.restartPending = false;
-        }
+        try { await this.returnToTitle(); }
+        catch (error) { console.error('Failed to return to title', error); }
     }
 
     private async advance(transition: () => Promise<void>) {
@@ -156,35 +241,88 @@ export class gamePlaying extends Component {
         }
     }
 
-    protected onLoad(): void {
-        if (typeof window !== 'undefined') {
+    public connectWebControl() {
+        if (typeof window !== 'undefined' && !this.webControlConnected) {
             window.addEventListener('message', this.onParentMessage);
+            this.webControlConnected = true;
         }
+    }
+
+    public disconnectWebControl() {
+        if (typeof window !== 'undefined' && this.webControlConnected) {
+            window.removeEventListener('message', this.onParentMessage);
+            this.webControlConnected = false;
+        }
+    }
+
+    protected onLoad(): void {
+        this.connectWebControl();
     }
 
     protected onDestroy(): void {
         this.sessionActive = false;
         this.sessionVersion++;
         this.releaseResumeWaiters();
-        if (typeof window !== 'undefined') {
-            window.removeEventListener('message', this.onParentMessage);
-        }
+        this.disconnectWebControl();
     }
 
     private readonly onParentMessage = (event: MessageEvent): void => {
-        if (event.source !== window.parent || event.data?.type !== 'RESTART_GAME') {
+        if (event.source !== window.parent || !event.data || typeof event.data !== 'object') return;
+        const { type, requestId } = event.data;
+        const commands = ['PAUSE_GAME', 'RESUME_GAME', 'RESTART_GAME', 'GO_TO_TITLE', 'EXIT_GAME',
+            'GET_GAME_STATE', 'SET_DEBUG_UI'];
+        if (commands.indexOf(type) < 0) return;
+        if (this.parentMessageOrigin !== null && event.origin !== this.parentMessageOrigin) return;
+        if (requestId !== undefined && (typeof requestId !== 'string' || requestId.length > 128)) return;
+        this.parentMessageOrigin = event.origin;
+
+        const previous = requestId ? this.commandRequests.get(requestId) : null;
+        if (previous && previous.command !== type) {
+            this.postParentMessage({ type: 'GAME_COMMAND_RESULT', command: type, requestId, ok: false, error: 'REQUEST_ID_REUSED' });
             return;
         }
-        if (this.currentSequence !== EPlayingSequence.EndGame || this.restartPending) {
-            return;
+        const result = previous?.result ?? this.executeParentCommand(type, event.data);
+        if (requestId && !previous) {
+            // 실행 중 요청은 보존하여 재전송으로 게임이 두 번 초기화되지 않게 한다.
+            this.commandRequests.set(requestId, { command: type, result });
+            void result.then(() => {
+                this.completedRequests.push(requestId);
+                if (this.completedRequests.length > 100) this.commandRequests.delete(this.completedRequests.shift());
+            });
         }
-        this.parentMessageOrigin = event.origin === 'null' ? '*' : event.origin;
-        void this.onTouchRetryButton();
+        void result.then((response) => this.postParentMessage({
+            type: 'GAME_COMMAND_RESULT', command: type, requestId, ...response,
+        }));
     };
 
-    private postParentMessage(message: { type: string; score?: number }): void {
-        if (typeof window !== 'undefined') {
-            window.parent.postMessage(message, this.parentMessageOrigin);
+    private async executeParentCommand(type: string, data: { enabled?: unknown }): Promise<Record<string, unknown>> {
+        try {
+            switch (type) {
+                case 'PAUSE_GAME': this.pauseGame(); break;
+                case 'RESUME_GAME': this.resumeGame(); break;
+                case 'RESTART_GAME': await this.restartGame(); break;
+                case 'GO_TO_TITLE': await this.returnToTitle(); break;
+                case 'EXIT_GAME': this.exitGame(); break;
+                case 'GET_GAME_STATE': break;
+                case 'SET_DEBUG_UI':
+                    if (typeof data.enabled !== 'boolean') throw new Error('INVALID_ARGUMENT');
+                    RootUI.I.setDebugControlsEnabled(data.enabled);
+                    break;
+            }
+            return { ok: true, state: this.getGameState() };
+        } catch (error) {
+            const reason = error instanceof Error ? error.message : '';
+            const expected = ['BUSY', 'INVALID_STATE', 'INVALID_ARGUMENT'].indexOf(reason) >= 0;
+            if (!expected) console.error('Parent game command failed', error);
+            return { ok: false, error: expected ? reason : 'COMMAND_FAILED', state: this.getGameState() };
+        }
+    }
+
+    private postParentMessage(message: Record<string, unknown>) {
+        if (typeof window !== 'undefined' && window.parent !== window) {
+            window.parent.postMessage({
+                protocol: 'pickgear', version: 1, state: this.getGameState(), ...message,
+            }, !this.parentMessageOrigin || this.parentMessageOrigin === 'null' ? '*' : this.parentMessageOrigin);
         }
     }
 
@@ -664,19 +802,8 @@ export class gamePlaying extends Component {
     }
 
     public async onTouchRetryButton() {
-        if (this.currentSequence !== EPlayingSequence.EndGame || this.restartPending) {
-            return;
-        }
-        this.restartPending = true;
-        try {
-            this.garbageDancer();
-            await gameModeManager.I.rootPlayGame();
-        } catch (error) {
-            console.error('Failed to restart game', error);
-            await gameModeManager.I.exitGame();
-        } finally {
-            this.restartPending = false;
-        }
+        try { await this.restartGame(); }
+        catch (error) { console.error('Failed to restart game', error); }
     }
 
     public onTouchHomeButton() {

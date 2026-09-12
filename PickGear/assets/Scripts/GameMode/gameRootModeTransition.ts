@@ -13,10 +13,14 @@ import { dancerSprite, nameTagSprite } from "../Character/dancerResource";
 import { getDancerFace } from "../Character/getDancerFace";
 
 export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGameRootModeEvent> {
+    private presentationVersion = 0;
+    public cancelPresentation() { this.presentationVersion++; }
+
     constructor() {
         super(EGameRootModeState.Begin, []);
         this.addTransitions([
             t(EGameRootModeState.Begin, EGameRootModeEvent.SelectType, EGameRootModeState.SelectType, this.onSelectType),
+            t(EGameRootModeState.SelectType, EGameRootModeEvent.SelectType, EGameRootModeState.SelectType, this.onSelectType),
             t(EGameRootModeState.SelectType, EGameRootModeEvent.PlayGame, EGameRootModeState.PlayGame, this.onPlayGame),
             t(EGameRootModeState.PlayGame, EGameRootModeEvent.SelectType, EGameRootModeState.SelectType, this.onSelectType),
             t(EGameRootModeState.PlayGame, EGameRootModeEvent.PlayGame, EGameRootModeState.PlayGame, this.onPlayGame),
@@ -28,6 +32,7 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
 
     private async onSelectType() {
         console.log('onSelectType');
+        const presentation = ++this.presentationVersion;
         RootUI.I.hideAllNodeOff();
         RootUI.I.hideAllGroup();
         // 선택 화면을 먼저 보여주고, 그 위에서 로딩 진행
@@ -78,21 +83,26 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
 
             await ResourceManager.I.preloadGameAssets(
                 assetLists,
-                (progress) => RootUI.I.setLoadingProgress(progress),
+                (progress) => { if (presentation === this.presentationVersion) RootUI.I.setLoadingProgress(progress); },
                 { concurrency: 6, continueOnError: false }
             );
-            await gameInstance.I.prepareGameAudio();
+            if (presentation === this.presentationVersion) await gameInstance.I.prepareGameAudio();
         } finally {
-            RootUI.I.setLoadingProgress(1);
-            await new Promise<void>((resolve) => setTimeout(resolve, 0));
-            RootUI.I.hideLoadingGroup();
+            if (presentation === this.presentationVersion) {
+                RootUI.I.setLoadingProgress(1);
+                await new Promise<void>((resolve) => setTimeout(resolve, 0));
+                if (presentation === this.presentationVersion) RootUI.I.hideLoadingGroup();
+            }
         }
 
+        if (presentation !== this.presentationVersion) return;
         RootUI.I.showSelectGameTypeNode();
+        gameInstance.I.playing.notifyGameReady();
     }
 
     private async onPlayGame() {
         console.log('onPlayGame');
+        this.presentationVersion++;
         const sessionId = gameInstance.I.playing.sessionId;
         RootUI.I.hideAllNodeOff();
         RootUI.I.hideAllGroup();

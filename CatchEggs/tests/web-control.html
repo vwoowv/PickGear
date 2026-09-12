@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CatchEggs 웹 메시지 테스트</title>
+<style>
+body{font:15px system-ui;margin:20px;background:#f4f3f8;color:#252235}main{display:flex;gap:20px;flex-wrap:wrap}iframe{width:390px;height:710px;border:1px solid #aaa;background:#222}section{width:440px}button{padding:10px;margin:3px;cursor:pointer}input{width:290px;padding:8px}pre{white-space:pre-wrap;overflow:auto;max-height:390px;background:white;padding:12px;font-size:12px}#state{padding:14px;background:#fff;border-radius:8px}
+</style>
+<h1>CatchEggs 웹 메시지 테스트</h1>
+<p>게임 종류는 게임 화면에서 선택하세요. 아래 버튼은 부모 웹에서 iframe으로 메시지를 보냅니다.</p>
+<p><input id="url" aria-label="게임 URL" value="http://localhost:7457"><button id="load">게임 로드</button></p>
+<main><iframe id="game" title="CatchEggs" allow="autoplay"></iframe><section>
+<p id="state">게임 로딩 중</p>
+<div id="controls">
+<button data-command="PAUSE_GAME">일시정지</button><button data-command="RESUME_GAME">계속하기</button>
+<button data-command="RESTART_GAME">다시하기</button><button data-command="GO_TO_TITLE">타이틀로</button>
+<button data-command="EXIT_GAME">나가기</button><button data-command="GET_GAME_STATE">상태 조회</button>
+</div>
+<p><label><input type="checkbox" id="debug" style="width:auto">게임 내부 테스트 UI 표시</label></p>
+<p>나가기는 게임을 정리하고 숨깁니다. 실제 서비스는 GAME_EXITED를 받은 뒤 iframe을 제거하거나 다른 페이지로 이동하세요.</p>
+<pre id="log" aria-label="메시지 기록"></pre>
+</section></main>
+<script>
+const frame=document.querySelector('#game');let gameOrigin='';let serial=0;
+function send(type,extra={}){frame.contentWindow.postMessage({type,requestId:`test-${++serial}`,...extra},gameOrigin);}
+function load(){const url=new URL(document.querySelector('#url').value,location.href);gameOrigin=url.origin;frame.src=url.href;document.querySelector('#log').textContent='';}
+document.querySelector('#load').onclick=load;
+document.querySelector('#controls').onclick=e=>{if(e.target.dataset.command)send(e.target.dataset.command);};
+document.querySelector('#debug').onchange=e=>send('SET_DEBUG_UI',{enabled:e.target.checked});
+window.addEventListener('message',e=>{
+ if(e.source!==frame.contentWindow||e.origin!==gameOrigin||e.data?.protocol!=='pickgear')return;
+ const m=e.data;const log=document.querySelector('#log');log.textContent=JSON.stringify(m,null,2)+'\n\n'+log.textContent.slice(0,15000);
+ if(m.state)document.querySelector('#state').textContent=`상태: ${m.state.status} / 점수: ${m.state.score} / LV.${m.state.level} / ${m.state.sequence} / busy: ${m.state.busy}`;
+ if(m.type==='GAME_READY')send('GET_GAME_STATE');
+});
+load();
+</script>
+</html>

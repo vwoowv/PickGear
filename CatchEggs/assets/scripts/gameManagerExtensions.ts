@@ -103,19 +103,25 @@ export class gameManagerExtensions extends Component {
     }
 
     public async spawnEggScore(position: Vec3, score: number): Promise<eggScore> {
-        const newEggScore = await ResourceManager.I.spawnPrefab<eggScore>("prefab/EggScore", this._gameManager.eggScoreParent);
-        newEggScore.node.setPosition(position);
+        const session = this.gameManager.sessionId;
+        const prefab = await ResourceManager.I.loadResource<Prefab>("prefab/EggScore", Prefab);
+        if (!await this.gameManager.waitUntilRunning(session)) return null;
+        const node = instantiate(prefab);
+        this.gameManager.eggScoreParent.addChild(node);
+        const newEggScore = node.getComponent(eggScore);
+        node.setPosition(position);
         newEggScore.setScore(score);
         return newEggScore;
     }
 
-    public async showEggEffect(eggPosition: Vec3) {
+    public async showEggEffect(eggPosition: Vec3): Promise<void> {
+        const session = this.gameManager.sessionId;
         const hitEffect = await ResourceManager.I.loadResource<Prefab>("effect/box/boxHit2D", Prefab);
+        if (!await this.gameManager.waitUntilRunning(session)) return;
         const hitEffectNode = instantiate(hitEffect);
-        const hitEffectPosition = new Vec3(eggPosition.x, eggPosition.y - 100, eggPosition.z);
-        hitEffectNode.setPosition(hitEffectPosition);
+        hitEffectNode.setPosition(eggPosition.x, eggPosition.y - 100, eggPosition.z);
         hitEffectNode.setScale(100, 100, 100);
-        this._gameManager.playingNode.addChild(hitEffectNode);
+        this.gameManager.playingNode.addChild(hitEffectNode);
     }
 
     private prevRandomX: number = -1;
@@ -123,10 +129,22 @@ export class gameManagerExtensions extends Component {
         this.prevRandomX = -1;
     }
     public async spawnRandomEgg(currentTime: number, totalDuration: number, gameMode: EGameMode): Promise<number> {
-        const newEgg = await ResourceManager.I.spawnPrefab<egg>("prefab/Egg", this.eggParent);
+        const session = this.gameManager.sessionId;
+        const prefab = await ResourceManager.I.loadResource<Prefab>("prefab/Egg", Prefab);
+        if (!await this.gameManager.waitUntilRunning(session)) return 1;
+        const node = instantiate(prefab);
+        node.active = false;
+        this.eggParent.addChild(node);
+        const newEgg = node.getComponent(egg);
         const randomEgg = Math.floor(Math.random() * EggType.TotalCount);
         const level = this._gameManager.gameMode.getCurrentLevelFromVersion();
-        newEgg.initialize(randomEgg, this.eggEndLine, currentTime, totalDuration, gameMode, this, level);
+        try {
+            await newEgg.initialize(randomEgg, this.eggEndLine, currentTime, totalDuration, gameMode, this, level);
+        } catch (error) {
+            node.destroy();
+            throw error;
+        }
+        if (!await this.gameManager.waitUntilRunning(session)) return 1;
         const leftX = this.eggSpawnPoint_Left.position.x;
         const rightX = this.eggSpawnPoint_Right.position.x;
         const minX = Math.min(leftX, rightX);
@@ -159,6 +177,7 @@ export class gameManagerExtensions extends Component {
         }
         const eggPosition = new Vec3(xPosition, this.eggSpawnPoint_Right.position.y, this.eggSpawnPoint_Right.position.z);
         newEgg.node.setPosition(eggPosition);
+        node.active = true;
         return this.getSpawnTime(currentTime, totalDuration, gameMode);
     }
 

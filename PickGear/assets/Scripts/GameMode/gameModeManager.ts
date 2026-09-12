@@ -38,8 +38,8 @@ export class gameModeManager {
 
     rootPlayGame = async () => {
         if (this.rootOperation) return;
-        gameInstance.I.activateGameAudio();
         const sessionId = gameInstance.I.playing.beginSession();
+        gameInstance.I.activateGameAudio();
         this.playingTransition = new playingModeTransition(sessionId);
         const operation = this.rootTransition.playGame();
         this.rootOperation = operation;
@@ -53,11 +53,16 @@ export class gameModeManager {
         }
     };
 
-    public async exitGame() {
+    public cancelGameSession() {
+        this.rootTransition.cancelPresentation();
         gameInstance.I.playing.endSession();
         // 로딩 완료를 기다리지 않고 복귀한다. 이전 작업은 세션 검사로 무효화한다.
         this.rootOperation = null;
         this.playingTransition = new playingModeTransition();
+    }
+
+    public async exitGame() {
+        this.cancelGameSession();
         await this.rootSelectGameType();
     }
 

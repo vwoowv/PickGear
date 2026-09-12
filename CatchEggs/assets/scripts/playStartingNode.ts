@@ -1,6 +1,5 @@
 import { _decorator, AnimationComponent, Component, Node } from 'cc';
 import { gameManager } from './gameManager';
-import { ResourceManager } from './ResourceManager';
 import { openingEgg } from './openingEgg';
 import { EggType } from './gameDefine';
 import { gameProperty } from './gameProperty';
@@ -24,20 +23,24 @@ export class playStartingNode extends Component {
     private elapsedTime: number = 0;
     private gameManager: gameManager = null;
 
-    public async initialize(gameManager: gameManager) {
+    private ready: boolean = false;
+    public get elapsedSeconds(): number { return this.elapsedTime; }
+
+    public async initialize(gameManager: gameManager): Promise<void> {
+        this.ready = false;
+        const session = gameManager.sessionId;
         this.sinElapsedTime = 0;
         this.elapsedTime = 0;
         this.gameManager = gameManager;
 
-        await this.setOpeningCharacter();
+        await this.setOpeningCharacter(session);
+        if (!await gameManager.waitUntilRunning(session)) return;
+        this.ready = true;
 
-        const soundName = this.gameManager.gameMode.getCurrentGameBgName();
-        const audioClip = await ResourceManager.I.loadAudioClip(soundName);
-        this.gameManager.playSound.playOneShot(audioClip);
         this.animation.play();
     }
 
-    private async setOpeningCharacter() {
+    private async setOpeningCharacter(session: number) {
         const level = this.gameManager.gameMode.getCurrentLevelFromVersion();
         const prop = gameProperty.I;
         
@@ -74,7 +77,8 @@ export class playStartingNode extends Component {
         let normalIndex = 0;
         for (const item of positiveScores) {
             if (normalIndex < this.openingEggNormalList.length && this.openingEggNormalList[normalIndex] != null) {
-                await this.openingEggNormalList[normalIndex].initialize(item.image, item.score);
+                await this.openingEggNormalList[normalIndex].initialize(item.image, item.score, () => this.gameManager.isSessionCurrent(session));
+                if (!await this.gameManager.waitUntilRunning(session)) return;
                 this.openingEggNormalList[normalIndex].node.active = true;
                 normalIndex++;
             }
@@ -90,7 +94,8 @@ export class playStartingNode extends Component {
         let negativeIndex = 0;
         for (const item of negativeScores) {
             if (negativeIndex < this.openingEggNegativeList.length && this.openingEggNegativeList[negativeIndex] != null) {
-                await this.openingEggNegativeList[negativeIndex].initialize(item.image, item.score);
+                await this.openingEggNegativeList[negativeIndex].initialize(item.image, item.score, () => this.gameManager.isSessionCurrent(session));
+                if (!await this.gameManager.waitUntilRunning(session)) return;
                 this.openingEggNegativeList[negativeIndex].node.active = true;
                 negativeIndex++;
             }
@@ -104,6 +109,7 @@ export class playStartingNode extends Component {
     }
 
     update(deltaTime: number) {
+        if (!this.ready || this.gameManager.isPaused) return;
         this.sinElapsedTime += deltaTime * 100;
         
         // 활성화된 openingEggNormalList에 애니메이션 적용

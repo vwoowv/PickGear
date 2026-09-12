@@ -44,6 +44,11 @@ export class gameInstance extends Component {
 
     // 인스턴스가 파괴될 때 참조 정리
     onDestroy() {
+        this.playing.disconnectWebControl();
+        if (this.audioUnlockSource) {
+            this.audioUnlockSource.node.off(AudioSource.EventType.STARTED, this.onAudioUnlocked, this);
+            this.audioUnlockSource.stop();
+        }
         this.audioGeneration++;
         this.audioSource.node.off(AudioSource.EventType.ENDED, this.onAudioEnded, this);
         if (gameInstance._instance === this) {
@@ -54,6 +59,7 @@ export class gameInstance extends Component {
 
     start() {
         gameModeManager.I.initialize(this.uiNode, this.node);
+        this.playing.connectWebControl();
         gameModeManager.I.rootSelectGameType();
     }
 
@@ -68,15 +74,47 @@ export class gameInstance extends Component {
 
     public async prepareGameAudio() {
         // 선택 화면에서 AudioSource의 디코딩까지 시작해 첫 클릭 전에 준비한다.
-        this.audioSource.clip = await ResourceManager.I.loadAudioClip('sound/Kiss and cry_Game');
+        const clip = await ResourceManager.I.loadAudioClip('sound/Kiss and cry_Game');
+        this.audioSource.clip = clip;
+        if (typeof document !== 'undefined' && !this.audioUnlockSource) {
+            // 재생이 차단되면 Cocos가 첫 canvas touchend/mouseup에 AudioContext를
+            // resume하도록 등록한다. 게임 선택 전에 등록해야 두 번째 클릭을 기다리지 않는다.
+            const node = new Node('BrowserAudioUnlock');
+            this.node.addChild(node);
+            const source = node.addComponent(AudioSource);
+            this.audioUnlockSource = source;
+            source.volume = 0;
+            source.clip = clip;
+            source.node.on(AudioSource.EventType.STARTED, this.onAudioUnlocked, this);
+            source.play();
+        }
     }
 
     public activateGameAudio() {
-        // 사용자 클릭의 동기 호출 안에서 브라우저 오디오를 활성화한다.
-        // 실제 음악은 준비 단계에서 처음부터 재생하며, 이 요청은 무음이다.
+        // 첫 클릭 안에서 실제 음악을 시작한다. 무음 재생 직후 stop하면
+        // 브라우저에 따라 이후의 비동기 유음 재생이 다시 차단될 수 있다.
         if (!this.audioSource.clip) return;
-        this.audioSource.volume = 0;
+        this.audioSource.volume = 1;
+        this.activeAudio.add(this.audioSource);
         this.audioSource.play();
+    }
+
+    private audioUnlockSource: AudioSource = null;
+    private audioUnlocked = false;
+    private readonly onAudioUnlocked = () => {
+        this.audioUnlocked = true;
+        this.audioUnlockSource.stop();
+    };
+
+    public getAudioState() {
+        return {
+            requested: this.activeAudio.has(this.audioSource),
+            playing: this.audioSource.playing,
+            paused: this.audioPaused,
+            currentTime: this.audioSource.currentTime,
+            volume: this.audioSource.volume,
+            browserUnlocked: this.audioUnlocked,
+        };
     }
 
     private activeAudio = new Set<AudioSource>();
@@ -90,6 +128,9 @@ export class gameInstance extends Component {
         const generation = this.audioGeneration;
         const clip = await ResourceManager.I.loadAudioClip(soundName);
         if (generation !== this.audioGeneration) return;
+        // 선택 클릭에서 시작한 음악을 준비 단계에서 멈추거나 처음부터 재생하지 않는다.
+        // 디코딩/일시정지 중에도 playing 대신 요청의 활성 상태를 확인한다.
+        if (music && this.audioSource.clip === clip && this.activeAudio.has(this.audioSource)) return;
         let source = this.audioSource;
         if (!music) {
             // 짧은 효과음도 제어 가능한 AudioSource로 재생한다.

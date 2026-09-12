@@ -10,8 +10,10 @@ export class openingEgg extends Component {
     @property(RichText)
     private eggScoreText: RichText = null;
 
-    public async initialize(eggTextureName: string, eggScore: number) {
-        this.eggImage.spriteFrame = await ResourceManager.I.loadResource(`textures/character/Opening/${eggTextureName}/spriteFrame`, SpriteFrame);
+    public async initialize(eggTextureName: string, eggScore: number, isCurrent: () => boolean = () => true): Promise<void> {
+        const frame = await ResourceManager.I.loadResource<SpriteFrame>(`textures/character/Opening/${eggTextureName}/spriteFrame`, SpriteFrame);
+        if (!isCurrent()) return;
+        this.eggImage.spriteFrame = frame;
         
         // 스코어가 +1인 경우는 안 보이게 처리
         if (eggScore === 1) {

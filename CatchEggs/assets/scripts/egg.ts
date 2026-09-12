@@ -13,8 +13,11 @@ export class egg extends Component {
     public currentType: EggType = EggType.DoArin;
     private defaultFallDownSpeed: number = 500;
     private fallDownSpeed: number = this.defaultFallDownSpeed;
-    public async initialize(egg: EggType, endLine: Node, currentTime: number, totalDuration: number, gameMode: EGameMode, extensions: gameManagerExtensions, level: number) {
-        this.eggImage.spriteFrame = await extensions.loadSprite(egg, level);
+    public async initialize(egg: EggType, endLine: Node, currentTime: number, totalDuration: number, gameMode: EGameMode, extensions: gameManagerExtensions, level: number): Promise<void> {
+        const session = extensions.gameManager.sessionId;
+        const frame = await extensions.loadSprite(egg, level);
+        if (!await extensions.gameManager.waitUntilRunning(session)) return;
+        this.eggImage.spriteFrame = frame;
         this.endLine = endLine;
         this.currentType = egg;
         this.extensions = extensions;
@@ -45,6 +48,7 @@ export class egg extends Component {
     }
 
     update(deltaTime: number) {
+        if (!this.extensions || this.extensions.gameManager.isPaused) return;
         this.fallDown(deltaTime);
         if (this.currentType == EggType.Happy) {
             this.node.angle += 180 * deltaTime;
@@ -70,8 +74,12 @@ export class egg extends Component {
         else {
             this.extensions.playSound.playOneShot(this.extensions.eggCatchSound[0]);
         }
-        this.extensions.showEggEffect(this.node.position.clone());
-        this.extensions.spawnEggScore(this.node.position.clone(), currentScore);
+        this.extensions.showEggEffect(this.node.position.clone()).catch(error => {
+            console.error("[egg] effect/box/boxHit2D load failed:", error);
+        });
+        this.extensions.spawnEggScore(this.node.position.clone(), currentScore).catch(error => {
+            console.error("[egg] prefab/EggScore load failed:", error);
+        });
     }
 
     private fallDown(deltaTime: number) {
@@ -80,7 +88,9 @@ export class egg extends Component {
             return;
         }
         if (this.node.position.y < this.endLine.position.y) {
-            this.extensions.spawnEggScore(this.node.position.clone(), 0);
+            this.extensions.spawnEggScore(this.node.position.clone(), 0).catch(error => {
+                console.error("[egg] prefab/EggScore load failed:", error);
+            });
             this.node.parent.removeChild(this.node);
             this.node.destroy();
             // 0보다 클 경우에만 콤보가 리셋된다

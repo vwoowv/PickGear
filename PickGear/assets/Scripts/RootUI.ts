@@ -71,6 +71,8 @@ export class RootUI extends Component {
     @property(Node)
     public gameNode: Node = null;
 
+    private debugControlsEnabled = false;
+    private exitButtonRequested = false;
     private exitButton: Node = null;
     private exitConfirmation: Node = null;
     private continueAction: () => void = null;
@@ -152,12 +154,22 @@ export class RootUI extends Component {
         return node;
     }
 
+    public setDebugControlsEnabled(enabled: boolean) {
+        this.debugControlsEnabled = enabled;
+        this.setExitButtonVisible(this.exitButtonRequested);
+        if (!enabled) this.hideExitConfirmation();
+        this.resultGroup.getChildByName('RetryButton').active = enabled;
+        this.resultGroup.getChildByName('HomeButton').active = enabled;
+    }
+
     public setExitButtonVisible(visible: boolean) {
+        this.exitButtonRequested = visible;
         if (visible) this.ensureExitUI();
-        if (this.exitButton) this.exitButton.active = visible;
+        if (this.exitButton) this.exitButton.active = visible && this.debugControlsEnabled;
     }
 
     public showExitConfirmation(onContinue: () => void, onExit: () => void) {
+        if (!this.debugControlsEnabled) return;
         this.ensureExitUI();
         this.continueAction = onContinue;
         this.exitAction = onExit;
@@ -249,6 +261,7 @@ export class RootUI extends Component {
 
     public setupResult(currentPoint: number, perfect: boolean) {
         this.hideAllGroup();
+        this.setDebugControlsEnabled(this.debugControlsEnabled);
         this.resultGroup.active = true;
         this.resultScoreText.string = new richTextMaker(currentPoint.toString(), "020202", 3, "000000").resultText;
         this.resultBackgroundSuccess.active = false;

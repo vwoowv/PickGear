@@ -15,6 +15,12 @@ export class LoadingNode extends Component {
     @property(ProgressBar)
     private readonly progressBar: ProgressBar = null;
     private _started: boolean = false;
+    private readyPromise: Promise<void> = null;
+
+    public whenReady(): Promise<void> {
+        if (!this.readyPromise) this.readyPromise = this.run();
+        return this.readyPromise;
+    }
 
     public start(): void {
         if (this._started) {
@@ -22,7 +28,7 @@ export class LoadingNode extends Component {
         }
         this._started = true;
 
-        void this.run();
+        void this.whenReady();
     }
 
     private async run(): Promise<void> {

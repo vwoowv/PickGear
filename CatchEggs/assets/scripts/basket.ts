@@ -1,4 +1,5 @@
 import { _decorator, Component, isValid, Node, Sprite, tween, Tween, Vec3 } from 'cc';
+import { gameManager } from './gameManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('basket')
@@ -10,6 +11,14 @@ export class basket extends Component {
 
     private baseScale: Vec3 = new Vec3(1, 1, 1);
     private pulseTween: Tween<Node> | null = null;
+
+    private flashTimeLeft: number = 0;
+
+    public update(deltaTime: number): void {
+        if (gameManager.I?.isPaused || this.flashTimeLeft <= 0) return;
+        this.flashTimeLeft -= deltaTime;
+        if (this.flashTimeLeft <= 0) this.restoreToNormal();
+    }
 
     private readonly restoreToNormal = () => {
         if (!isValid(this.node, true)) {
@@ -26,7 +35,7 @@ export class basket extends Component {
     }
 
     public initialize() {
-        this.unschedule(this.restoreToNormal);
+        this.flashTimeLeft = 0;
         this.stopPulse();
         this.node.setScale(this.baseScale);
         this.setNormal();
@@ -38,8 +47,8 @@ export class basket extends Component {
         }
         this.setRed();
         this.startPulse();
-        this.unschedule(this.restoreToNormal);
-        this.scheduleOnce(this.restoreToNormal, Math.max(0, durationSeconds));
+        this.flashTimeLeft = Math.max(0, durationSeconds);
+        if (this.flashTimeLeft === 0) this.restoreToNormal();
     }
 
     private startPulse() {
