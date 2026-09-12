@@ -1,4 +1,4 @@
-import { _decorator, Component, Sprite, SpriteFrame } from 'cc';
+import { _decorator, Component, Sprite, SpriteFrame, isValid } from 'cc';
 import { ECharacterSuitType, ECharacterType } from '../GameDefine';
 import { dancerSprite, nameTagSprite } from './dancerResource';
 import { ResourceManager } from '../ResourceManager';
@@ -18,8 +18,11 @@ export class dancer extends Component {
     public async initialize(dancerType: ECharacterType) {
         this.dancerType = dancerType;
         const resourcePath = new dancerSprite(this.dancerType).resourcePath;
-        this.characterSprite.spriteFrame = await ResourceManager.I.loadResource(resourcePath, SpriteFrame);
-        this.nameTag.spriteFrame = await ResourceManager.I.loadResource(new nameTagSprite(this.dancerType).resourcePath, SpriteFrame);
+        const character = await ResourceManager.I.loadResource<SpriteFrame>(resourcePath, SpriteFrame);
+        if (!isValid(this, true)) return;
+        this.characterSprite.spriteFrame = character;
+        const name = await ResourceManager.I.loadResource<SpriteFrame>(new nameTagSprite(this.dancerType).resourcePath, SpriteFrame);
+        if (isValid(this, true)) this.nameTag.spriteFrame = name;
     }
 
     public showNameTag(isShow: boolean) {
@@ -27,7 +30,8 @@ export class dancer extends Component {
     }
 
     public async suitChange(suitType: ECharacterSuitType) {
-        this.currentSuit.spriteFrame = await new getDancerSuitSpriteFrame().getAsync(this.dancerType, suitType, true);
+        const frame = await new getDancerSuitSpriteFrame().getAsync(this.dancerType, suitType, true);
+        if (isValid(this, true)) this.currentSuit.spriteFrame = frame;
     }
 
     public takeOffSuit() {

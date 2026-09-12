@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Vec3 } from 'cc';
+import { _decorator, Component, Node, Vec3, isValid } from 'cc';
 import { RootUI } from './RootUI';
 import { EGameModeState } from './GameMode/gameModeStateEvent';
 import { ECharacterSuitType, ECharacterType, EFaceType, EPlayingSequence } from './GameDefine';
@@ -28,7 +28,7 @@ export class gamePlaying extends Component {
     private characterRollingPosEnd: Node = null;
     @property(gamePlayProperty)
     private gameProperty: gamePlayProperty = null;
-    private currentSequence: EPlayingSequence = EPlayingSequence.ShowSuit;
+    private currentSequence: EPlayingSequence = EPlayingSequence.Exited;
     public currentSuitType: ECharacterSuitType = ECharacterSuitType.YG;
     private currentLevel: number = 1;
     private currentPoint: number = 0;
@@ -52,6 +52,110 @@ export class gamePlaying extends Component {
     private restartPending: boolean = false;
     private parentMessageOrigin: string = '*';
 
+    private sessionVersion = 0;
+    private sessionActive = false;
+    private paused = false;
+    private stateLoading = false;
+    private transitionPending = false;
+    private stateVersion = 0;
+    private resumeWaiters: Array<() => void> = [];
+
+    public get sessionId(): number { return this.sessionVersion; }
+    public get isSessionActive(): boolean { return this.sessionActive; }
+    public isSessionCurrent(id: number): boolean {
+        return this.sessionActive && id === this.sessionVersion && isValid(this, true);
+    }
+
+    public async waitUntilRunning(id: number): Promise<boolean> {
+        while (this.isSessionCurrent(id) && this.paused) {
+            await new Promise<void>((resolve) => this.resumeWaiters.push(resolve));
+        }
+        return this.isSessionCurrent(id);
+    }
+
+    private releaseResumeWaiters() {
+        const waiters = this.resumeWaiters.splice(0);
+        waiters.forEach((resolve) => resolve());
+    }
+
+    public beginSession(): number {
+        this.endSession();
+        this.sessionActive = true;
+        this.currentSequence = EPlayingSequence.Prepare;
+        return this.sessionVersion;
+    }
+
+    public endSession() {
+        this.sessionActive = false;
+        this.sessionVersion++;
+        this.stateVersion++;
+        this.paused = false;
+        this.stateLoading = false;
+        this.transitionPending = false;
+        this.currentSequence = EPlayingSequence.Exited;
+        this.releaseResumeWaiters();
+        RootUI.I.setGamePaused(false);
+        RootUI.I.hideExitConfirmation();
+        RootUI.I.setExitButtonVisible(false);
+        RootUI.I.resetTransientUI();
+        gameInstance.I.stopGameAudio();
+        this.garbageRollingSuit();
+        this.pickedSuitList.clear();
+        this.garbageDancer();
+        this.currentPoint = this.currentComboScore = this.currentComboCount = 0;
+        this.currentTime = this.currentGameRoundTime = this.nextRollingSuitTime = 0;
+        this.currentLevel = 1;
+        this.finalRoundSequence = this.waitingTimeForNextDancer = 0;
+        this.showPickSuit = false;
+    }
+
+    public onTouchExitButton() {
+        if (!this.sessionActive || this.paused || this.restartPending ||
+            this.currentSequence === EPlayingSequence.EndGame) return;
+        this.paused = true;
+        gameInstance.I.pauseGameAudio();
+        RootUI.I.setGamePaused(true);
+        RootUI.I.showExitConfirmation(
+            () => this.onTouchContinueButton(),
+            () => { void this.confirmExit(); }
+        );
+    }
+
+    public onTouchContinueButton() {
+        if (!this.sessionActive || !this.paused || this.restartPending) return;
+        RootUI.I.hideExitConfirmation();
+        this.paused = false;
+        RootUI.I.setGamePaused(false);
+        gameInstance.I.resumeGameAudio();
+        this.releaseResumeWaiters();
+    }
+
+    private async confirmExit() {
+        if (!this.sessionActive || this.restartPending) return;
+        this.restartPending = true;
+        try {
+            await gameModeManager.I.exitGame();
+        } catch (error) {
+            console.error('Failed to exit game', error);
+        } finally {
+            this.restartPending = false;
+        }
+    }
+
+    private async advance(transition: () => Promise<void>) {
+        if (this.transitionPending) return;
+        const id = this.sessionId;
+        this.transitionPending = true;
+        try {
+            await transition();
+        } catch (error) {
+            console.error('Game transition failed', error);
+            if (this.isSessionCurrent(id)) await this.confirmExit();
+        } finally {
+            if (this.isSessionCurrent(id)) this.transitionPending = false;
+        }
+    }
+
     protected onLoad(): void {
         if (typeof window !== 'undefined') {
             window.addEventListener('message', this.onParentMessage);
@@ -59,6 +163,9 @@ export class gamePlaying extends Component {
     }
 
     protected onDestroy(): void {
+        this.sessionActive = false;
+        this.sessionVersion++;
+        this.releaseResumeWaiters();
         if (typeof window !== 'undefined') {
             window.removeEventListener('message', this.onParentMessage);
         }
@@ -82,6 +189,7 @@ export class gamePlaying extends Component {
     }
 
     update(deltaTime: number) {
+        if (!this.sessionActive || this.paused || this.stateLoading || this.transitionPending) return;
         this.pickedSuitList.update(deltaTime);
         switch (this.currentSequence) {
             case EPlayingSequence.ShowSuit:
@@ -99,7 +207,7 @@ export class gamePlaying extends Component {
     private updateShowSuit(deltaTime: number) {
         this.currentTime += deltaTime;
         if (this.currentTime > this.showSuitTime) {
-            gameModeManager.I.playingToGameRound(this.currentLevel);
+            void this.advance(() => gameModeManager.I.playingToGameRound(this.currentLevel));
         }
     }
 
@@ -116,8 +224,8 @@ export class gamePlaying extends Component {
 
     private garbageRollingSuit() {
         for (let i = 0; i < this.rollingSuitList.length; i++) {
-            this.rollingSuitPos.removeChild(this.rollingSuitList[i].node);
-            this.rollingSuitList[i].destroy();
+            this.rollingSuitList[i].node.removeFromParent();
+            this.rollingSuitList[i].node.destroy();
         }
         this.rollingSuitList = [];
         this.wrongSuitList = [];
@@ -127,17 +235,18 @@ export class gamePlaying extends Component {
     private rollingSuitList: RollingSuit[] = [];
     private wrongSuitList: RollingSuit[] = [];
     private readonly pickedSuitList: PickedSuitManager = new PickedSuitManager();
-    private async updateGameRoundUnderLevel5(deltaTime: number) {
+    private updateGameRoundUnderLevel5(deltaTime: number) {
         if (this.currentTime > this.currentGameRoundTime) {
             // 이번 라운드 종료. 게임 결과로 넘어간다
-            gameModeManager.I.playingToShowSuit(this.currentLevel + 1);
+            void this.advance(() => gameModeManager.I.playingToShowSuit(this.currentLevel + 1));
             this.garbageRollingSuit();
+            return;
         }
 
         this.nextRollingSuitTime -= deltaTime;
         if (this.nextRollingSuitTime <= 0 && this.currentGameRoundTime - this.currentTime > 0.5) {
             this.nextRollingSuitTime = 1 - this.currentLevel * 0.1;
-            await this.newRandomRollingSuit();
+            void this.newRandomRollingSuit().catch((error) => console.error('Failed to spawn suit', error));
         }
 
         this.updateRollingSuitList(deltaTime);
@@ -199,15 +308,32 @@ export class gamePlaying extends Component {
     }
 
     private async newRandomRollingSuit() {
+        const id = this.sessionId;
+        const state = this.stateVersion;
         const newRollingSuit = await ResourceManager.I.spawnPrefab<RollingSuit>("prefab/suit/RollingSuit", this.rollingSuitPos);
-        const startPosition: Vec3 = new Vec3(this.characterRollingPosStart.position.x, 0, this.characterRollingPosStart.position.z);
-        newRollingSuit.node.setPosition(startPosition);
-        const currentCharacterType = this.randomCharacterTypeList[this.currentCharacterTypeIndex];
-        newRollingSuit.Initialize(currentCharacterType, this.currentSuitType, this.currentDancer.dancerType, this.getMoveSpeed());
-        this.rollingSuitList.push(newRollingSuit);
-        this.currentCharacterTypeIndex++;
-        if (this.currentCharacterTypeIndex >= this.randomCharacterTypeList.length) {
-            this.shuffleCharacterTypeList();
+        newRollingSuit.node.active = false;
+        if (!await this.waitUntilRunning(id) || state !== this.stateVersion) {
+            newRollingSuit.node.destroy();
+            return;
+        }
+        try {
+            const startPosition = new Vec3(this.characterRollingPosStart.position.x, 0, this.characterRollingPosStart.position.z);
+            newRollingSuit.node.setPosition(startPosition);
+            const characterType = this.randomCharacterTypeList[this.currentCharacterTypeIndex];
+            await newRollingSuit.Initialize(characterType, this.currentSuitType, this.currentDancer.dancerType, this.getMoveSpeed());
+            if (!await this.waitUntilRunning(id) || state !== this.stateVersion) {
+                newRollingSuit.node.destroy();
+                return;
+            }
+            newRollingSuit.node.active = true;
+            this.rollingSuitList.push(newRollingSuit);
+            this.currentCharacterTypeIndex++;
+            if (this.currentCharacterTypeIndex >= this.randomCharacterTypeList.length) {
+                this.shuffleCharacterTypeList();
+            }
+        } catch (error) {
+            newRollingSuit.node.destroy();
+            throw error;
         }
     }
 
@@ -238,7 +364,7 @@ export class gamePlaying extends Component {
         return currentX <= -300;
     }
 
-    private async updateGameRoundOverLevel5(deltaTime: number) {
+    private updateGameRoundOverLevel5(deltaTime: number) {
         this.updateRollingSuitList(deltaTime);
 
         // 마지막 롤링 수트가 중간 지점을 지나 100 만큼 이동했다면 다음 댄서로 넘어간다
@@ -258,7 +384,7 @@ export class gamePlaying extends Component {
                 this.finalRoundSequence++;
                 if (this.finalRoundSequence >= 4) {
                     // 게임 종료. 결과 보여준다
-                    gameModeManager.I.playingToLevel5Result();
+                    void this.advance(() => gameModeManager.I.playingToLevel5Result());
                     this.garbageRollingSuit();
                     return;
                 }
@@ -283,7 +409,7 @@ export class gamePlaying extends Component {
             this.nextRollingSuitTime -= deltaTime;
             if (this.nextRollingSuitTime <= 0 && this.currentGameRoundTime - this.currentTime > 0.5) {
                 this.nextRollingSuitTime = 1;
-                await this.newRandomRollingSuit();
+                void this.newRandomRollingSuit().catch((error) => console.error('Failed to spawn suit', error));
             }
         }
     }
@@ -338,7 +464,7 @@ export class gamePlaying extends Component {
         if (this.currentTime > this.finalRoundTime[this.finalRoundSequence]) {
             this.finalRoundSequence++;
             if (this.finalRoundSequence >= 4) {
-                gameModeManager.I.playingToEndGame();
+                void this.advance(() => gameModeManager.I.playingToEndGame());
                 return;
             }
             this.dancerPos.removeAllChildren();
@@ -350,7 +476,18 @@ export class gamePlaying extends Component {
         this.currentSuitType = gameType;
     }
 
-    public onTransitionChanged(currentMode: EGameModeState) {
+    public async onTransitionChanged(currentMode: EGameModeState, sessionId: number = this.sessionId) {
+        if (!await this.waitUntilRunning(sessionId)) return;
+        const state = ++this.stateVersion;
+        this.stateLoading = true;
+        try {
+            await this.applyTransition(currentMode);
+        } finally {
+            if (state === this.stateVersion) this.stateLoading = false;
+        }
+    }
+
+    private applyTransition(currentMode: EGameModeState) {
         // enum 이름이 찍히도록 출력
         this.currentSequence = new getPlaySequenceFromState(currentMode).gameSequence;
         this.currentLevel = new getPlayLevelFromState(currentMode).currentLevel;
@@ -376,6 +513,7 @@ export class gamePlaying extends Component {
 
     private async onPrepare() {
         console.log('onPrepare');
+        const id = this.sessionId;
         this.currentPoint = 0;
         this.currentComboScore = 0;
         this.currentComboCount = 0;
@@ -385,28 +523,36 @@ export class gamePlaying extends Component {
         this.showPickSuit = false;
         this.showPickSuitTime = 0.5;
         this.shuffleCharacterTypeList();
-        await gameInstance.I.playAudioClip('sound/Kiss and cry_Game');
+        await gameInstance.I.playAudioClip('sound/Kiss and cry_Game', 1, true);
+        if (!await this.waitUntilRunning(id)) return;
         await gameModeManager.I.playingToLevel1ShowSuit();
-        this.postParentMessage({ type: 'GAME_START' });
+        if (this.isSessionCurrent(id)) this.postParentMessage({ type: 'GAME_START' });
     }
 
     private currentDancer: dancer = null;
     private allDancer: dancer[] = [];
     private async onShowSuit() {
         console.log('onShowSuit');
+        const id = this.sessionId;
         // 현재 레벨의 댄서와 맞출 복장을 보여준다
         RootUI.I.setupShowSuit(this.currentLevel);
         this.garbageDancer();
         if (this.currentLevel > 4) {
             // 4명 전부 나온다
             for (let i = 0; i < 4; i++) {
-                this.allDancer[i] = await this.newDancer(i + 1, this.dancerResultPos[i]);
-                this.allDancer[i].suitChange(this.currentSuitType);
+                const created = await this.newDancer(i + 1, this.dancerResultPos[i], id);
+                if (!created) return;
+                this.allDancer[i] = created;
+                await created.suitChange(this.currentSuitType);
+                if (!await this.waitUntilRunning(id)) return;
             }
         }
         else {
-            this.currentDancer = await this.newDancer(this.currentLevel, this.dancerPos);
-            this.currentDancer.suitChange(this.currentSuitType);
+            const created = await this.newDancer(this.currentLevel, this.dancerPos, id);
+            if (!created) return;
+            this.currentDancer = created;
+            await created.suitChange(this.currentSuitType);
+            if (!await this.waitUntilRunning(id)) return;
         }
         this.currentTime = 0;
     }
@@ -420,7 +566,7 @@ export class gamePlaying extends Component {
         this.currentDancer = null;
         if (this.allDancer.length > 0) {
             for (let i = 0; i < 4; i++) {
-                if (this.allDancer[i] === null) {
+                if (!this.allDancer[i]) {
                     continue;
                 }
                 this.allDancer[i].node.removeFromParent();
@@ -430,9 +576,24 @@ export class gamePlaying extends Component {
         }
     }
 
-    private async newDancer(level: number, dancerPos: Node) {
+    private async newDancer(level: number, dancerPos: Node, id: number) {
         const newDancer = await ResourceManager.I.spawnPrefab<dancer>("prefab/character/Dancer", dancerPos);
-        newDancer.initialize(new getCharacterTypeFromLevel(level).characterType);
+        newDancer.node.active = false;
+        if (!await this.waitUntilRunning(id)) {
+            newDancer.node.destroy();
+            return null;
+        }
+        try {
+            await newDancer.initialize(new getCharacterTypeFromLevel(level).characterType);
+        } catch (error) {
+            newDancer.node.destroy();
+            throw error;
+        }
+        if (!await this.waitUntilRunning(id)) {
+            newDancer.node.destroy();
+            return null;
+        }
+        newDancer.node.active = true;
         newDancer.showNameTag(true);
         return newDancer;
     }
@@ -446,7 +607,7 @@ export class gamePlaying extends Component {
         RootUI.I.setFaceSprite(this.currentDancer.dancerType, this.currentSuitType, EFaceType.Normal);
     }
 
-    private async onGameRound() {
+    private onGameRound() {
         console.log('onGameRound');
         if (this.currentLevel > 4) {
             // 마지막 레벨에서는 4명이 한번씩 번갈아 가면서 나온다
@@ -493,6 +654,7 @@ export class gamePlaying extends Component {
 
     private onEndGame() {
         console.log('onEndGame');
+        RootUI.I.setExitButtonVisible(false);
         RootUI.I.setupResult(this.currentPoint, this.perfect);
         this.dancerPos.removeAllChildren();
         for (let i = 0; i < 4; i++) {
@@ -511,22 +673,24 @@ export class gamePlaying extends Component {
             await gameModeManager.I.rootPlayGame();
         } catch (error) {
             console.error('Failed to restart game', error);
+            await gameModeManager.I.exitGame();
         } finally {
             this.restartPending = false;
         }
     }
 
     public onTouchHomeButton() {
-        if (this.restartPending) {
-            return;
+        if (this.currentSequence === EPlayingSequence.EndGame) {
+            void this.confirmExit();
+        } else {
+            this.onTouchExitButton();
         }
-        this.garbageDancer();
-        gameModeManager.I.rootSelectGameType();
     }
 
     private showPickSuit: boolean = false;
     public onTouchPickSuitButton() {
-        if (this.currentSequence != EPlayingSequence.GameRound) {
+        if (!this.sessionActive || this.paused || this.stateLoading || this.transitionPending ||
+            this.currentSequence != EPlayingSequence.GameRound) {
             return;
         }
 

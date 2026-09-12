@@ -1,4 +1,5 @@
-import { _decorator, Component, ProgressBar, RichText, Node, Label, AnimationComponent, Sprite, SpriteFrame, BlockInputEvents } from 'cc';
+import { _decorator, Component, ProgressBar, RichText, Node, Label, AnimationComponent, Sprite, SpriteFrame, BlockInputEvents, UITransform, Graphics, Color, Button, Widget, Tween, isValid } from 'cc';
+import { gameInstance } from './gameInstance';
 import { richTextMaker } from './Utility/richTextMaker';
 import { ECharacterSuitType, ECharacterType, EFaceType } from './GameDefine';
 import { getDancerFace } from './Character/getDancerFace';
@@ -70,11 +71,137 @@ export class RootUI extends Component {
     @property(Node)
     public gameNode: Node = null;
 
+    private exitButton: Node = null;
+    private exitConfirmation: Node = null;
+    private continueAction: () => void = null;
+    private exitAction: () => void = null;
+    private gamePaused = false;
+    private pausedAnimations: AnimationComponent[] = [];
+    private faceRequest = 0;
+
+    // 기존 씬 참조를 유지하며 게임 UI 안에 버튼과 팝업을 생성한다.
+    private ensureExitUI() {
+        if (this.exitButton) return;
+        this.exitButton = this.createExitAction(this.gameNode, 'ExitButton', '나가기', 132, 58,
+            new Color(40, 36, 55, 235), () => gameInstance.I.playing.onTouchExitButton());
+        const placement = this.exitButton.addComponent(Widget);
+        placement.isAlignTop = true;
+        placement.isAlignRight = true;
+        placement.top = 180;
+        placement.right = 24;
+        placement.alignMode = Widget.AlignMode.ALWAYS;
+
+        this.exitConfirmation = this.createExitPanel(this.gameNode, 'ExitConfirmation', 720, 1280,
+            new Color(15, 12, 25, 190));
+        const stretch = this.exitConfirmation.addComponent(Widget);
+        stretch.isAlignTop = stretch.isAlignBottom = true;
+        stretch.isAlignLeft = stretch.isAlignRight = true;
+        stretch.top = stretch.bottom = stretch.left = stretch.right = 0;
+        stretch.alignMode = Widget.AlignMode.ALWAYS;
+        this.exitConfirmation.addComponent(BlockInputEvents);
+        const card = this.createExitPanel(this.exitConfirmation, 'ExitCard', 600, 350, new Color(255, 251, 247));
+        this.createExitLabel(card, '게임을 나갈까요?', 38, 560, 60).setPosition(0, 95);
+        this.createExitLabel(card, '진행 중인 점수는 사라집니다.', 26, 560, 50).setPosition(0, 25);
+        this.createExitAction(card, 'ContinueButton', '계속하기', 240, 76,
+            new Color(67, 53, 102), () => this.continueAction?.()).setPosition(-132, -90);
+        this.createExitAction(card, 'ConfirmExitButton', '나가기', 240, 76,
+            new Color(161, 54, 75), () => this.exitAction?.()).setPosition(132, -90);
+        this.exitConfirmation.active = false;
+        this.exitButton.active = false;
+    }
+
+    private createExitPanel(parent: Node, name: string, width: number, height: number, color: Color): Node {
+        const node = new Node(name);
+        node.layer = parent.layer;
+        parent.addChild(node);
+        node.addComponent(UITransform).setContentSize(width, height);
+        const graphic = node.addComponent(Graphics);
+        const draw = () => {
+            const size = node.getComponent(UITransform).contentSize;
+            graphic.clear();
+            graphic.fillColor = color;
+            graphic.roundRect(-size.width / 2, -size.height / 2, size.width, size.height, 16);
+            graphic.fill();
+        };
+        node.on(Node.EventType.SIZE_CHANGED, draw);
+        draw();
+        return node;
+    }
+
+    private createExitLabel(parent: Node, text: string, fontSize: number, width: number, height: number): Node {
+        const node = new Node('Label');
+        node.layer = parent.layer;
+        parent.addChild(node);
+        node.addComponent(UITransform).setContentSize(width, height);
+        const label = node.addComponent(Label);
+        label.string = text;
+        label.fontSize = fontSize;
+        label.lineHeight = fontSize + 8;
+        label.color = new Color(40, 36, 55);
+        label.horizontalAlign = Label.HorizontalAlign.CENTER;
+        label.verticalAlign = Label.VerticalAlign.CENTER;
+        return node;
+    }
+
+    private createExitAction(parent: Node, name: string, text: string, width: number, height: number,
+        color: Color, action: () => void): Node {
+        const node = this.createExitPanel(parent, name, width, height, color);
+        node.addComponent(Button);
+        this.createExitLabel(node, text, 28, width, height).getComponent(Label).color = Color.WHITE;
+        node.on(Button.EventType.CLICK, action);
+        return node;
+    }
+
+    public setExitButtonVisible(visible: boolean) {
+        if (visible) this.ensureExitUI();
+        if (this.exitButton) this.exitButton.active = visible;
+    }
+
+    public showExitConfirmation(onContinue: () => void, onExit: () => void) {
+        this.ensureExitUI();
+        this.continueAction = onContinue;
+        this.exitAction = onExit;
+        this.exitConfirmation.setSiblingIndex(this.gameNode.children.length - 1);
+        this.exitConfirmation.active = true;
+    }
+
+    public hideExitConfirmation() {
+        if (this.exitConfirmation) this.exitConfirmation.active = false;
+        this.continueAction = this.exitAction = null;
+    }
+
+    public setGamePaused(paused: boolean) {
+        if (this.gamePaused === paused) return;
+        this.gamePaused = paused;
+        if (paused) {
+            this.pausedAnimations = this.gameNode.getComponentsInChildren(AnimationComponent)
+                .filter((animation) => animation.clips.some((clip) => clip && animation.getState(clip.name)?.isPlaying));
+            this.pausedAnimations.forEach((animation) => animation.pause());
+        } else {
+            this.pausedAnimations.forEach((animation) => { if (isValid(animation)) animation.resume(); });
+            this.pausedAnimations = [];
+        }
+        const visit = (node: Node) => {
+            if (paused) Tween.pauseAllByTarget(node);
+            else Tween.resumeAllByTarget(node);
+            node.children.forEach(visit);
+        };
+        visit(this.gameNode);
+    }
+
+    public resetTransientUI() {
+        this.faceRequest++;
+        this.leftFaceSpriteBackToNormalTime = -1;
+        this.currentShowScoreGroup.getComponent(AnimationComponent)?.stop();
+    }
+
     update(deltaTime: number) {
-        this.updateFaceSprite(deltaTime);
+        if (!this.gamePaused) this.updateFaceSprite(deltaTime);
     }
 
     public hideAllNodeOff() {
+        this.hideExitConfirmation();
+        this.setExitButtonVisible(false);
         this.selectGameTypeNode.active = false;
         this.gameNode.active = false;
     }
@@ -86,6 +213,7 @@ export class RootUI extends Component {
     public showGameNode() {
         this.selectGameTypeNode.active = false;
         this.gameNode.active = true;
+        this.setExitButtonVisible(true);
     }
 
     public hideAllGroup() {
@@ -201,11 +329,15 @@ export class RootUI extends Component {
 
     public async setFaceSprite(dancerType: ECharacterType, characterSuitType: ECharacterSuitType, faceType: EFaceType) {
         const resourcePath = new getDancerFace().getFaceResourcePath(dancerType, characterSuitType, faceType);
-        this.faceSprite.spriteFrame = await ResourceManager.I.loadResource(resourcePath, SpriteFrame);
+        const request = ++this.faceRequest;
+        const frame = await ResourceManager.I.loadResource<SpriteFrame>(resourcePath, SpriteFrame);
+        if (request !== this.faceRequest || !isValid(this, true)) return false;
+        this.faceSprite.spriteFrame = frame;
+        return true;
     }
 
     public async setFaceSpriteAndBackToNormal(dancerType: ECharacterType, characterSuitType: ECharacterSuitType, faceType: EFaceType) {
-        await this.setFaceSprite(dancerType, characterSuitType, faceType);
+        if (!await this.setFaceSprite(dancerType, characterSuitType, faceType)) return;
         this.faceDancerType = dancerType;
         this.faceCharacterSuitType = characterSuitType;
         this.leftFaceSpriteBackToNormalTime = 1;

@@ -1,4 +1,4 @@
-import { _decorator, Component, Sprite, tween, Vec3 } from 'cc';
+import { _decorator, Component, Sprite, tween, Vec3, isValid } from 'cc';
 import { ECharacterSuitType, ECharacterType } from '../GameDefine';
 import { getDancerSuitSpriteFrame } from '../Utility/getDancerSuitSpriteFrame';
 const { ccclass, property } = _decorator;
@@ -15,7 +15,9 @@ export class RollingSuit extends Component {
     public async Initialize(dancerType: ECharacterType, suitType: ECharacterSuitType, correctDancerType: ECharacterType, moveSpeed: number) {
         this.suitType = suitType;
         this.dancerType = dancerType;
-        this.suitSprite.spriteFrame = await new getDancerSuitSpriteFrame().getAsync(dancerType, suitType, false);
+        const frame = await new getDancerSuitSpriteFrame().getAsync(dancerType, suitType, false);
+        if (!isValid(this, true)) return;
+        this.suitSprite.spriteFrame = frame;
         this.moveSpeed = moveSpeed;
         this.isScoreEnabled = true;
     }

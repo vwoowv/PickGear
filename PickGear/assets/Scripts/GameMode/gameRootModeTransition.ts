@@ -1,3 +1,4 @@
+import { gameInstance } from "../gameInstance";
 import { RootUI } from "../RootUI";
 import { StateMachine, t } from "../StateMachine/stateMachine";
 import { EGameRootModeEvent, EGameRootModeState } from "./gameModeStateEvent";
@@ -37,7 +38,7 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
         try {
             const assetLists: IAssetLists = {
                 prefabs: [],
-                audioClips: [],
+                audioClips: ['sound/Kiss and cry_Game'],
                 spriteFrames: [],
             };
 
@@ -80,6 +81,7 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
                 (progress) => RootUI.I.setLoadingProgress(progress),
                 { concurrency: 6, continueOnError: false }
             );
+            await gameInstance.I.prepareGameAudio();
         } finally {
             RootUI.I.setLoadingProgress(1);
             await new Promise<void>((resolve) => setTimeout(resolve, 0));
@@ -91,6 +93,7 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
 
     private async onPlayGame() {
         console.log('onPlayGame');
+        const sessionId = gameInstance.I.playing.sessionId;
         RootUI.I.hideAllNodeOff();
         RootUI.I.hideAllGroup();
         RootUI.I.showLoadingGroup();
@@ -106,15 +109,17 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
             console.log(`gameBackgroundPath: ${gameBackgroundPath}, gameType: ${currentSuitType}`);
 
             if (gameBackgroundPath) {
-                backgroundSprite.spriteFrame = await ResourceManager.I.loadResource(gameBackgroundPath, SpriteFrame);
+                const frame = await ResourceManager.I.loadResource<SpriteFrame>(gameBackgroundPath, SpriteFrame);
+                if (gameInstance.I.playing.isSessionCurrent(sessionId)) backgroundSprite.spriteFrame = frame;
             }
         } finally {
-            // 마지막 프레임에 100%가 보이도록 보정
-            RootUI.I.setLoadingProgress(1);
-            // UI 렌더링이 한 프레임 반영될 시간을 줌 (같은 프레임에 비활성화하면 100%가 안 보일 수 있음)
-            await new Promise<void>((resolve) => setTimeout(resolve, 0));
-            RootUI.I.hideLoadingGroup();
+            if (gameInstance.I.playing.isSessionCurrent(sessionId)) {
+                RootUI.I.setLoadingProgress(1);
+                await new Promise<void>((resolve) => setTimeout(resolve, 0));
+                if (gameInstance.I.playing.isSessionCurrent(sessionId)) RootUI.I.hideLoadingGroup();
+            }
         }
+        if (!gameInstance.I.playing.isSessionCurrent(sessionId)) return;
         RootUI.I.showGameNode();
         await new playNewGame().initialize();
     }

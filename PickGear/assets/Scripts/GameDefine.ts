@@ -27,6 +27,7 @@ export enum EPlayingSequence {
     GameRound,
     Result,
     EndGame,
+    Exited,
 }
 
 export enum EFaceType {

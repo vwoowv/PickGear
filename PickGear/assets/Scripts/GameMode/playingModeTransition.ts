@@ -3,7 +3,7 @@ import { StateMachine, t } from "../StateMachine/stateMachine";
 import { EGameModeEvent, EGameModeState } from "./gameModeStateEvent";
 
 export class playingModeTransition extends StateMachine<EGameModeState, EGameModeEvent> {
-    constructor() {
+    constructor(private readonly sessionId: number = 0) {
         super(EGameModeState.None, []);
         this.addTransitions([
             t(EGameModeState.None, EGameModeEvent.ToPrepare, EGameModeState.Prepare, this.onPrepare),
@@ -39,66 +39,66 @@ export class playingModeTransition extends StateMachine<EGameModeState, EGameMod
 
     private async onPrepare() {
         console.log('onPrepare');
-        await gameInstance.I.playing.onTransitionChanged(this.getState());
+        await gameInstance.I.playing.onTransitionChanged(this.getState(), this.sessionId);
     }
 
     private async onLevel1ShowSuit() {
         console.log('onLevel1ShowSuit');
-        await gameInstance.I.playing.onTransitionChanged(this.getState());
+        await gameInstance.I.playing.onTransitionChanged(this.getState(), this.sessionId);
     }
 
     private async onLevel1GameRound() {
         console.log('onLevel1GameRound');
-        gameInstance.I.playing.onTransitionChanged(this.getState());
+        await gameInstance.I.playing.onTransitionChanged(this.getState(), this.sessionId);
     }
 
     private async onLevel2ShowSuit() {
         console.log('onLevel2ShowSuit');
-        gameInstance.I.playing.onTransitionChanged(this.getState());
+        await gameInstance.I.playing.onTransitionChanged(this.getState(), this.sessionId);
     }
 
     private async onLevel2GameRound() {
         console.log('onLevel2GameRound');
-        gameInstance.I.playing.onTransitionChanged(this.getState());
+        await gameInstance.I.playing.onTransitionChanged(this.getState(), this.sessionId);
     }
 
     private async onLevel3ShowSuit() {
         console.log('onLevel3ShowSuit');
-        gameInstance.I.playing.onTransitionChanged(this.getState());
+        await gameInstance.I.playing.onTransitionChanged(this.getState(), this.sessionId);
     }
 
     private async onLevel3GameRound() {
         console.log('onLevel3GameRound');
-        gameInstance.I.playing.onTransitionChanged(this.getState());
+        await gameInstance.I.playing.onTransitionChanged(this.getState(), this.sessionId);
     }
 
     private async onLevel4ShowSuit() {
         console.log('onLevel4ShowSuit');
-        gameInstance.I.playing.onTransitionChanged(this.getState());
+        await gameInstance.I.playing.onTransitionChanged(this.getState(), this.sessionId);
     }
 
     private async onLevel4GameRound() {
         console.log('onLevel4GameRound');
-        gameInstance.I.playing.onTransitionChanged(this.getState());
+        await gameInstance.I.playing.onTransitionChanged(this.getState(), this.sessionId);
     }
 
     private async onLevel5ShowSuit() {
         console.log('onLevel5ShowSuit');
-        gameInstance.I.playing.onTransitionChanged(this.getState());
+        await gameInstance.I.playing.onTransitionChanged(this.getState(), this.sessionId);
     }
 
     private async onLevel5GameRound() {
         console.log('onLevel5GameRound');
-        gameInstance.I.playing.onTransitionChanged(this.getState());
+        await gameInstance.I.playing.onTransitionChanged(this.getState(), this.sessionId);
     }
 
     private async onLevel5Result() {
         console.log('onLevel5Result');
-        gameInstance.I.playing.onTransitionChanged(this.getState());
+        await gameInstance.I.playing.onTransitionChanged(this.getState(), this.sessionId);
     }
 
     private async onEndGame() {
         console.log('onEndGame');
-        gameInstance.I.playing.onTransitionChanged(this.getState());
+        await gameInstance.I.playing.onTransitionChanged(this.getState(), this.sessionId);
     }
 }
