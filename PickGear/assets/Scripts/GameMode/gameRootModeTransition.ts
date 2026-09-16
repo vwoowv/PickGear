@@ -7,7 +7,7 @@ import { IAssetLists, ResourceManager } from "../ResourceManager";
 import { gameInstanceUtility } from "./gameInstanceUtility";
 import { getGameBackground } from "../Utility/getGameBackground";
 import { SpriteFrame } from "cc";
-import { ECharacterType, ECharacterSuitType } from "../GameDefine";
+import { ECharacterType, ECharacterSuitType, EFaceType } from "../GameDefine";
 import { getDancerSuit } from "../Character/getDancerSuit";
 import { dancerSprite, nameTagSprite } from "../Character/dancerResource";
 import { getDancerFace } from "../Character/getDancerFace";
@@ -41,55 +41,17 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
         RootUI.I.setLoadingProgress(0);
 
         try {
-            const assetLists: IAssetLists = {
-                prefabs: [],
-                audioClips: ['sound/Kiss and cry_Game'],
-                spriteFrames: [],
-            };
-
-            // 모든 수트 타입의 배경 및 캐릭터 수트 스프라이트를 프리로드
-            for (const suitTypeKey of Object.keys(ECharacterSuitType)) {
-                // enum의 역매핑 숫자 키 필터링
-                const numericKey = Number(suitTypeKey);
-                if (Number.isNaN(numericKey)) {
-                    continue;
-                }
-                const suitType = numericKey as ECharacterSuitType;
-                const gameBackgroundPath = new getGameBackground(suitType).getBackgroundResourcePath();
-                if (gameBackgroundPath) {
-                    assetLists.spriteFrames.push(gameBackgroundPath);
-                }
-                for (let i = 0; i < ECharacterType.TotalCount; i++) {
-                    const characterType = i as ECharacterType;
-                    const resourcePath = new getDancerSuit(characterType).getSuitResourcePath(suitType, false);
-                    if (resourcePath) {
-                        assetLists.spriteFrames.push(resourcePath);
-                    }
-
-                    // 캐릭터 페이스(표정) 리소스 프리로드
-                    const faceNormal = new getDancerFace().getFaceResourcePath(characterType, suitType, 0);
-                    const faceSuccess = new getDancerFace().getFaceResourcePath(characterType, suitType, 1);
-                    const faceFail = new getDancerFace().getFaceResourcePath(characterType, suitType, 2);
-                    assetLists.spriteFrames.push(faceNormal, faceSuccess, faceFail);
-                }
-            }
-
-            // 기본 캐릭터 스프라이트 및 네임태그 프리로드
-            assetLists.spriteFrames.push(...dancerSprite.getAllResourcePath());
-            for (let i = 0; i < ECharacterType.TotalCount; i++) {
-                const characterType = i as ECharacterType;
-                assetLists.spriteFrames.push(new nameTagSprite(characterType).resourcePath);
-            }
-
+            // 첫 클릭 음악 재생에 필요한 공통 오디오만 기다린다.
+            // 게임용 이미지는 종류를 선택한 뒤 해당 종류만 준비한다.
             await ResourceManager.I.preloadGameAssets(
-                assetLists,
+                { audioClips: ['sound/Kiss and cry_Game'] },
                 (progress) => { if (presentation === this.presentationVersion) RootUI.I.setLoadingProgress(progress); },
                 { concurrency: 6, continueOnError: false }
             );
-            if (presentation === this.presentationVersion) await gameInstance.I.prepareGameAudio();
+            if (presentation !== this.presentationVersion) return;
+            await gameInstance.I.prepareGameAudio();
         } finally {
             if (presentation === this.presentationVersion) {
-                RootUI.I.setLoadingProgress(1);
                 await new Promise<void>((resolve) => setTimeout(resolve, 0));
                 if (presentation === this.presentationVersion) RootUI.I.hideLoadingGroup();
             }
@@ -98,6 +60,32 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
         if (presentation !== this.presentationVersion) return;
         RootUI.I.showSelectGameTypeNode();
         gameInstance.I.playing.notifyGameReady();
+    }
+
+    private getGameAssetLists(suitType: ECharacterSuitType): IAssetLists {
+        const spriteFrames = [
+            new getGameBackground(suitType).getBackgroundResourcePath(),
+            ...dancerSprite.getAllResourcePath(),
+        ];
+        for (let i = 0; i < ECharacterType.TotalCount; i++) {
+            const characterType = i as ECharacterType;
+            const suit = new getDancerSuit(characterType);
+            spriteFrames.push(
+                new nameTagSprite(characterType).resourcePath,
+                suit.getSuitResourcePath(suitType, false),
+                // YG의 정답 의상은 이동하는 의상과 별도 에셋이다.
+                // 나머지 종류의 동일 경로는 ResourceManager가 중복 제거한다.
+                suit.getSuitResourcePath(suitType, true),
+            );
+            for (const faceType of [EFaceType.Normal, EFaceType.Success, EFaceType.Fail]) {
+                spriteFrames.push(new getDancerFace().getFaceResourcePath(characterType, suitType, faceType));
+            }
+        }
+        return {
+            prefabs: ['prefab/character/Dancer', 'prefab/suit/RollingSuit'],
+            audioClips: ['sound/Kiss and cry_Game_Yes', 'sound/Kiss and cry_Game_No'],
+            spriteFrames,
+        };
     }
 
     private async onPlayGame() {
@@ -110,8 +98,17 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
         RootUI.I.setLoadingProgress(0);
 
         try {
-            // 선택된 수트 타입에 맞는 배경을 캐시에서 가져와 적용
+            // 선택한 게임에서 사용할 에셋만 준비한다. 재시작 시에는 캐시를 재사용한다.
             const currentSuitType = gameInstanceUtility.getCurrentSuitType();
+            await ResourceManager.I.preloadGameAssets(
+                this.getGameAssetLists(currentSuitType),
+                (progress) => {
+                    if (gameInstance.I.playing.isSessionCurrent(sessionId)) RootUI.I.setLoadingProgress(progress);
+                },
+                { concurrency: 6, continueOnError: false }
+            );
+            if (!gameInstance.I.playing.isSessionCurrent(sessionId)) return;
+
             const backgroundSprite = gameInstanceUtility.getBackgroundSprite();
             backgroundSprite.spriteFrame = null;
 
@@ -124,7 +121,6 @@ export class gameRootModeTransition extends StateMachine<EGameRootModeState, EGa
             }
         } finally {
             if (gameInstance.I.playing.isSessionCurrent(sessionId)) {
-                RootUI.I.setLoadingProgress(1);
                 await new Promise<void>((resolve) => setTimeout(resolve, 0));
                 if (gameInstance.I.playing.isSessionCurrent(sessionId)) RootUI.I.hideLoadingGroup();
             }

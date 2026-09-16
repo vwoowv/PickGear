@@ -10,7 +10,6 @@ import { gameManagerExtensions } from './gameManagerExtensions';
 import { playStartingNode } from './playStartingNode';
 import { richTextMaker } from './richTextMaker';
 import { gameProperty } from './gameProperty';
-import { midiJsonData } from './midi/midiJsonData';
 import { openingEgg } from './openingEgg';
 import { sortOpeningPositiveScores } from './openingCharacterOrder';
 import { ResultNode } from './ResultNode';
@@ -57,6 +56,7 @@ export class gameManager extends Component {
     }
 
     onDestroy(): void {
+        this.presentationVersion++;
         this.playSound?.node.off(AudioSource.EventType.STARTED, this.onMusicStarted, this);
         if (this.audioUnlockSource) {
             this.audioUnlockSource.node.off(AudioSource.EventType.STARTED, this.onBrowserAudioStarted, this);
@@ -78,6 +78,7 @@ export class gameManager extends Component {
     private parentOrigin: string = null;
     private controlBusy: boolean = false;
     private presentationVersion: number = 0;
+    private preparingMode: boolean = false;
     private commandRequests = new Map<string, { command: string; result: Promise<Record<string, unknown>> }>();
     private completedRequests: string[] = [];
 
@@ -400,6 +401,8 @@ export class gameManager extends Component {
         // 이전 비동기 스폰을 먼저 무효화한 뒤 일시정지 대기 작업을 해제한다.
         this.sessionVersion++;
         this.presentationVersion++;
+        this.preparingMode = false;
+        this.loadingNode.getComponent(LoadingNode).hide();
         if (this.exitConfirmation) this.exitConfirmation.active = false;
         if (this.exitButton) this.exitButton.active = false;
         if (this.paused) this.setPaused(false);
@@ -502,18 +505,16 @@ export class gameManager extends Component {
         }
         this.perfect = false;
     }
-    async start() {
+    public async start(): Promise<void> {
         this.loadingNode.active = true;
 
         this.extensions = this.node.addComponent(gameManagerExtensions);
         await this.extensions.initialize(this);
+        await this.loadingNode.getComponent(LoadingNode).whenReady();
         if (this.gameState === EGameState.None && !this.exited) this.selectGameMode();
         this.setDebugUIVisible(this.debugUIVisible);
         this.controlsReady = true;
 
-        const midiData: midiJsonData = new midiJsonData();
-        await midiData.loadMidiJsonData();
-        await this.loadingNode.getComponent(LoadingNode).whenReady();
         this.notifyHost({ type: 'GAME_READY' });
     }
 
@@ -537,6 +538,7 @@ export class gameManager extends Component {
     }
 
     private selectGameMode() {
+        this.loadingNode.getComponent(LoadingNode).hide();
         this.exited = false;
         this.gameState = EGameState.SelectGameMode;
         this.selectGameModeNode.active = true;
@@ -551,11 +553,14 @@ export class gameManager extends Component {
         this.exited = false;
         this.gameState = EGameState.Prepare;
         const soundName = this.gameMode.getCurrentGameBgName();
+        const loading = this.loadingNode.getComponent(LoadingNode);
+        this.preparingMode = true;
         try {
-            const [background, audioClip] = await Promise.all([
+            const [background, audioClip] = await loading.prepareMode(
+                this.gameMode.getCurrentLevelFromVersion(),
                 this.gameMode.getCurrentBackground(),
                 ResourceManager.I.loadAudioClip(soundName),
-            ]);
+            );
             if (version !== this.presentationVersion) return;
             this.background.spriteFrame = background;
             this.playSound.stop();
@@ -571,7 +576,12 @@ export class gameManager extends Component {
         } catch (error) {
             console.error(`[gameManager] 모드 준비 실패 (${soundName}):`, error);
             if (version === this.presentationVersion) this.selectGameMode();
-            if (this.controlBusy) throw error;
+            if (version === this.presentationVersion && this.controlBusy) throw error;
+        } finally {
+            if (version === this.presentationVersion) {
+                this.preparingMode = false;
+                loading.hide();
+            }
         }
     }
 
@@ -675,7 +685,7 @@ export class gameManager extends Component {
     }
 
     public async startPlayStarting(): Promise<void> {
-        if (this.paused || this.gameState !== EGameState.Prepare) return;
+        if (this.preparingMode || this.paused || this.gameState !== EGameState.Prepare) return;
         const version = this.presentationVersion;
         // 모드 준비/다시하기에서 이미 정지했다. 여기서 stop을 넣으면
         // 엔진의 비동기 큐가 play를 입력 콜백 밖으로 미룰 수 있다.
