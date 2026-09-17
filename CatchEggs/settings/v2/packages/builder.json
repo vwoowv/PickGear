@@ -13,19 +13,9 @@
           "web": {
             "png": {
               "quality": 80
-            }
-          }
-        }
-      },
-      "select-stage-web": {
-        "name": "SelectStageWeb",
-        "options": {
-          "web": {
-            "webp": {
-              "quality": 90
             },
-            "png": {
-              "quality": 95
+            "webp": {
+              "quality": 80
             }
           }
         }
