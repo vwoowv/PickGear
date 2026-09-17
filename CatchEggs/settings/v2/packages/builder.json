@@ -16,6 +16,19 @@
             }
           }
         }
+      },
+      "select-stage-web": {
+        "name": "SelectStageWeb",
+        "options": {
+          "web": {
+            "webp": {
+              "quality": 90
+            },
+            "png": {
+              "quality": 95
+            }
+          }
+        }
       }
     }
   }

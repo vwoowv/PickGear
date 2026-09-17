@@ -42,13 +42,13 @@
         "trimThreshold": 1,
         "rotated": false,
         "offsetX": 0,
-        "offsetY": -2,
+        "offsetY": -1.5,
         "trimX": 0,
-        "trimY": 561,
-        "width": 1146,
-        "height": 919,
-        "rawWidth": 1146,
-        "rawHeight": 2037,
+        "trimY": 351,
+        "width": 720,
+        "height": 581,
+        "rawWidth": 720,
+        "rawHeight": 1280,
         "borderTop": 0,
         "borderBottom": 0,
         "borderLeft": 0,
@@ -60,17 +60,17 @@
         "meshType": 0,
         "vertices": {
           "rawPosition": [
-            -573,
-            -459.5,
+            -360,
+            -290.5,
             0,
-            573,
-            -459.5,
+            360,
+            -290.5,
             0,
-            -573,
-            459.5,
+            -360,
+            290.5,
             0,
-            573,
-            459.5,
+            360,
+            290.5,
             0
           ],
           "indexes": [
@@ -83,32 +83,32 @@
           ],
           "uv": [
             0,
-            1476,
-            1146,
-            1476,
+            929,
+            720,
+            929,
             0,
-            557,
-            1146,
-            557
+            348,
+            720,
+            348
           ],
           "nuv": [
             0,
-            0.27344133529700543,
+            0.271875,
             1,
-            0.27344133529700543,
+            0.271875,
             0,
-            0.7245949926362297,
+            0.72578125,
             1,
-            0.7245949926362297
+            0.72578125
           ],
           "minPos": [
-            -573,
-            -459.5,
+            -360,
+            -290.5,
             0
           ],
           "maxPos": [
-            573,
-            459.5,
+            360,
+            290.5,
             0
           ]
         },
@@ -132,7 +132,7 @@
     "redirect": "16918c14-3bcb-46bf-8eaa-53b113992136@6c48a",
     "compressSettings": {
       "useCompressTexture": true,
-      "presetId": "4ewlGpyIJCi4sLhFC+9evD"
+      "presetId": "select-stage-web"
     }
   }
 }
